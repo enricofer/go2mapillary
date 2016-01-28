@@ -23,6 +23,18 @@
             width: 320px;
             height: 240px;
             z-index: 10000;
+            text-align: center;
+            display: table;
+        }
+        
+        #message {
+            font-family:  "Arial", "Helvetica", sans-serif;
+            width:200px;
+            height: 50px;
+            display: table-cell;
+            vertical-align: middle;
+            color: white;
+            font-size: 0.85em;
         }
         
         #splash {
@@ -36,7 +48,7 @@
     <body style="margin:0px;">
     <div id="mly"></div>
     <div id="location" class="hidden" ></div>
-    <div id="focus" class="hidden" onclick="focusOn()"></div>
+    <div id="focus" class="hidden" onclick="focusOn()"><span id="message">click to enable<br/>go2mapillary maptool</span></div>
     <div id="splash" class="hidden" onclick="focusOn()"></div>
     <script src="https://npmcdn.com/mapillary-js@0.0.3/dist/mapillary-js.min.js"></script>
     <script>

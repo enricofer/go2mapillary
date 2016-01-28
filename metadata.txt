@@ -14,7 +14,7 @@ version=0.1
 author=enrico ferreguti
 email=enricofer@gmail.com
 
-about=explore mapillary images
+about=Explore Mapillary photos on qgis map  http://www.mapillary.com
 
 tracker=https://github.com/enricofer/go2mapillary/issues
 repository=https://github.com/enricofer/go2mapillary

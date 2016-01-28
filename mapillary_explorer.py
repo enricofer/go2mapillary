@@ -32,6 +32,10 @@ import resources
 from mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from mapillary_viewer import mapillaryViewer
 from identifygeometry import IdentifyGeometry
+
+from py_tiled_layer.tilelayer import TileLayer, TileLayerType
+from py_tiled_layer.tiles import TileServiceInfo
+
 import os.path
 import json
 
@@ -214,10 +218,8 @@ class go2mapillary:
         """Removes the plugin menu item and icon from QGIS GUI."""
 
         #print "** UNLOAD go2mapillary"
-        try:
-            QgsMapLayerRegistry.instance().removeMapLayer(self.mapillaryLayer.id())
-        except:
-            pass
+        self.removeCoverageLayer()
+        self.removeLocationsLayer()
         try:
             self.canvas.extentsChanged.disconnect(self.mapChanged)
         except:
@@ -234,9 +236,39 @@ class go2mapillary:
 
     #--------------------------------------------------------------------------
 
+    def getCoverageLayer(self):
+            service_info = TileServiceInfo("Mapillary coverage",u"Mapillary coverage", "http://d2cd86j8eqns9s.cloudfront.net/tiles/{z}/{x}/{y}.png")
+            service_info.yOriginTop = 1
+            #service_info.epsg_crs_id = 3857
+            service_info.zmin = 0
+            service_info.zmax = 21
+            layer = TileLayer(self, service_info, True)
+            self.coverageLayerId = layer.id()
+            layer.setAttribution(unicode("Mapillary coverage \u00A9MAPILLARY"))
+            #layer.setAttributionUrl("")
+            #QgsMapLayerRegistry.instance().addMapLayer(layer, False)
+            #toc_root = QgsProject.instance().layerTreeRoot()
+            #toc_root.insertLayer(0, layer)
+            return layer
+
+    def removeCoverageLayer(self):
+            try:
+                QgsMapLayerRegistry.instance().removeMapLayer(self.mapillaryCoverage.id())
+                self.mapillaryCoverage = None
+            except:
+                pass
+
+    def removeLocationsLayer(self):
+            try:
+                QgsMapLayerRegistry.instance().removeMapLayer(self.mapillaryLocations.id())
+                self.mapillaryLocations = None
+            except:
+                pass
+
     def toggleViewer(self,mapTool):
+        print "enabled:",self.viewer.isEnabled()
         print "CURRENT MAPTOOL:",mapTool
-        if mapTool != self.mapSelectionTool and self.viewer.isEnabled():
+        if mapTool != self.mapSelectionTool:
             self.viewer.disable()
 
 
@@ -249,8 +281,8 @@ class go2mapillary:
                 self.currentLocation = message
                 try:
                     #set a variable to view selected mapillary layer feature as selected
-                    QgsExpressionContextUtils.setLayerVariable(self.mapillaryLayer,"mapillaryCurrentKey",self.currentLocation['key'])
-                    self.mapillaryLayer.triggerRepaint()
+                    QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
+                    self.mapillaryLocations.triggerRepaint()
                 except:
                     pass
             elif message["transport"] == "focusOn":
@@ -278,39 +310,39 @@ class go2mapillary:
 
     def mapChanged(self):
         #print "ok",self.canvas.scale()
-        if self.canvas.scale() < 10000:
+        if self.canvas.scale() < 30000:
+            self.removeCoverageLayer()
             extents = self.canvas.extent()
             bottomLeft = self.transformToWGS84(QgsPoint(extents.xMinimum(),extents.yMinimum()))
             topRight = self.transformToWGS84(QgsPoint(extents.xMaximum(),extents.yMaximum()))
-            url = "http://api.mapillary.com/v1/im/search?min-lat=%s&max-lat=%s&min-lon=%s&max-lon=%s&max-results=200&geojson=true" \
+            url = "http://api.mapillary.com/v1/im/search?min-lat=%s&max-lat=%s&min-lon=%s&max-lon=%s&max-results=500&geojson=true" \
                   % (bottomLeft.y(),topRight.y(),bottomLeft.x(),topRight.x())
-            if not self.mapillaryLayer or not(self.mapillaryLayer.id() in QgsMapLayerRegistry.instance().mapLayers().keys()):
+            if not self.mapillaryLocations or not(self.mapillaryLocations.id() in QgsMapLayerRegistry.instance().mapLayers().keys()):
                 self.setupLayer(url)
-                QgsMapLayerRegistry.instance().addMapLayer(self.mapillaryLayer)
-                self.iface.legendInterface().setLayerExpanded(self.mapillaryLayer,False)
+                QgsMapLayerRegistry.instance().addMapLayer(self.mapillaryLocations)
+                self.iface.legendInterface().setLayerExpanded(self.mapillaryLocations, False)
             else:
-                self.mapillaryLayer.setDataSource(url , "Mapillary Images", "ogr")
+                self.mapillaryLocations.setDataSource(url, "Mapillary Images", "ogr")
                 self.setLayerStyle()
         else:
-            try:
-                QgsMapLayerRegistry.instance().removeMapLayer(self.mapillaryLayer.id())
-                self.mapillaryLayer = None
-            except:
-                pass
+            self.removeLocationsLayer()
+            if not self.mapillaryCoverage:
+                self.mapillaryCoverage = self.getCoverageLayer()
+                QgsMapLayerRegistry.instance().addMapLayer(self.mapillaryCoverage)
 
     def setLayerStyle(self):
-        if self.canvas.scale() < 1000:
-            self.mapillaryLayer.loadNamedStyle(os.path.join(self.plugin_dir,"res","mapillaryLayer0.qml"))
+        if self.canvas.scale() < 2000:
+            self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer0.qml"))
         else:
-            self.mapillaryLayer.loadNamedStyle(os.path.join(self.plugin_dir,"res","mapillaryLayer1.qml"))
+            self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer1.qml"))
 
     def setupLayer(self,url):
         #self.mapillaryLayer = QgsVectorLayer("http://api.mapillary.com/v1/im/search?min-lat=0&max-lat=0&min-lon=0&max-lon=0&max-results=200&geojson=true","Mapillary Images", "ogr")
         print "URL:",url
-        self.mapillaryLayer = QgsVectorLayer(url, "Mapillary Images", "ogr")
-        self.mapillaryLayer.setCrs (QgsCoordinateReferenceSystem(4326))
-        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLayer,"mapillaryCurrentKey","undefined")
-        self.mapSelectionTool = IdentifyGeometry(self.canvas,self.mapillaryLayer)
+        self.mapillaryLocations = QgsVectorLayer(url, "Mapillary Images", "ogr")
+        self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
+        self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryLocations)
         self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
         self.setLayerStyle()
 
@@ -337,7 +369,9 @@ class go2mapillary:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
-            self.setupLayer('')
+            #self.setupLayer('')
+            self.mapillaryCoverage = None
+            self.mapillaryLocations = None
             self.canvas.extentsChanged.connect(self.mapChanged)
             self.mapChanged()
             self.canvas.setMapTool(self.mapSelectionTool)
@@ -347,10 +381,8 @@ class go2mapillary:
             if self.dockwidget.isVisible():
                 self.dockwidget.hide()
                 self.pluginIsActive = False
-                try:
-                    QgsMapLayerRegistry.instance().removeMapLayer(self.mapillaryLayer.id())
-                except:
-                    pass
+                self.removeCoverageLayer()
+                self.removeLocationsLayer()
                 self.canvas.extentsChanged.disconnect(self.mapChanged)
             else:
                 self.dockwidget.show()
@@ -363,8 +395,8 @@ class go2mapillary:
         print 'KEY', feature[4]
         self.viewer.openLocation(feature['key'])
         #set a variable to view selected mapillary layer feature as selected
-        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLayer,"mapillaryCurrentKey",feature['key'])
-        self.mapillaryLayer.triggerRepaint()
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", feature['key'])
+        self.mapillaryLocations.triggerRepaint()
 
         
         

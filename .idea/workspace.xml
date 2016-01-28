@@ -24,8 +24,8 @@
       <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65957445">
-              <caret line="360" column="8" selection-start-line="360" selection-start-column="8" selection-end-line="360" selection-end-column="8" />
+            <state vertical-scroll-proportion="0.40425533">
+              <caret line="317" column="114" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
               <folding>
                 <element signature="e#1132#1220#0" expanded="true" />
               </folding>
@@ -37,7 +37,7 @@
         <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="36" column="21" selection-start-line="36" selection-start-column="21" selection-end-line="36" selection-end-column="21" />
+              <caret line="58" column="60" selection-start-line="58" selection-start-column="47" selection-end-line="58" selection-end-column="60" />
               <folding>
                 <element signature="e#1130#1156#0" expanded="true" />
               </folding>
@@ -431,7 +431,7 @@
     <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="36" column="21" selection-start-line="36" selection-start-column="21" selection-end-line="36" selection-end-column="21" />
+          <caret line="58" column="60" selection-start-line="58" selection-start-column="47" selection-end-line="58" selection-end-column="60" />
           <folding>
             <element signature="e#1130#1156#0" expanded="true" />
           </folding>
@@ -440,8 +440,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65957445">
-          <caret line="360" column="8" selection-start-line="360" selection-start-column="8" selection-end-line="360" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.40425533">
+          <caret line="317" column="114" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
           <folding>
             <element signature="e#1132#1220#0" expanded="true" />
           </folding>
