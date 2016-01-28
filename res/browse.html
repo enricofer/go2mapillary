@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>mapillary-js preview</title>
+    <link rel="stylesheet" href="https://npmcdn.com/mapillary-js@0.0.3/dist/mapillary-js.css" />
+    <link rel="stylesheet" href="https://npmcdn.com/mapillary-js@0.0.3/dist/SimpleNavUI.css">
+    <style>
+        
+        .hidden{
+            visibility: hidden;
+        }
+        
+        .disabled{
+            visibility: hidden;
+        }
+        
+        #focus, #splash {
+            background-color: rgba(80, 80, 80, 0.5);
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 320px;
+            height: 240px;
+            z-index: 10000;
+        }
+        
+        #splash {
+            background: transparent url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Mapillary_logo.svg/langfr-96px-Mapillary_logo.svg.png") no-repeat center;
+        }
+        
+        
+        
+    </style>
+  </head>
+    <body style="margin:0px;">
+    <div id="mly"></div>
+    <div id="location" class="hidden" ></div>
+    <div id="focus" class="hidden" onclick="focusOn()"></div>
+    <div id="splash" class="hidden" onclick="focusOn()"></div>
+    <script src="https://npmcdn.com/mapillary-js@0.0.3/dist/mapillary-js.min.js"></script>
+    <script>
+        
+    function focusOn(){
+        var viewPar = {
+            "transport":"focusOn",
+        };
+        window.status = JSON.stringify(viewPar);
+        var focusElement = document.getElementById("focus");
+    }
+    
+    function gup(name)
+    {
+      name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+      var regexS = "[\\?&]"+name+"=([^&#]*)";
+      var regex = new RegExp( regexS );
+      var results = regex.exec( window.location.href );
+      if( results == null )
+        return "";
+      else
+        return results[1];
+    };
+    
+    var key_param = gup('key');
+    
+    if (key_param == '') {
+        //key_param = 'lGR_tpysmbwfQCRhgX2etw'
+        document.getElementById("splash").classList.remove("hidden");
+        document.getElementById("focus").classList.add("disabled");
+        document.getElementById("mly").classList.add("hidden");
+    } else {
+        document.getElementById("splash").classList.add("hidden");
+        document.getElementById("focus").classList.remove("disabled");
+        document.getElementById("mly").classList.remove("hidden");
+    }
+    
+    console.log(key_param);
+    
+    var mly = new Mapillary
+      .Viewer('mly', // container id
+              'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
+              {
+                key: key_param,  // photoId at which the viewer initializes
+                uis: ['gl', 'simplenav', 'simplecache', 'keyboard'] // UIs upon which the viewer will depend on
+              });
+              
+    mly.on('moveend', function (node) {
+        var viewPar = {
+            "transport":"view",
+            "lat":node.latLon.lat,
+            "lon":node.latLon.lon,
+            "key":node.key,
+            "ca":node.ca
+            //"sequence":node.sequence
+        };
+        console.log(viewPar);
+        window.status = JSON.stringify(viewPar);
+        document.getElementById("location").innerHTML = JSON.stringify(viewPar) + '';
+    })      
+              
+    </script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/plugins/go2mapillary" >
+        <file>res/icon.png</file>
+        <file>res/browse.html</file>
+    </qresource>
+</RCC>
