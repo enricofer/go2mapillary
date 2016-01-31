@@ -279,18 +279,45 @@ class go2mapillary:
             if message["transport"] == "view":
                 print message
                 self.currentLocation = message
-                try:
-                    #set a variable to view selected mapillary layer feature as selected
-                    QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
-                    self.mapillaryLocations.triggerRepaint()
-                except:
-                    pass
+                #try:
+                #set a variable to view selected mapillary layer feature as selected
+                exp = QgsExpression('"key"='+"'%s'" % self.currentLocation['key'])
+                request = QgsFeatureRequest(exp)
+                target = zip(self.mapillaryLocations.getFeatures(request))
+                print target
+                if not target:
+                    feat = QgsFeature(self.mapillaryLocations.pendingFields())
+                    #feat.setAttributes(["","","","",self.currentLocation['key'],"",float(self.currentLocation['cm'])])
+                    feat.setAttribute('key',self.currentLocation['key'])
+                    feat.setAttribute('ca',self.currentLocation['ca'])
+                    feat.setGeometry(QgsGeometry.fromPoint(QgsPoint(float(self.currentLocation['lon']), float(self.currentLocation['lat']))))
+                    print "feat is valid:", feat.isValid()
+                    self.mapillaryLocations.startEditing()
+                    print "RES:",self.mapillaryLocations.dataProvider().addFeatures([feat])
+                    self.mapillaryLocations.commitChanges()
+                else:
+                    reqFeat = target[0][0]
+                    print "presente:", reqFeat['key'],reqFeat['image']
+                QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
+                self.mapillaryLocations.triggerRepaint()
+                #except:
+                #    pass
             elif message["transport"] == "focusOn":
                 print "enabled MAPTOOL", self.mapSelectionTool
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
 
-
+    def cloneToMemoryLayer(self,layer):
+        ml = QgsVectorLayer("Point?crs=epsg:4326&index=yes", "Mapillary images", "memory") #&index=yes
+        ml.startEditing()
+        ml.dataProvider().addAttributes(layer.pendingFields())
+        mlFeats = []
+        for feat in layer.getFeatures():
+            mlFeat = QgsFeature(feat)
+            mlFeats.append(mlFeat)
+        print "memory layer res:",ml.dataProvider().addFeatures(mlFeats)
+        ml.commitChanges()
+        return ml
 
     def transformToWGS84(self, pPoint):
         # transformation from the current SRS to WGS84
@@ -315,8 +342,14 @@ class go2mapillary:
             extents = self.canvas.extent()
             bottomLeft = self.transformToWGS84(QgsPoint(extents.xMinimum(),extents.yMinimum()))
             topRight = self.transformToWGS84(QgsPoint(extents.xMaximum(),extents.yMaximum()))
-            url = "http://api.mapillary.com/v1/im/search?min-lat=%s&max-lat=%s&min-lon=%s&max-lon=%s&max-results=500&geojson=true" \
-                  % (bottomLeft.y(),topRight.y(),bottomLeft.x(),topRight.x())
+            url = "http://api.mapillary.com/v1/im/search?min-lat=%s&max-lat=%s&min-lon=%s&max-results=500&max-lon=%s&geojson=true"  \
+                  % (bottomLeft.y(),topRight.y(),bottomLeft.x(),topRight.x()) #&max-results=500
+            print url
+            self.removeLocationsLayer()
+            self.setupLayer(url)
+            QgsMapLayerRegistry.instance().addMapLayer(self.mapillaryLocations)
+            self.iface.legendInterface().setLayerExpanded(self.mapillaryLocations, False)
+            '''
             if not self.mapillaryLocations or not(self.mapillaryLocations.id() in QgsMapLayerRegistry.instance().mapLayers().keys()):
                 self.setupLayer(url)
                 QgsMapLayerRegistry.instance().addMapLayer(self.mapillaryLocations)
@@ -324,6 +357,7 @@ class go2mapillary:
             else:
                 self.mapillaryLocations.setDataSource(url, "Mapillary Images", "ogr")
                 self.setLayerStyle()
+            '''
         else:
             self.removeLocationsLayer()
             if not self.mapillaryCoverage:
@@ -339,8 +373,8 @@ class go2mapillary:
     def setupLayer(self,url):
         #self.mapillaryLayer = QgsVectorLayer("http://api.mapillary.com/v1/im/search?min-lat=0&max-lat=0&min-lon=0&max-lon=0&max-results=200&geojson=true","Mapillary Images", "ogr")
         print "URL:",url
-        self.mapillaryLocations = QgsVectorLayer(url, "Mapillary Images", "ogr")
-        self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
+        self.mapillaryLocations = self.cloneToMemoryLayer(QgsVectorLayer(url, "Mapillary Images", "ogr"))
+        #self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
         QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
         self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryLocations)
         self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
