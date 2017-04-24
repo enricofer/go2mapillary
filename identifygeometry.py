@@ -26,8 +26,8 @@
 #
 #---------------------------------------------------------------------
 
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QPixmap, QCursor
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QPixmap, QCursor
 from qgis.core import QgsVectorLayer, QgsFeature
 from qgis.gui import QgsMapToolIdentify
 
@@ -51,6 +51,6 @@ class IdentifyGeometry(QgsMapToolIdentify):
         except:
             results = []
         if len(results) > 0:
-            print results[0].mFeature.attributes()
+            print (results[0].mFeature.attributes())
             self.geomIdentified.emit(QgsFeature(results[0].mFeature))
 

@@ -20,9 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtWebKit import *
+from PyQt5.QtCore import QObject, QUrl, pyqtSignal
+from PyQt5.QtGui import *
+from PyQt5.QtWebKit import QWebSettings
+
+from qgis.core import QgsNetworkAccessManager
+
 import os
 import json
 
@@ -50,15 +53,15 @@ class mapillaryViewer(QObject):
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         #QtWebKit.QWebSettings.globalSettings().globalSettings().enablePersistentStorage(QtCore.QDir.tempPath())
         #self.viewport.setPage(MyBrowser())
-        #self.page = os.path.join(os.path.dirname(__file__),'res','browse.html')
-        self.page = 'qrc:///plugins/go2mapillary/res/browse.html'
+        self.page = os.path.join(os.path.dirname(__file__),'res','browse.html')
+        #self.page = 'qrc:///plugins/go2mapillary/res/browse.html'
         self.openLocation('')
         self.enabled = True
-        print self.page
+        print (self.page)
     
     def openLocation(self, key):
         self.locationKey = key
-        print QUrl(self.page+'?key='+key)
+        print (QUrl(self.page+'?key='+key))
         self.viewport.load(QUrl(self.page+'?key='+key))
 
     def getJSONmessage(self,status):
@@ -76,7 +79,7 @@ class mapillaryViewer(QObject):
 
     def disable(self):
         js = 'document.getElementById("focus").classList.remove("hidden");'
-        print self.viewport
+        print (self.viewport)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
         self.enabled = None
 

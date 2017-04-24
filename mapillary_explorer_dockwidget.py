@@ -23,21 +23,21 @@
 
 import os
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSignal
-from mapillary_explorer_dockwidget_base import Ui_go2mapillaryDockWidgetBase
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import pyqtSignal
+from .mapillary_explorer_dockwidget_base import Ui_go2mapillaryDockWidgetBase
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'mapillary_explorer_dockwidget_base.ui'))
 
 
-class go2mapillaryDockWidget(QtGui.QDockWidget, Ui_go2mapillaryDockWidgetBase):
+class go2mapillaryDockWidget(QtWidgets.QDockWidget, Ui_go2mapillaryDockWidgetBase):
 
     closingPlugin = pyqtSignal()
 
     def __init__(self):
         """Constructor."""
-        QtGui.QDockWidget.__init__(self)
+        QtWidgets.QDockWidget.__init__(self)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
@@ -50,7 +50,7 @@ class go2mapillaryDockWidget(QtGui.QDockWidget, Ui_go2mapillaryDockWidgetBase):
         event.accept()
 
 
-class exgo2mapillaryDockWidget(QtGui.QDockWidget, FORM_CLASS):
+class exgo2mapillaryDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
