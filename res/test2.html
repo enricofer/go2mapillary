@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <script src="test2_files/mapillary.js"></script>
+    <link href="test2_files/mapillary.css" rel="stylesheet">
+  
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; }
+        #mly { height: 100%; }
+    </style>
+</head>
+
+<body>
+    <div id="mly" class="mapillary-js"><div class="mapillary-js-interactive"><canvas width="1412" height="890" style="width: 1412px; height: 890px; position: absolute;"></canvas></div><div class="domRenderer"><div class="Cover CoverDone"><div style="background-image: url(&quot;https://d1cuyjsrcm0gby.cloudfront.net/u0P76tytQBWjrc0alKvR2g/thumb-640.jpg&quot;);" class="CoverBackground"><div class="CoverBackgroundGradient"></div></div></div><div class="Attribution"><a href="https://www.mapillary.com/app/user/bhousel" target="_blank">@bhousel</a><span>|</span><a href="https://www.mapillary.com/app/?pKey=u0P76tytQBWjrc0alKvR2g&amp;focus=photo" target="_blank">mapillary.com</a></div><div style="bottom: -28px; height: 348.04px; left: 706px; margin-left: -226px; transform: perspective(452px) rotateX(60deg); width: 452px;" class="DirectionsPerspective"><div data-key="H-3Y3Npg7GKiUWiMM4dnWw" style="height: 104.412px; transform: rotate(0deg); width: 104.412px; left: 5px; top: 5px;" class="TurnCircle"><div class="TurnLeft"></div></div><div data-key="QNYYgrnK_X9a8ONT4ZnUCw" style="height: 104.412px; transform: rotate(0deg); width: 104.412px; right: 5px; top: 5px;" class="TurnCircle"><div class="TurnRight"></div></div><div data-key="we93SHtVHACce11OttP99g" style="height: 104.412px; transform: rotate(0deg); width: 104.412px; left: 5px; bottom: 5px;" class="TurnCircle"><div class="TurnAround"></div></div><div data-key="dSbkLFK_CudmF2B03Me8AQ" style="height: 118.334px; margin-left: -59.1668px; margin-top: -59.1668px; transform: translate(227px, 66px) rotate(0.437063deg); width: 118.334px;" class="DirectionsCircle"><div style="filter: drop-shadow(0.0228843px 2.99991px 1px rgba(0, 0, 0, 0.8));" class="DirectionsArrowStep"></div></div><div data-key="g2756V9v-1YMfApOVOcG4g" style="height: 118.334px; margin-left: -59.1668px; margin-top: -59.1668px; transform: translate(225px, 282px) rotate(180.561deg); width: 118.334px;" class="DirectionsCircle"><div style="filter: drop-shadow(-0.0293511px -2.99986px 1px rgba(0, 0, 0, 0.8));" class="DirectionsArrowStep"></div></div></div><div style="height: 30.8461px; width: 114.245px;" class="SequenceContainer"><div class="SequenceStepNext"><div class="SequenceComponentIcon"></div></div><div class="SequenceStepPrev"><div class="SequenceComponentIcon"></div></div><div class="SequencePlay"><div class="SequenceComponentIcon Play"></div></div></div><div class="BearingIndicator"><div class="BearingIndicatorBackground"><div class="BearingIndicatorBackgroundRectangle"></div><div class="BearingIndicatorBackgroundCircle"></div></div><div class="BearingIndicatorNorth"></div><svg viewBox="0 0 2 2" style="bottom: 4px; height: 48px; left: 4px; position: absolute; width: 48px;"><g transform="translate(1,1)"><path d="M 0 0 -0.23568339783414835 -0.9718298904568384 A 1 1 0 0 1 0.9400193577302415 -0.3411211032645507" fill="#000"></path><path d="M 0 0 -0.18082595410592825 -0.9835151113845078 A 1 1 0 0 1 0.9194154524494536 -0.39328771376330407" fill="#fff"></path></g><circle cx="1" cy="1" fill="#abb1b9" r="0.291667" stroke="#000" stroke-width="0.0833333"></circle></svg></div><div class="Loading"><div style="width: 100%; opacity: 0;" class="LoadingBar"></div></div></div></div>
+
+    <script>
+        var mly = new Mapillary.Viewer(
+            'mly',
+            // Replace this with your own client ID from mapillary.com
+            'QjI1NnU0aG5FZFZISE56U3R5aWN4ZzowODkzY2RjNjM1ZmEwYTVi',
+            null);
+      
+        mly.moveToKey('u0P76tytQBWjrc0alKvR2g')
+            .then(
+                function(node) { console.log(node.key); },
+                function(error) { console.error(error); });
+      
+        // Viewer size is dynamic so resize should be called every time the window size changes
+        window.addEventListener("resize", function() { mly.resize(); });
+    </script>
+
+</body></html>

@@ -3,7 +3,9 @@
   <head>
     <meta charset=utf-8>
     <title>mapillary-js preview</title>
-    <link rel="stylesheet" href="https://npmcdn.com/mapillary-js@1.0.1/dist/mapillary-js.min.css" />
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.js'></script>
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.css'>
     <style>
         
         .hidden{
@@ -40,7 +42,8 @@
             background: transparent url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Mapillary_logo.svg/langfr-96px-Mapillary_logo.svg.png") no-repeat center;
         }
         
-        
+        html, body { margin: 0; padding: 0; height: 100%; }
+        #mly { height: 100%; } 
         
     </style>
   </head>
@@ -49,7 +52,6 @@
     <div id="location" class="hidden" ></div>
     <div id="focus" class="hidden" onclick="focusOn()"><span id="message">click to enable<br/>go2mapillary maptool</span></div>
     <div id="splash" class="hidden" onclick="focusOn()"></div>
-    <script src="https://npmcdn.com/mapillary-js@1.0.1/dist/mapillary-js.min.js"></script>
     <script>
         
     function focusOn(){
@@ -90,24 +92,12 @@
     var mly = new Mapillary
       .Viewer('mly', // container id
               'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
-              {
-                key: key_param,  // photoId at which the viewer initializes
-                uis: ['gl', 'simplenav', 'simplecache', 'keyboard'] // UIs upon which the viewer will depend on
-              });
-              
-    mly.on('moveend', function (node) {
-        var viewPar = {
-            "transport":"view",
-            "lat":node.latLon.lat,
-            "lon":node.latLon.lon,
-            "key":node.key,
-            "ca":node.ca
-            //"sequence":node.sequence
-        };
-        console.log(viewPar);
-        window.status = JSON.stringify(viewPar);
-        document.getElementById("location").innerHTML = JSON.stringify(viewPar) + '';
-    })      
+              null);
+      
+        mly.moveToKey(key_param)
+            .then(
+                function(node) { console.log(node.key); },
+                function(error) { console.error(error); });    
               
     </script>
   </body>

@@ -7,3 +7,6 @@ i18n/
 .idea/*
 .DS_Store
 *~
+temp/*
+res/bak/*
+res/bak/

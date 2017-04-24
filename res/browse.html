@@ -3,8 +3,9 @@
   <head>
     <meta charset=utf-8>
     <title>mapillary-js preview</title>
-    <link rel="stylesheet" href="https://npmcdn.com/mapillary-js@0.0.3/dist/mapillary-js.css" />
-    <link rel="stylesheet" href="https://npmcdn.com/mapillary-js@0.0.3/dist/SimpleNavUI.css">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.js'></script>
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.css'>
     <style>
         
         .hidden{
@@ -41,7 +42,8 @@
             background: transparent url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Mapillary_logo.svg/langfr-96px-Mapillary_logo.svg.png") no-repeat center;
         }
         
-        
+        html, body { margin: 0; padding: 0; height: 100%; }
+        #mly { height: 100%; } 
         
     </style>
   </head>

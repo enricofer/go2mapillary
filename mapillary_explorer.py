@@ -20,9 +20,10 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtGui import QIcon
+from qgis.PyQt.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtNetwork import QNetworkProxy
 
 from qgis.core import (QgsExpressionContextUtils,
                        QgsNetworkAccessManager,
@@ -40,6 +41,7 @@ from qgis.core import (QgsExpressionContextUtils,
 from .mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from .mapillary_viewer import mapillaryViewer
 from .identifygeometry import IdentifyGeometry
+from .geojson_request import geojson_request
 
 #from .py_tiled_layer.tilelayer import TileLayer, TileLayerType
 #from .py_tiled_layer.tiles import TileServiceInfo
@@ -186,7 +188,7 @@ class go2mapillary:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/go2mapillary/res/icon.png'
+        icon_path = os.path.join(self.plugin_dir,'res','icon.png')
         self.add_action(
             icon_path,
             text=self.tr(u'go2mapillary'),
@@ -204,6 +206,7 @@ class go2mapillary:
         self.mapSelectionTool = None
 
     #--------------------------------------------------------------------------
+        
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
@@ -331,7 +334,7 @@ class go2mapillary:
                 print ("SETUP locations")
                 #self.iface.legendInterface().setLayerExpanded(self.mapillaryLocations, False) no qgis3
             else:
-                self.mapillaryLocations.setDataSource(url, "Mapillary Images", "ogr")
+                self.mapillaryLocations.triggerRepaint()
                 self.setLayerStyle()
 
 
@@ -352,12 +355,13 @@ class go2mapillary:
     def setupLayer(self,url):
         #self.mapillaryLayer = QgsVectorLayer("http://api.mapillary.com/v1/im/search?min-lat=0&max-lat=0&min-lon=0&max-lon=0&max-results=200&geojson=true","Mapillary Images", "ogr")
         print (("URL:",url))
-        self.mapillaryLocations = QgsVectorLayer(url, "Mapillary Images", "ogr")
-        self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
-        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
-        self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryLocations)
-        self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
-        self.setLayerStyle()
+        if geojson_request.download(url):
+            self.mapillaryLocations = QgsVectorLayer(os.path.join(os.path.dirname(__file__),'temp','requested.geojson'), "Mapillary Images", "ogr")
+            self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
+            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryLocations)
+            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
+            self.setLayerStyle()
 
 
     def run(self):
