@@ -94,7 +94,7 @@
               'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
               null);
               
-    mly.on('moveend', function (node) {
+    mly.on(Mapillary.Viewer.nodechanged, function (node) {
         var viewPar = {
             "transport":"view",
             "lat":node.latLon.lat,
