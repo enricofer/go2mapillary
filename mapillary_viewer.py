@@ -41,15 +41,14 @@ class mapillaryViewer(QObject):
         self.viewport.statusBarMessage.connect(self.getJSONmessage)
         WS = self.viewport.settings()
         WS.setAttribute(QWebSettings.JavascriptEnabled,True)
-        #WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
-        #WS.setAttribute(QWebSettings.JavascriptCanAccessClipboard,True)
+        WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
+        WS.setAttribute(QWebSettings.JavascriptCanAccessClipboard,True)
         # next parameters can crash qgis if user use arrows after clicked in the sliders of the webview
         # QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.SpatialNavigationEnabled,True)
-        #WS.setAttribute(QWebSettings.PrintElementBackgrounds,True)
-        #WS.setAttribute(QWebSettings.OfflineStorageDatabaseEnabled,True)
-        #WS.setAttribute(QWebSettings.LocalStorageEnabled,True)
-        #WS.setAttribute(QWebSettings.AcceleratedCompositingE,True)
-        #WS.setAttribute(QWebSettings.PluginsEnabled,True)
+        WS.setAttribute(QWebSettings.PrintElementBackgrounds,True)
+        WS.setAttribute(QWebSettings.OfflineStorageDatabaseEnabled,True)
+        WS.setAttribute(QWebSettings.LocalStorageEnabled,True)
+        WS.setAttribute(QWebSettings.PluginsEnabled,True)
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         #self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         #QtWebKit.QWebSettings.globalSettings().globalSettings().enablePersistentStorage(QtCore.QDir.tempPath())
@@ -83,7 +82,7 @@ class mapillaryViewer(QObject):
         QNetworkProxy.setApplicationProxy(proxy)
         
         self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
-        #self.page = os.path.join('C:/Users/ferregutie/Dropbox/dev/go2mapillary/res/test2.html')
+        self.page = os.path.join('https://enricofer.github.io/go2mapillary/res/browser.html')
         self.openLocation('')
         self.enabled = True
         print (self.page)
@@ -91,7 +90,7 @@ class mapillaryViewer(QObject):
     def openLocation(self, key):
         self.locationKey = key
         print (QUrl(self.page+'?key='+key))
-        self.viewport.load(QUrl('file:///'+self.page+'?key='+key)) #'file:///'+
+        self.viewport.load(QUrl(self.page+'?key='+key)) #'file:///'+
 
     def getJSONmessage(self,status):
         try:

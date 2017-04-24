@@ -93,11 +93,25 @@
       .Viewer('mly', // container id
               'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
               null);
+              
+    mly.on('moveend', function (node) {
+        var viewPar = {
+            "transport":"view",
+            "lat":node.latLon.lat,
+            "lon":node.latLon.lon,
+            "key":node.key,
+            "ca":node.ca
+            //"sequence":node.sequence
+        };
+        console.log(viewPar);
+        window.status = JSON.stringify(viewPar);
+        document.getElementById("location").innerHTML = JSON.stringify(viewPar) + '';
+    })   
       
-        mly.moveToKey(key_param)
-            .then(
-                function(node) { console.log(node.key); },
-                function(error) { console.error(error); });    
+    mly.moveToKey(key_param)
+        .then(
+            function(node) { console.log(node.key); },
+            function(error) { console.error(error); });    
               
     </script>
   </body>
