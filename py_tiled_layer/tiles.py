@@ -156,7 +156,7 @@ class TileServiceInfo:
                     digit += 2
                 quadkey += chr(digit)
             return self.serviceUrl.replace("{q}", str(quadkey))
-
+        #print "TILES: {z}", str(zoom),"{x}", str(x),"{y}", str(y)
         return self.serviceUrl.replace("{z}", str(zoom)).replace("{x}", str(x)).replace("{y}", str(y))
 
     def getTileRect(self, zoom, x, y):

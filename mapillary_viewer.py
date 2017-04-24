@@ -35,6 +35,20 @@ class mapillaryViewer(QObject):
         super(mapillaryViewer, self).__init__()
         self.viewport = viewport
         self.viewport.statusBarMessage.connect(self.getJSONmessage)
+        WS = self.viewport.settings()
+        WS.setAttribute(QWebSettings.JavascriptEnabled,True)
+        WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
+        WS.setAttribute(QWebSettings.JavascriptCanAccessClipboard,False)
+        # next parameters can crash qgis if user use arrows after clicked in the sliders of the webview
+        # QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.SpatialNavigationEnabled,True)
+        WS.setAttribute(QWebSettings.PrintElementBackgrounds,True)
+        WS.setAttribute(QWebSettings.OfflineStorageDatabaseEnabled,False)
+        WS.setAttribute(QWebSettings.LocalStorageEnabled,False)
+        #WS.setAttribute(QWebSettings.AcceleratedCompositingE,True)
+        WS.setAttribute(QWebSettings.PluginsEnabled,True)
+        WS.setAttribute(QWebSettings.WebGLEnabled,True)
+        self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
+        #QtWebKit.QWebSettings.globalSettings().globalSettings().enablePersistentStorage(QtCore.QDir.tempPath())
         #self.viewport.setPage(MyBrowser())
         #self.page = os.path.join(os.path.dirname(__file__),'res','browse.html')
         self.page = 'qrc:///plugins/go2mapillary/res/browse.html'
