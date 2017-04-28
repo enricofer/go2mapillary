@@ -31,7 +31,9 @@ from qgis.core import (QgsExpressionContextUtils,
                        QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
                        QgsPoint,
-                       QgsVectorLayer,)
+                       QgsVectorLayer,
+                       QgsRasterLayer,
+                       QgsDataSourceUri,)
 
 #from qgis.utils import *
 # Initialize Qt resources from file resources.py
@@ -40,11 +42,9 @@ from qgis.core import (QgsExpressionContextUtils,
 # Import the code for the DockWidget
 from .mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from .mapillary_viewer import mapillaryViewer
+from .mapillary_coverage import mapillary_coverage
 from .identifygeometry import IdentifyGeometry
 from .geojson_request import geojson_request
-
-#from .py_tiled_layer.tilelayer import TileLayer, TileLayerType
-#from .py_tiled_layer.tiles import TileServiceInfo
 
 import os.path
 import json
@@ -204,6 +204,10 @@ class go2mapillary:
         self.viewer.messageArrived.connect(self.viewerConnection)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         self.mapSelectionTool = None
+        self.coverage = mapillary_coverage(self.iface)
+        self.mapillaryOverview = None
+        self.mapillaryCoverage = None
+        self.mapillaryLocations = None
 
     #--------------------------------------------------------------------------
         
@@ -248,6 +252,16 @@ class go2mapillary:
     #--------------------------------------------------------------------------
 
     def getCoverageLayer(self):
+        XYZuri = QgsDataSourceUri()
+        XYZuri.setParam("type", "xyz")
+        XYZuri.setParam('url', 'http://d2cd86j8eqns9s.cloudfront.net/tiles/{z}/{x}/{y}.png')
+        XYZuri.setParam("zmin", "0")
+        XYZuri.setParam("zmax", "15")
+        layer = QgsRasterLayer(str(XYZuri.encodedUri()), 'Mapillary coverage', 'wms')
+        self.coverageLayerId = layer.id()
+        print (self.coverageLayerId)
+        return layer
+        '''
             service_info = TileServiceInfo("Mapillary coverage",u"Mapillary coverage", "http://d2cd86j8eqns9s.cloudfront.net/tiles/{z}/{x}/{y}.png")
             service_info.yOriginTop = 1
             #service_info.epsg_crs_id = 3857
@@ -261,27 +275,37 @@ class go2mapillary:
             #toc_root = QgsProject.instance().layerTreeRoot()
             #toc_root.insertLayer(0, layer)
             return layer
+        '''
+
+    def removeOverviewLayer(self):
+        try:
+            QgsProject.instance().removeMapLayer(self.mapillaryOverview.id())
+            self.mapillaryOverview = None
+        except:
+            pass
+        self.iface.mapCanvas().refresh()
 
     def removeCoverageLayer(self):
-            try:
-                QgsProject.instance().removeMapLayer(self.mapillaryCoverage.id())
-                self.mapillaryCoverage = None
-            except:
-                pass
+        try:
+            QgsProject.instance().removeMapLayer(self.mapillaryCoverage.id())
+            self.mapillaryCoverage = None
+        except:
+            pass
+        self.iface.mapCanvas().refresh()
 
     def removeLocationsLayer(self):
-            try:
-                QgsProject.instance().removeMapLayer(self.mapillaryLocations.id())
-                self.mapillaryLocations = None
-            except:
-                pass
+        try:
+            QgsProject.instance().removeMapLayer(self.mapillaryLocations.id())
+            self.mapillaryLocations = None
+        except:
+            pass
+        self.iface.mapCanvas().refresh()
 
     def toggleViewer(self,mapTool):
         print (("enabled:",self.viewer.isEnabled()))
         print (("CURRENT MAPTOOL:",mapTool))
         if mapTool != self.mapSelectionTool:
             self.viewer.disable()
-
 
     def viewerConnection(self, message):
         print (message)
@@ -301,8 +325,6 @@ class go2mapillary:
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
 
-
-
     def transformToWGS84(self, pPoint):
         # transformation from the current SRS to WGS84
         crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
@@ -320,48 +342,70 @@ class go2mapillary:
         return xform.transform(pPoint) # forward transformation: src -> dest
 
     def mapChanged(self):
-        print (("ok",self.canvas.scale()))
-        if self.canvas.scale() < 30000:
-            self.removeCoverageLayer()
-            extents = self.canvas.extent()
-            bottomLeft = self.transformToWGS84(QgsPoint(extents.xMinimum(),extents.yMinimum()))
-            topRight = self.transformToWGS84(QgsPoint(extents.xMaximum(),extents.yMaximum()))
-            url = "http://api.mapillary.com/v1/im/search?min-lat=%s&max-lat=%s&min-lon=%s&max-lon=%s&max-results=500&geojson=true" \
-                  % (bottomLeft.y(),topRight.y(),bottomLeft.x(),topRight.x())
-            if not self.mapillaryLocations or not(self.mapillaryLocations.id() in QgsProject.instance().mapLayers().keys()):
-                self.setupLayer(url)
-                QgsProject.instance().addMapLayer(self.mapillaryLocations)
-                print ("SETUP locations")
-                #self.iface.legendInterface().setLayerExpanded(self.mapillaryLocations, False) no qgis3
-            else:
-                self.mapillaryLocations.triggerRepaint()
-                self.setLayerStyle()
+        self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
 
-
-        '''
-        else:
-            self.removeLocationsLayer()
-            if not self.mapillaryCoverage:
-                self.mapillaryCoverage = self.getCoverageLayer()
-                QgsProject.instance().addMapLayer(self.mapillaryCoverage)
-        '''
+    def mapRefreshed(self):
+        try:
+            self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
+        except:
+            pass
+        self.coverage.update_coverage()
+        if not self.mapillaryOverview:
+            self.setupOverviewLayer()
+        if not self.mapillaryCoverage:
+            self.setupCoverageLayer()
+        if not self.mapillaryLocations:
+            self.setupLocationsLayer()
+        self.setLayerStyle()
+        self.iface.mapCanvas().refreshAllLayers()
 
     def setLayerStyle(self):
-        if self.canvas.scale() < 2000:
-            self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer0.qml"))
-        else:
-            self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer1.qml"))
+        if self.mapillaryOverview:
+            if self.coverage.has_overview():
+                self.mapillaryOverview.triggerRepaint()
+            else:
+                self.removeOverviewLayer()
+        if self.mapillaryCoverage:
+            if self.coverage.has_coverage():
+                self.mapillaryCoverage.triggerRepaint()
+            else:
+                self.removeCoverageLayer()
+        if self.mapillaryLocations:
+            if self.coverage.has_images():
+                if self.canvas.scale() < 1000:
+                    self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer0.qml"))
+                else:
+                    self.mapillaryLocations.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer1.qml"))
+                self.mapillaryLocations.triggerRepaint()
+            else:
+                self.removeLocationsLayer()
 
-    def setupLayer(self,url):
-        #self.mapillaryLayer = QgsVectorLayer("http://api.mapillary.com/v1/im/search?min-lat=0&max-lat=0&min-lon=0&max-lon=0&max-results=200&geojson=true","Mapillary Images", "ogr")
-        print (("URL:",url))
-        if geojson_request.download(url):
-            self.mapillaryLocations = QgsVectorLayer(os.path.join(os.path.dirname(__file__),'temp','requested.geojson'), "Mapillary Images", "ogr")
-            self.mapillaryLocations.setCrs (QgsCoordinateReferenceSystem(4326))
+    def setupOverviewLayer(self):
+        self.mapillaryOverview = self.coverage.get_overview_layer()
+        if self.mapillaryOverview:
+            print ("setup overview")
+            self.mapillaryOverview.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer3.qml"))
+            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryOverview)
+            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
+            QgsProject.instance().addMapLayer(self.mapillaryOverview)
+
+    def setupCoverageLayer(self):
+        self.mapillaryCoverage = self.coverage.get_coverage_layer()
+        if self.mapillaryCoverage:
+            print ("setup coverage")
+            self.mapillaryCoverage.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer2.qml"))
+            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryCoverage)
+            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
+            QgsProject.instance().addMapLayer(self.mapillaryCoverage)
+
+    def setupLocationsLayer(self):
+        self.mapillaryLocations = self.coverage.get_images_layer()
+        if self.mapillaryLocations:
+            print ("setup locations")
             QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
             self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryLocations)
             self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
-            self.setLayerStyle()
+            QgsProject.instance().addMapLayer(self.mapillaryLocations)
 
 
     def run(self):
@@ -387,10 +431,11 @@ class go2mapillary:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
             #self.setupLayer('')
+            self.mapillaryOverview = None
             self.mapillaryCoverage = None
             self.mapillaryLocations = None
             self.canvas.extentsChanged.connect(self.mapChanged)
-            self.mapChanged()
+            self.mapRefreshed()
             self.canvas.setMapTool(self.mapSelectionTool)
 
         else:
@@ -405,15 +450,23 @@ class go2mapillary:
                 self.dockwidget.show()
                 self.canvas.setMapTool(self.mapSelectionTool)
                 self.canvas.extentsChanged.connect(self.mapChanged)
-                self.mapChanged()
+                self.mapRefreshed()
 
     def changeMapillaryLocation(self, feature):
-        print (('ATTRS', feature.attributes()))
-        print (('KEY', feature[4]))
-        self.viewer.openLocation(feature['key'])
-        #set a variable to view selected mapillary layer feature as selected
-        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", feature['key'])
-        self.mapillaryLocations.triggerRepaint()
+        #print (('ATTRS', feature.attributes()))
+        #print (('KEY', feature[4]))
+        if self.mapillaryLocations:
+            self.viewer.openLocation(feature['key'])
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", feature['key'])
+            self.mapillaryLocations.triggerRepaint()
+        elif self.mapillaryCoverage:
+            self.viewer.openLocation(feature['ikey'])
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", feature['ikey'])
+            self.mapillaryCoverage.triggerRepaint()
+        else:
+            self.viewer.openLocation(feature['ikey'])
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", feature['ikey'])
+            self.mapillaryOverview.triggerRepaint()
 
         
         
