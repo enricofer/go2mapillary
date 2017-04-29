@@ -49,8 +49,8 @@
       <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="203" column="63" selection-start-line="203" selection-start-column="63" selection-end-line="203" selection-end-column="63" />
+            <state relative-caret-position="375">
+              <caret line="262" column="86" selection-start-line="262" selection-start-column="86" selection-end-line="262" selection-end-column="86" />
               <folding>
                 <element signature="e#1132#1143#0" expanded="true" />
               </folding>
@@ -751,8 +751,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="203" column="63" selection-start-line="203" selection-start-column="63" selection-end-line="203" selection-end-column="63" />
+        <state relative-caret-position="375">
+          <caret line="262" column="86" selection-start-line="262" selection-start-column="86" selection-end-line="262" selection-end-column="86" />
           <folding>
             <element signature="e#1132#1143#0" expanded="true" />
           </folding>

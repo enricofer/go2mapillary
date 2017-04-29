@@ -260,7 +260,7 @@ class mapillary_coverage:
 
     def get_overview_layer(self):
         if self.overview:
-            self.mapillary_overview_layer = QgsVectorLayer(os.path.join(os.path.dirname(__file__), 'temp', 'mapillary_overview.geojson'), "Mapillary Coverage", "ogr")
+            self.mapillary_overview_layer = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_overview.geojson'), "Mapillary Coverage", "ogr")
             self.mapillary_overview_layer.setCrs(QgsCoordinateReferenceSystem(4326))
         else:
             self.mapillary_overview_layer = None
@@ -268,7 +268,7 @@ class mapillary_coverage:
 
     def get_coverage_layer(self):
         if self.coverage:
-            self.mapillary_coverage_layer = QgsVectorLayer(os.path.join(os.path.dirname(__file__), 'temp', 'mapillary_coverage.geojson'), "Mapillary Coverage", "ogr")
+            self.mapillary_coverage_layer = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_coverage.geojson'), "Mapillary Coverage", "ogr")
             self.mapillary_coverage_layer.setCrs(QgsCoordinateReferenceSystem(4326))
         else:
             self.mapillary_coverage_layer = None
@@ -276,7 +276,7 @@ class mapillary_coverage:
 
     def get_images_layer(self):
         if self.images:
-            self.mapillary_images_layer = QgsVectorLayer(os.path.join(os.path.dirname(__file__), 'temp', 'mapillary_images.geojson'), "Mapillary Images", "ogr")
+            self.mapillary_images_layer = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_images.geojson'), "Mapillary Images", "ogr")
             self.mapillary_images_layer.setCrs (QgsCoordinateReferenceSystem(4326))
         else:
             self.mapillary_images_layer = None
