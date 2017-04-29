@@ -31,7 +31,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'mapillary_explorer_dockwidget_base.ui'))
 
 
-class go2mapillaryDockWidget(QtWidgets.QDockWidget, Ui_go2mapillaryDockWidgetBase):
+class exgo2mapillaryDockWidget(QtWidgets.QDockWidget, Ui_go2mapillaryDockWidgetBase):
 
     closingPlugin = pyqtSignal()
 
@@ -50,7 +50,7 @@ class go2mapillaryDockWidget(QtWidgets.QDockWidget, Ui_go2mapillaryDockWidgetBas
         event.accept()
 
 
-class exgo2mapillaryDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class go2mapillaryDockWidget(QtWidgets.QDialog, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 

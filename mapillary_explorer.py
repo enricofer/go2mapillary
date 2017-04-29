@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QDockWidget
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtNetwork import QNetworkProxy
 
@@ -194,13 +194,17 @@ class go2mapillary:
             text=self.tr(u'go2mapillary'),
             callback=self.run,
             parent=self.iface.mainWindow())
-        
-        self.dockwidget = go2mapillaryDockWidget()
-        self.dockwidget.webView.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
-        self.dockwidget.webView.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
-        self.dockwidget.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
+
+        self.dlg = go2mapillaryDockWidget()
+
+        self.dockwidget=QDockWidget("go2mapillary" , self.iface.mainWindow() )
+        self.dockwidget.setObjectName("go2mapillary")
+        self.dockwidget.setWidget(self.dlg)
+        self.dlg.webView.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
+        self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
+        self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         self.canvas.mapToolSet.connect(self.toggleViewer)
-        self.viewer = mapillaryViewer(self.dockwidget.webView)
+        self.viewer = mapillaryViewer(self.dlg.webView)
         self.viewer.messageArrived.connect(self.viewerConnection)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         self.mapSelectionTool = None
@@ -210,23 +214,7 @@ class go2mapillary:
         self.mapillaryLocations = None
 
     #--------------------------------------------------------------------------
-        
 
-    def onClosePlugin(self):
-        """Cleanup necessary items here when plugin dockwidget is closed"""
-
-        #print "** CLOSING go2mapillary"
-
-        # disconnects
-        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
-
-        # remove this statement if dockwidget is to remain
-        # for reuse if plugin is reopened
-        # Commented next statement since it causes QGIS crashe
-        # when closing the docked window:
-        # self.dockwidget = None
-
-        self.pluginIsActive = False
 
 
     def unload(self):
@@ -419,12 +407,12 @@ class go2mapillary:
             # dockwidget may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
+            #if self.dockwidget == None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = go2mapillaryDockWidget()
+            #    self.dockwidget = go2mapillaryDockWidget()
 
             # connect to provide cleanup on closing of dockwidget
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+            #self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location

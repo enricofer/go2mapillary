@@ -112,7 +112,8 @@
         .then(
             function(node) { console.log(node.key); },
             function(error) { console.error(error); });    
-              
+        
+    window.addEventListener("resize", function() { mly.resize(); });          
     </script>
   </body>
 </html>
