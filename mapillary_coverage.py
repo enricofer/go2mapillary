@@ -30,6 +30,7 @@ import math
 import json
 import datetime
 import mercantile
+import tempfile
 
 from qgis.PyQt.QtCore import QSettings
 
@@ -120,7 +121,9 @@ class mapillary_coverage:
 
     def __init__(self,iface):
         self.iface = iface
-        self.cache_dir = loc=os.path.join(os.path.dirname(__file__),'temp','tiles')
+        self.cache_dir = loc=os.path.join(tempfile.gettempdir(),'temp','tiles')
+        if not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir)
         self.actual_ranges = None
         self.images = None
 
@@ -198,7 +201,7 @@ class mapillary_coverage:
                         if "mapillary-images" in json_data:
                             images_features = images_features + json_data["mapillary-images"]["features"]
 
-            geojson_overview_file = os.path.join(os.path.dirname(__file__), "temp", "mapillary_overview.geojson")
+            geojson_overview_file = os.path.join(self.cache_dir, "mapillary_overview.geojson")
             if overview_features:
                 self.overview = True
                 geojson_overview = {
@@ -213,7 +216,7 @@ class mapillary_coverage:
                 if os.path.exists(geojson_overview_file):
                     os.remove(geojson_overview_file)
 
-            geojson_coverage_file = os.path.join(os.path.dirname(__file__), "temp", "mapillary_coverage.geojson")
+            geojson_coverage_file = os.path.join(self.cache_dir, "mapillary_coverage.geojson")
             if coverage_features:
                 self.coverage = True
                 geojson_coverage = {
@@ -228,7 +231,7 @@ class mapillary_coverage:
                 if os.path.exists(geojson_coverage_file):
                     os.remove(geojson_coverage_file)
 
-            geojson_images_file = os.path.join(os.path.dirname(__file__), "temp", "mapillary_images.geojson")
+            geojson_images_file = os.path.join(self.cache_dir, "mapillary_images.geojson")
             if zoom_level==14 and images_features:
                 self.images = True
                 geojson_images = {
