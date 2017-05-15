@@ -8,9 +8,9 @@
 
 [general]
 name=go2mapillary
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.18
 description=mapillary explorer
-version=0.1
+version=1.0
 author=enrico ferreguti
 email=enricofer@gmail.com
 
