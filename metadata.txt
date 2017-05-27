@@ -8,7 +8,7 @@
 
 [general]
 name=go2mapillary
-qgisMinimumVersion=2.18
+qgisMinimumVersion=2.99
 description=mapillary explorer
 version=1.0
 author=enrico ferreguti
@@ -32,7 +32,7 @@ homepage=geogear.wordpress.com
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
