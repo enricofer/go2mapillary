@@ -2,27 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/icon.jpg" afterPath="$PROJECT_DIR$/res/icon.jpg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/icon.png" afterPath="$PROJECT_DIR$/res/icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/icon.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/res/browse.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Copia di mapillary_explorer_dockwidget_base.py" afterPath="$PROJECT_DIR$/Copia di mapillary_explorer_dockwidget_base.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.txt" afterPath="$PROJECT_DIR$/README.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__init__.py" afterPath="$PROJECT_DIR$/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/geojson_request.py" afterPath="$PROJECT_DIR$/geojson_request.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/getTiles.py" afterPath="$PROJECT_DIR$/getTiles.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/i18n/af.ts" afterPath="$PROJECT_DIR$/i18n/af.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/identifygeometry.py" afterPath="$PROJECT_DIR$/identifygeometry.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_coverage.py" afterPath="$PROJECT_DIR$/mapillary_coverage.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer_dockwidget.py" afterPath="$PROJECT_DIR$/mapillary_explorer_dockwidget.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base (copia).ui" afterPath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base (copia).ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base.py" afterPath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base.ui" afterPath="$PROJECT_DIR$/mapillary_explorer_dockwidget_base.ui" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_viewer.py" afterPath="$PROJECT_DIR$/mapillary_viewer.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/metadata.txt" afterPath="$PROJECT_DIR$/metadata.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/browse.html" afterPath="$PROJECT_DIR$/res/browse.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources.py" afterPath="$PROJECT_DIR$/resources.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources.qrc" afterPath="$PROJECT_DIR$/resources.qrc" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/browser.html" afterPath="$PROJECT_DIR$/res/browser.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/mapillaryLayer0.qml" afterPath="$PROJECT_DIR$/res/mapillaryLayer0.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/mapillaryLayer1.qml" afterPath="$PROJECT_DIR$/res/mapillaryLayer1.qml" />
     </list>
     <ignored path="go2mapillary.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -45,8 +34,8 @@
       <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6987">
-              <caret line="438" column="13" lean-forward="false" selection-start-line="438" selection-start-column="13" selection-end-line="438" selection-end-column="13" />
+            <state relative-caret-position="429">
+              <caret line="369" column="97" lean-forward="false" selection-start-line="369" selection-start-column="97" selection-end-line="369" selection-end-column="116" />
               <folding>
                 <element signature="e#1132#1224#0" expanded="true" />
               </folding>
@@ -66,12 +55,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="701">
-              <caret line="346" column="3" lean-forward="true" selection-start-line="346" selection-start-column="3" selection-end-line="346" selection-end-column="3" />
-              <folding />
+            <state relative-caret-position="687">
+              <caret line="287" column="0" lean-forward="true" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+              <folding>
+                <element signature="e#1132#1143#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -79,18 +70,18 @@
       <file leaf-file-name="GlobalMapTiles.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GlobalMapTiles.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="796">
+            <state relative-caret-position="3910">
               <caret line="230" column="68" lean-forward="false" selection-start-line="230" selection-start-column="68" selection-end-line="230" selection-end-column="68" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_viewer.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mapillary_viewer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1485">
-              <caret line="114" column="27" lean-forward="true" selection-start-line="114" selection-start-column="27" selection-end-line="114" selection-end-column="27" />
+            <state relative-caret-position="303">
+              <caret line="85" column="29" lean-forward="true" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -99,7 +90,7 @@
       <file leaf-file-name="identifygeometry.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/identifygeometry.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
+            <state relative-caret-position="765">
               <caret line="48" column="9" lean-forward="false" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
               <folding />
             </state>
@@ -130,9 +121,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="66" />
-    <option name="y" value="37" />
-    <option name="width" value="1847" />
+    <option name="x" value="387" />
+    <option name="y" value="50" />
+    <option name="width" value="1462" />
     <option name="height" value="968" />
   </component>
   <component name="ProjectView">
@@ -150,6 +141,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -164,8 +157,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -329,10 +320,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="66" y="37" width="1847" height="968" extended-state="0" />
+    <frame x="387" y="50" width="1462" height="968" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19606772" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19571231" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32971507" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -407,7 +398,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#1132#1143#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -716,19 +709,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6987">
-          <caret line="438" column="13" lean-forward="false" selection-start-line="438" selection-start-column="13" selection-end-line="438" selection-end-column="13" />
-          <folding>
-            <element signature="e#1132#1224#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/identifygeometry.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
+        <state relative-caret-position="765">
           <caret line="48" column="9" lean-forward="false" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
           <folding />
         </state>
@@ -736,24 +719,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GlobalMapTiles.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="796">
+        <state relative-caret-position="3910">
           <caret line="230" column="68" lean-forward="false" selection-start-line="230" selection-start-column="68" selection-end-line="230" selection-end-column="68" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1485">
-          <caret line="114" column="27" lean-forward="true" selection-start-line="114" selection-start-column="27" selection-end-line="114" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="701">
-          <caret line="346" column="3" lean-forward="true" selection-start-line="346" selection-start-column="3" selection-end-line="346" selection-end-column="3" />
+        <state relative-caret-position="687">
+          <caret line="287" column="0" lean-forward="true" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+          <folding>
+            <element signature="e#1132#1143#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="429">
+          <caret line="369" column="97" lean-forward="false" selection-start-line="369" selection-start-column="97" selection-end-line="369" selection-end-column="116" />
+          <folding>
+            <element signature="e#1132#1224#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="85" column="29" lean-forward="true" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
           <folding />
         </state>
       </provider>

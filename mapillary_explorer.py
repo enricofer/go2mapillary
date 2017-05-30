@@ -213,6 +213,7 @@ class go2mapillary:
         self.mapillaryCoverage = None
         self.mapillaryLocations = None
 
+
     #--------------------------------------------------------------------------
 
 
@@ -223,6 +224,8 @@ class go2mapillary:
         #print "** UNLOAD go2mapillary"
         self.removeCoverageLayer()
         self.removeLocationsLayer()
+        self.removeOverviewLayer()
+
         try:
             self.canvas.extentsChanged.disconnect(self.mapChanged)
         except:
@@ -236,6 +239,7 @@ class go2mapillary:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
+        self.dockwidget.hide()
 
     #--------------------------------------------------------------------------
 
@@ -441,20 +445,16 @@ class go2mapillary:
                 self.mapRefreshed()
 
     def changeMapillaryLocation(self, feature):
-        #print (('ATTRS', feature.attributes()))
-        #print (('KEY', feature[4]))
         if self.mapillaryLocations:
-            self.viewer.openLocation(feature['key'])
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", feature['key'])
-            self.mapillaryLocations.triggerRepaint()
+            context = self.mapillaryLocations
         elif self.mapillaryCoverage:
-            self.viewer.openLocation(feature['ikey'])
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", feature['ikey'])
-            self.mapillaryCoverage.triggerRepaint()
+            context = self.mapillaryCoverage
         else:
-            self.viewer.openLocation(feature['ikey'])
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", feature['ikey'])
-            self.mapillaryOverview.triggerRepaint()
+            context = self.mapillaryOverview
+
+        self.viewer.openLocation(feature['key'])
+        QgsExpressionContextUtils.setLayerVariable(context, "mapillaryCurrentKey", feature['key'])
+        self.mapillaryLocations.triggerRepaint()
 
         
         

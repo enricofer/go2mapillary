@@ -121,7 +121,8 @@ class mapillary_coverage:
 
     def __init__(self,iface):
         self.iface = iface
-        self.cache_dir = loc=os.path.join(tempfile.gettempdir(),'temp','tiles')
+        self.cache_dir = os.path.join(tempfile.gettempdir(),'go2mapillary')
+        print ("CACHE_DIR", self.cache_dir)
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
         self.actual_ranges = None
@@ -284,64 +285,3 @@ class mapillary_coverage:
 
     def update_coverage(self):
         self.download_tiles()
-
-
-'''
-#this is your study Area. You need to change the extent here
-#In this Example, I've given the boundary of Mumbai
-    
-#stArea=Polygon([(11.84741,45.39398),(11.86360,45.39328),(11.86223,45.38308),(11.84645,45.38348)])
-stArea=Polygon([(11.80,45.47),(11.96,45.47),(11.96,45.32),(11.80,45.32)])
-
-print stArea.bounds
-zl = ZoomForPixelSize(0.00015838789012617165)
-print zl
-print getTileRange(stArea,zl)
-
-loc=os.path.join(os.path.dirname(__file__),'temp','tiles') #You need to change the location for files to download
-server_url=r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt" #This is the template for the Tile Sets
-
-
-tileList=[]
-
-ranges=getTileRange(stArea, zl)
-x_range=ranges[0]
-y_range=ranges[1]
-
-for y in range(y_range[0], y_range[1]+1):
-    for x in range(x_range[0], x_range[1]+1):
-        if(doesTileIntersects(x,y,zl,stArea)):
-            tileList.append((zl, y, x))
-tileCount=len(tileList)
-
-
-print 'Total number of Tiles: ' + str(tileCount)
-count=0
-features = []
-# Now do the downloading
-for y in range(y_range[0], y_range[1] + 1):
-    for x in range(x_range[0], x_range[1] + 1):
-        #make the URL
-        url=getURL(x, y, zl, SERVER_URL)
-        print url
-
-        #urllib.urlretrieve(url,filePathM)
-        res = requests.get(url)
-        print ("COUNT",count,res.status_code, mercantile.bounds(x,y,zl))
-        if res.status_code == 200:
-            bounds = mercantile.bounds(x,y,zl)
-            tile_box = (bounds.west,bounds.south,bounds.east,bounds.north)
-            json_data = mapbox_vector_tile.decode(res.content, quantize_bounds=tile_box)
-            features = features + json_data["mapillary-sequences"]["features"]
-        count=count+1
-        print 'finished '+str(count)+'/'+str(tileCount)
-
-geojson = {
-    "type": "FeatureCollection",
-    "features": features
-}
-
-with open(os.path.join(os.path.dirname(__file__),"temp","mapillary_coverage.geojson"), 'w') as outfile:
-    json.dump(geojson, outfile)
-
-'''
