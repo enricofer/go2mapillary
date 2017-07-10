@@ -50,7 +50,7 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.LocalStorageEnabled,True)
         WS.setAttribute(QWebSettings.PluginsEnabled,True)
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
-        #self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
+        self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         #QtWebKit.QWebSettings.globalSettings().globalSettings().enablePersistentStorage(QtCore.QDir.tempPath())
         #self.viewport.setPage(MyBrowser())
         
@@ -79,7 +79,7 @@ class mapillaryViewer(QObject):
             proxy.setPort(int(proxyPort))
             proxy.setUser(proxyUser)
             proxy.setPassword(proxyPassword)
-            QNetworkProxy.setApplicationProxy(proxy)
+            #QNetworkProxy.setApplicationProxy(proxy)
         
         #self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
         self.page = os.path.join('https://enricofer.github.io/go2mapillary/res/browser.html')

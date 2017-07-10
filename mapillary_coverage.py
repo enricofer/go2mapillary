@@ -34,7 +34,7 @@ import tempfile
 
 from qgis.PyQt.QtCore import QSettings
 
-from qgis.core import QgsPoint, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer
 
 SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
 
@@ -140,8 +140,8 @@ class mapillary_coverage:
 
         #calculate zoom_level con current canvas extents
         ex = self.iface.mapCanvas().extent()
-        wgs84_minimum = self.transformToWGS84(QgsPoint (ex.xMinimum(),ex.yMinimum()))
-        wgs84_maximum = self.transformToWGS84(QgsPoint (ex.xMaximum(),ex.yMaximum()))
+        wgs84_minimum = self.transformToWGS84(QgsPointXY (ex.xMinimum(),ex.yMinimum()))
+        wgs84_maximum = self.transformToWGS84(QgsPointXY (ex.xMaximum(),ex.yMaximum()))
         bounds =(wgs84_minimum.x(),wgs84_minimum.y(),wgs84_maximum.x(),wgs84_maximum.y())
         map_units_per_pixel = (wgs84_maximum.x() - wgs84_minimum.x())/self.iface.mapCanvas().width()
         zoom_level = ZoomForPixelSize(map_units_per_pixel)
