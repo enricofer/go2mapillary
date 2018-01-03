@@ -322,7 +322,7 @@ class go2mapillary:
         crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
         crsSrc = crcMappaCorrente
         crsDest = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest)
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
         return xform.transform(pPoint) # forward transformation: src -> dest
 
     def transformToCurrentSRS(self, pPoint):
@@ -330,7 +330,7 @@ class go2mapillary:
         crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
         crsDest = crcMappaCorrente
         crsSrc = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest)
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
         return xform.transform(pPoint) # forward transformation: src -> dest
 
     def mapChanged(self):

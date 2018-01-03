@@ -43,16 +43,12 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.JavascriptEnabled,True)
         WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
         WS.setAttribute(QWebSettings.JavascriptCanAccessClipboard,True)
-        # next parameters can crash qgis if user use arrows after clicked in the sliders of the webview
-        # QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.SpatialNavigationEnabled,True)
         WS.setAttribute(QWebSettings.PrintElementBackgrounds,True)
         WS.setAttribute(QWebSettings.OfflineStorageDatabaseEnabled,True)
         WS.setAttribute(QWebSettings.LocalStorageEnabled,True)
         WS.setAttribute(QWebSettings.PluginsEnabled,True)
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
-        #QtWebKit.QWebSettings.globalSettings().globalSettings().enablePersistentStorage(QtCore.QDir.tempPath())
-        #self.viewport.setPage(MyBrowser())
         
         s = QSettings() #getting proxy from qgis options settings
         proxyEnabled = s.value("proxy/proxyEnabled", "")

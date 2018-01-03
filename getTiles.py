@@ -84,10 +84,10 @@ def getURL(x,y,z,url):
 #stArea=Polygon([(11.84741,45.39398),(11.86360,45.39328),(11.86223,45.38308),(11.84645,45.38348)])
 stArea=Polygon([(11.80,45.47),(11.96,45.47),(11.96,45.32),(11.80,45.32)])
 
-print stArea.bounds
+print (stArea.bounds)
 zl = ZoomForPixelSize(0.00015838789012617165)
-print zl
-print getTileRange(stArea,zl)
+print (zl)
+print (getTileRange(stArea,zl))
 
 loc=os.path.join(os.path.dirname(__file__),'temp','tiles') #You need to change the location for files to download
 server_url=r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt" #This is the template for the Tile Sets
@@ -106,7 +106,7 @@ for y in range(y_range[0], y_range[1]+1):
 tileCount=len(tileList)
 
 
-print 'Total number of Tiles: ' + str(tileCount)
+print ('Total number of Tiles: ' + str(tileCount))
 count=0
 features = []
 # Now do the downloading
@@ -114,7 +114,7 @@ for y in range(y_range[0], y_range[1] + 1):
     for x in range(x_range[0], x_range[1] + 1):
         #make the URL
         url=getURL(x, y, zl, server_url)
-        print url
+        print (url)
 
         #urllib.urlretrieve(url,filePathM)
         res = requests.get(url)
@@ -133,7 +133,7 @@ for y in range(y_range[0], y_range[1] + 1):
         os.remove(filePathM)
         '''
         count=count+1
-        print 'finished '+str(count)+'/'+str(tileCount)
+        print ('finished '+str(count)+'/'+str(tileCount))
 
 geojson = {
     "type": "FeatureCollection",
