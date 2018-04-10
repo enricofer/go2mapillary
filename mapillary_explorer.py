@@ -206,7 +206,8 @@ class go2mapillary:
         self.canvas.mapToolSet.connect(self.toggleViewer)
         self.viewer = mapillaryViewer(self.dlg.webView)
         self.viewer.messageArrived.connect(self.viewerConnection)
-        QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
+        #QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
+        QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.mapSelectionTool = None
         self.coverage = mapillary_coverage(self.iface)
         self.mapillaryOverview = None
@@ -300,15 +301,14 @@ class go2mapillary:
             self.viewer.disable()
 
     def viewerConnection(self, message):
-        print (message)
+        print ("viewerConnection",message)
         if message:
             #print tmpPOV
             if message["transport"] == "view":
-                print (message)
                 self.currentLocation = message
+                QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
                 try:
                     #set a variable to view selected mapillary layer feature as selected
-                    QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
                     self.mapillaryLocations.triggerRepaint()
                 except:
                     pass
@@ -376,18 +376,20 @@ class go2mapillary:
         self.mapillaryOverview = self.coverage.get_overview_layer()
         if self.mapillaryOverview:
             print ("setup overview")
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", "undefined")
             self.mapillaryOverview.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer3.qml"))
             self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryOverview)
-            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
+            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryOverview)
             QgsProject.instance().addMapLayer(self.mapillaryOverview)
 
     def setupCoverageLayer(self):
         self.mapillaryCoverage = self.coverage.get_coverage_layer()
         if self.mapillaryCoverage:
             print ("setup coverage")
+            QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", "undefined")
             self.mapillaryCoverage.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer2.qml"))
             self.mapSelectionTool = IdentifyGeometry(self.canvas, self.mapillaryCoverage)
-            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryLocation)
+            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryCoverage)
             QgsProject.instance().addMapLayer(self.mapillaryCoverage)
 
     def setupLocationsLayer(self):
@@ -445,16 +447,21 @@ class go2mapillary:
                 self.mapRefreshed()
 
     def changeMapillaryLocation(self, feature):
-        if self.mapillaryLocations:
-            context = self.mapillaryLocations
-        elif self.mapillaryCoverage:
-            context = self.mapillaryCoverage
-        else:
-            context = self.mapillaryOverview
-
         self.viewer.openLocation(feature['key'])
-        QgsExpressionContextUtils.setLayerVariable(context, "mapillaryCurrentKey", feature['key'])
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", feature['key'])
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", feature['skey'])
         self.mapillaryLocations.triggerRepaint()
+        self.mapillaryCoverage.triggerRepaint()
+
+    def changeMapillaryCoverage(self, feature):
+        self.viewer.openLocation(feature['ikey'])
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", feature['key'])
+        self.mapillaryCoverage.triggerRepaint()
+
+    def changeMapillaryOverview(self, feature):
+        self.viewer.openLocation(feature['ikey'])
+        QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", feature['key'])
+        self.mapillaryOverview.triggerRepaint()
 
         
         

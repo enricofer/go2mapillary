@@ -2,8 +2,8 @@
 <qgis maximumScale="1e+08" version="2.99.0-Master" minimumScale="0" simplifyMaxScale="1" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" readOnly="0" simplifyDrawingHints="1" simplifyLocal="1">
   <renderer-v2 symbollevels="0" forceraster="0" type="RuleRenderer" enableorderby="0">
     <rules key="{85246a61-c4a7-4d95-aa57-c7dc594e8806}">
-      <rule symbol="0" filter=" &quot;ikey&quot;  !=  @mapillaryCurrentKey " key="{922a635d-2736-4afb-8cb9-c756205a0ccb}"/>
-      <rule symbol="1" filter=" &quot;ikey&quot;  =  @mapillaryCurrentKey " key="{5bb0862b-fc98-469a-abf9-4f4fdafdf5e4}"/>
+      <rule symbol="0" filter=" &quot;key&quot;  !=  @mapillaryCurrentKey " key="{922a635d-2736-4afb-8cb9-c756205a0ccb}"/>
+      <rule symbol="1" filter=" &quot;key&quot;  =  @mapillaryCurrentKey " key="{5bb0862b-fc98-469a-abf9-4f4fdafdf5e4}"/>
     </rules>
     <symbols>
       <symbol name="0" alpha="1" clip_to_extent="1" type="line">
