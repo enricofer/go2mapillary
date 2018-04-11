@@ -20,9 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import math
 import os
-import urllib
+import sys
 from shapely.geometry import Polygon
 import mapbox_vector_tile
 import requests
@@ -32,9 +31,11 @@ import datetime
 import mercantile
 import tempfile
 
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtWidgets import QProgressBar, QApplication
 
-from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog
+from qgis.gui import QgsMessageBar
 
 SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
 
@@ -117,6 +118,45 @@ def getProxiesConf():
     else:
         return None
 
+class progressBar:
+    def __init__(self, parent, title = ''):
+        '''
+        progressBar class instatiation method. It creates a QgsMessageBar with provided msg and a working QProgressBar
+        :param parent:
+        :param msg: string
+        '''
+        self.iface = parent.iface
+        self.title = title
+
+    def start(self,max=0, msg = ''):
+        self.widget = self.iface.messageBar().createMessage(self.title,msg)
+        self.progressBar = QProgressBar()
+        self.progressBar.setRange(0,max)
+        self.progressBar.setValue(0)
+        self.progressBar.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.widget.layout().addWidget(self.progressBar)
+        QApplication.processEvents()
+        self.iface.messageBar().pushWidget(self.widget, Qgis.Info, 50)
+        QApplication.processEvents()
+
+    def setProgress(self,value):
+        self.progressBar.setValue(value)
+        QApplication.processEvents()
+
+    def setMsg(self,msg):
+        self.widget.setText(msg)
+        QApplication.processEvents()
+
+    def stop(self, msg = ''):
+        '''
+        the progressbar is stopped with a succes message
+        :param msg: string
+        :return:
+        '''
+        self.iface.messageBar().clearWidgets()
+        message = self.iface.messageBar().createMessage(self.title,msg)
+        self.iface.messageBar().pushWidget(message, Qgis.Info, 2)
+
 class mapillary_coverage:
 
     expire_time = datetime.timedelta(hours=12)
@@ -176,6 +216,8 @@ class mapillary_coverage:
             sequences_features = []
             images_features = []
 
+            progress = progressBar(self, 'go2mapillary')
+
             for y in range(y_range[0], y_range[1] + 1):
                 for x in range(x_range[0], x_range[1] + 1):
                     folderPath = os.path.join(self.cache_dir, str(zoom_level), str(x))
@@ -185,21 +227,35 @@ class mapillary_coverage:
                         os.makedirs(folderPath)
                     res = None
 
+
                     if not os.path.exists(filePathMvt) or (datetime.datetime.fromtimestamp(os.path.getmtime(filePathMvt)) < (datetime.datetime.now() - self.expire_time) ):
                         # make the URL
                         url = getURL(x, y, zoom_level, SERVER_URL)
-                        res = requests.get(url, proxies=getProxiesConf())
-                        print ('MISS',x, y, zoom_level, res, url)
-                        if res.status_code == 200:
-                            with open(filePathMvt, 'wb') as f:
-                                f.write(res.content)
-                            print (os.path.getmtime(filePathMvt))
+                        with open(filePathMvt, 'wb') as f:
+                            response = requests.get(url, proxies=getProxiesConf(), stream=True)
+                            total_length = response.headers.get('content-length')
+
+                            if total_length is None:  # no content length header
+                                f.write(response.content)
+                            else:
+                                dl = 0
+                                total_length = int(total_length)
+                                progress.start(total_length,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
+                                QgsMessageLog.logMessage("MISS [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
+                                                         level=Qgis.Info)
+                                for data in response.iter_content(chunk_size=4096):
+                                    dl += len(data)
+                                    f.write(data)
+                                    progress.setProgress(dl)
+
 
                     if os.path.exists(filePathMvt):
+                        progress.start(0, 'loading vector tile [%d,%d,%d]' % (x, y, zoom_level))
                         if not res:
                             with open(filePathMvt, "rb") as f:
                                 mvt = f.read()
-                            print ('CACHE', x, y, zoom_level)
+                                QgsMessageLog.logMessage("CACHE [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
+                                                         level=Qgis.Info)
                         else:
                             mvt = res.content
 
@@ -212,6 +268,8 @@ class mapillary_coverage:
                             sequences_features = sequences_features + json_data["mapillary-sequences"]["features"]
                         if "mapillary-images" in json_data and zoom_level==14:
                             images_features = images_features + json_data["mapillary-images"]["features"]
+
+            progress.stop('loading complete')
 
             for level in LAYER_LEVELS:
                 geojson_file = os.path.join(self.cache_dir, "mapillary_%s.geojson" % level)

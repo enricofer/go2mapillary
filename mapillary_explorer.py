@@ -240,9 +240,7 @@ class go2mapillary:
             self.viewer.disable()
 
     def viewerConnection(self, message):
-        print ("viewerConnection",message)
         if message:
-            #print tmpPOV
             if message["transport"] == "view":
                 self.currentLocation = message
                 try:
@@ -285,7 +283,6 @@ class go2mapillary:
             if not (level == 'sequences' and 'images' in enabledLevels.keys()):
                 self.mapSelectionTool = IdentifyGeometry(self.canvas, layer)
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
-            layer.triggerRepaint()
 
 
     def run(self):
