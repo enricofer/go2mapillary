@@ -34,7 +34,7 @@ import tempfile
 
 from qgis.PyQt.QtCore import QSettings
 
-from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils
 
 SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
 
@@ -228,66 +228,15 @@ class mapillary_coverage:
 
                     with open(geojson_file, 'w') as outfile:
                         json.dump(geojson, outfile)
-
                     defLyr = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % level),"Mapillary " + level, "ogr")
+                    defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s.qml" % level))
+                    QgsExpressionContextUtils.setLayerVariable(defLyr, "mapillaryCurrentKey", "noKey")
                     defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
-                    if self.iface.mapCanvas().scale() < 1000:
-                        suff = '1'
-                    else:
-                        suff = '0'
-                    defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s%s.qml" % (level, suff)))
                     QgsProject.instance().addMapLayer(defLyr)
                     QgsProject.instance().layerTreeRoot().findLayer(defLyr.id()).setExpanded(False)
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)
-
-            '''
-            geojson_overview_file = os.path.join(self.cache_dir, "mapillary_overview.geojson")
-            if overview_features:
-                self.overview = True
-                geojson_overview = {
-                    "type": "FeatureCollection",
-                    "features": overview_features
-                }
-
-                with open(geojson_overview_file, 'w') as outfile:
-                    json.dump(geojson_overview, outfile)
-            else:
-                self.overview = None
-                if os.path.exists(geojson_overview_file):
-                    os.remove(geojson_overview_file)
-
-            geojson_coverage_file = os.path.join(self.cache_dir, "mapillary_coverage.geojson")
-            if coverage_features:
-                self.coverage = True
-                geojson_coverage = {
-                    "type": "FeatureCollection",
-                    "features": coverage_features
-                }
-
-                with open(geojson_coverage_file, 'w') as outfile:
-                    json.dump(geojson_coverage, outfile)
-            else:
-                self.coverage = None
-                if os.path.exists(geojson_coverage_file):
-                    os.remove(geojson_coverage_file)
-
-            geojson_images_file = os.path.join(self.cache_dir, "mapillary_images.geojson")
-            if zoom_level==14 and images_features:
-                self.images = True
-                geojson_images = {
-                    "type": "FeatureCollection",
-                    "features": images_features
-                }
-
-                with open(geojson_images_file, 'w') as outfile:
-                    json.dump(geojson_images, outfile)
-            else:
-                self.images = None
-                if os.path.exists(geojson_images_file):
-                    os.remove(geojson_images_file)
-            '''
 
         else:
             pass
@@ -326,6 +275,14 @@ class mapillary_coverage:
             self.mapillary_images_layer = None
         return self.mapillary_images_layer
 
+    def removeLevels(self):
+        for level in LAYER_LEVELS:
+            try:
+                QgsProject.instance().removeMapLayer(getattr(self, level + 'Layer').id())
+            except:
+                pass
+        self.iface.mapCanvas().refresh()
+
     def getActiveLevels(self):
         activeLevels = {}
         for level in LAYER_LEVELS:
@@ -335,4 +292,4 @@ class mapillary_coverage:
 
     def update_coverage(self):
         self.download_tiles()
-        return self.has_overview(), self.has_sequences(), self.has_images()
+        return self.getActiveLevels()

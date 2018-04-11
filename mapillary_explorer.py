@@ -210,10 +210,6 @@ class go2mapillary:
         QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.mapSelectionTool = None
         self.coverage = mapillary_coverage(self.iface)
-        self.last_overview = None
-        self.last_sequences = None
-        self.last_images = None
-        self.lastEnabledLevels = []
 
 
     #--------------------------------------------------------------------------
@@ -223,17 +219,12 @@ class go2mapillary:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
-        #print "** UNLOAD go2mapillary"
-
-        self.removeOverviewLayer()
-        self.removeSequencesLayer()
-        self.removeImagesLayer()
+        self.coverage.removeLevels()
 
         try:
             self.canvas.extentsChanged.disconnect(self.mapChanged)
         except:
             pass
-
 
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -244,58 +235,7 @@ class go2mapillary:
         del self.toolbar
         self.dockwidget.hide()
 
-    #--------------------------------------------------------------------------
-
-    def getCoverageLayer(self):
-        XYZuri = QgsDataSourceUri()
-        XYZuri.setParam("type", "xyz")
-        XYZuri.setParam('url', 'http://d2cd86j8eqns9s.cloudfront.net/tiles/{z}/{x}/{y}.png')
-        XYZuri.setParam("zmin", "0")
-        XYZuri.setParam("zmax", "15")
-        layer = QgsRasterLayer(str(XYZuri.encodedUri()), 'Mapillary coverage', 'wms')
-        self.coverageLayerId = layer.id()
-        print (self.coverageLayerId)
-        return layer
-        '''
-            service_info = TileServiceInfo("Mapillary coverage",u"Mapillary coverage", "http://d2cd86j8eqns9s.cloudfront.net/tiles/{z}/{x}/{y}.png")
-            service_info.yOriginTop = 1
-            #service_info.epsg_crs_id = 3857
-            service_info.zmin = 0
-            service_info.zmax = 21
-            layer = TileLayer(self, service_info, True)
-            self.coverageLayerId = layer.id()
-            layer.setAttribution("Mapillary coverage \u00A9MAPILLARY")
-            #layer.setAttributionUrl("")
-            #QgsMapLayerRegistry.instance().addMapLayer(layer, False)
-            #toc_root = QgsProject.instance().layerTreeRoot()
-            #toc_root.insertLayer(0, layer)
-            return layer
-        '''
-
-    def removeOverviewLayer(self):
-        try:
-            QgsProject.instance().removeMapLayer(self.coverage.overviewLayer.id())
-        except:
-            pass
-        self.iface.mapCanvas().refresh()
-
-    def removeSequencesLayer(self):
-        try:
-            QgsProject.instance().removeMapLayer(self.self.coverage.sequencesLayer.id())
-        except:
-            pass
-        self.iface.mapCanvas().refresh()
-
-    def removeImagesLayer(self):
-        try:
-            QgsProject.instance().removeMapLayer(self.coverage.imagesLayer.id().id())
-        except:
-            pass
-        self.iface.mapCanvas().refresh()
-
     def toggleViewer(self,mapTool):
-        print (("enabled:",self.viewer.isEnabled()))
-        print (("CURRENT MAPTOOL:",mapTool))
         if mapTool != self.mapSelectionTool:
             self.viewer.disable()
 
@@ -305,14 +245,12 @@ class go2mapillary:
             #print tmpPOV
             if message["transport"] == "view":
                 self.currentLocation = message
-                QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", self.currentLocation['key'])
                 try:
-                    #set a variable to view selected mapillary layer feature as selected
-                    self.mapillaryLocations.triggerRepaint()
+                    QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", self.currentLocation['key'])
+                    self.coverage.imagesLayer.triggerRepaint()
                 except:
                     pass
             elif message["transport"] == "focusOn":
-                print (("enabled MAPTOOL", self.mapSelectionTool))
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
 
@@ -333,136 +271,22 @@ class go2mapillary:
         return xform.transform(pPoint) # forward transformation: src -> dest
 
     def mapChanged(self):
-        print("mapChanged")
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
 
     def mapRefreshed(self):
-        print("mapRefreshed")
         try:
             self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
         except:
             pass
 
-        overview, sequences, images = self.coverage.update_coverage()
-
-        print ("levels",overview, sequences, images)
-
-
-        enabledLevels = self.coverage.getActiveLevels()
-
-        disabledLevels = list(set(LAYER_LEVELS) - set(enabledLevels))
-
-        print ("alllevels",LAYER_LEVELS)
-        print ("enabledlevels",enabledLevels)
-        print ("disabledLayers",disabledLevels)
-        print ("lastenabledlevels",self.lastEnabledLevels)
+        enabledLevels = self.coverage.update_coverage()
 
         for level,layer in enabledLevels.items():
-            print ("processing ",level)
-            QgsExpressionContextUtils.setLayerVariable(layer, "mapillaryCurrentKey", "undefined")
             if not (level == 'sequences' and 'images' in enabledLevels.keys()):
                 self.mapSelectionTool = IdentifyGeometry(self.canvas, layer)
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
-            enabledLevels[level].triggerRepaint()
+            layer.triggerRepaint()
 
-        self.lastEnabledLevels = enabledLevels
-
-    '''
-        for level in LAYER_LEVELS:
-            levelLayer = getattr(self.coverage,level+'Layer')
-            if locals()[level]:
-                print (level,"levelLayer",levelLayer)
-                if locals()[level] and not getattr(self,'last_'+level):
-                    QgsExpressionContextUtils.setLayerVariable(levelLayer, "mapillaryCurrentKey","undefined")
-                    if self.canvas.scale() < 1000:
-                        suff = '1'
-                    else:
-                        suff = '0'
-                    levelLayer.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillary_%s.qml" % level+suff))
-                    QgsProject.instance().addMapLayer(levelLayer)
-                    QgsProject.instance().layerTreeRoot().findLayer(levelLayer.id()).setExpanded(False)
-                    setattr(self, 'last_' + level, True)
-
-                if not locals()[level] and getattr(self,'last_'+level):
-                    QgsProject.instance().removeMapLayer(levelLayer.id())
-
-                if locals()[level]:
-                    self.mapSelectionTool = IdentifyGeometry(self.canvas, levelLayer)
-                    self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
-                    self.coverage.levelLayer.triggerRepaint()
-
-    
-        if overview:
-            if self.last_overview != overview:
-                QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", "undefined")
-                self.mapillaryOverview.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer3.qml"))
-                QgsProject.instance().addMapLayer(self.mapillaryOverview)
-                QgsProject.instance().layerTreeRoot().findLayer(self.mapillaryOverview.id()).setExpanded(False)
-            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.coverage.overviewLayer)
-            self.mapSelectionTool.geomIdentified.connect(self.changeMapillaryOverview)
-            self.coverage.overviewLayer.triggerRepaint()
-        else:
-            try:
-                QgsProject.instance().removeMapLayer(self.coverage.overviewLayer.id())
-            except:
-                pass
-
-        if sequences:
-            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.coverage.sequencesLayer)
-            self.mapSelectionTool.geomIdentified.connect(self.changeMapillarySequence)
-            self.mapillaryCoverage.triggerRepaint()
-        else:
-            try:
-                QgsProject.instance().removeMapLayer(self.coverage.sequencesLayer.id())
-            except:
-                pass
-
-        if images:
-            self.mapSelectionTool = IdentifyGeometry(self.canvas, self.coverage.imagesLayer)
-            self.mapSelectionTool.geomIdentified.connect(self.self.coverage.imagesLayer)
-            if self.canvas.scale() < 1000:
-                self.coverage.imagesLayer.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer0.qml"))
-            else:
-                self.coverage.imagesLayer.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer1.qml"))
-            self.mapillaryLocations.triggerRepaint()
-        else:
-            try:
-                QgsProject.instance().removeMapLayer(self.coverage.imagesLayer.id())
-            except:
-                pass
-
-        self.iface.mapCanvas().refreshAllLayers()
-
-    def setupOverviewLayer(self):
-        self.mapillaryOverview = self.coverage.get_overview_layer()
-        print ("setup overview 1",self.mapillaryOverview,)
-        if self.mapillaryOverview:
-            print ("setup overview 2")
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryOverview, "mapillaryCurrentKey", "undefined")
-            self.mapillaryOverview.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer3.qml"))
-            QgsProject.instance().addMapLayer(self.mapillaryOverview)
-            QgsProject.instance().layerTreeRoot().findLayer(self.mapillaryOverview.id()).setExpanded(False)
-
-    def setupCoverageLayer(self):
-        self.mapillaryCoverage = self.coverage.get_coverage_layer()
-        print ("setup coverage 1",self.mapillaryCoverage,)
-        if self.mapillaryCoverage:
-            print ("setup coverage")
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", "undefined")
-            self.mapillaryCoverage.loadNamedStyle(os.path.join(self.plugin_dir, "res", "mapillaryLayer2.qml"))
-            QgsProject.instance().addMapLayer(self.mapillaryCoverage)
-            QgsProject.instance().layerTreeRoot().findLayer(self.mapillaryCoverage.id()).setExpanded(False)
-
-    def setupLocationsLayer(self):
-        self.mapillaryLocations = self.coverage.get_images_layer()
-        print ("setup locations 1",self.mapillaryLocations,)
-        if self.mapillaryLocations:
-            print ("setup locations")
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryLocations, "mapillaryCurrentKey", "undefined")
-            QgsExpressionContextUtils.setLayerVariable(self.mapillaryCoverage, "mapillaryCurrentKey", "undefined")
-            QgsProject.instance().addMapLayer(self.mapillaryLocations)
-            QgsProject.instance().layerTreeRoot().findLayer(self.mapillaryLocations.id()).setExpanded(False)
-    '''
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -484,9 +308,7 @@ class go2mapillary:
             if self.dockwidget.isVisible():
                 self.dockwidget.hide()
                 self.pluginIsActive = False
-                self.removeOverviewLayer()
-                self.removeSequencesLayer()
-                self.removeImagesLayer()
+                self.coverage.removeLevels()
                 self.canvas.extentsChanged.disconnect(self.mapChanged)
             else:
                 self.dockwidget.show()
@@ -499,20 +321,20 @@ class go2mapillary:
         self.viewer.openLocation(feature['key'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", feature['key'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
-        self.mapillaryLocations.triggerRepaint()
-        self.mapillaryCoverage.triggerRepaint()
+        self.coverage.imagesLayer.triggerRepaint()
+        self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_sequences(self, feature):
         print("changeMapillary_sequences")
         self.viewer.openLocation(feature['ikey'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['key'])
-        self.mapillaryCoverage.triggerRepaint()
+        self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_overview(self, feature):
         print("changeMapillary_overview")
         self.viewer.openLocation(feature['ikey'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
-        self.mapillaryOverview.triggerRepaint()
+        self.coverage.overviewLayer.triggerRepaint()
 
         
         
