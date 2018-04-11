@@ -38,6 +38,8 @@ from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTra
 
 SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
 
+LAYER_LEVELS = ['overview', 'sequences', 'images']
+
 def deg2num(lat_deg, lon_deg, zoom):
     lat_rad = math.radians(lat_deg)
     n = 2.0 ** zoom
@@ -125,8 +127,17 @@ class mapillary_coverage:
         print ("CACHE_DIR", self.cache_dir)
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
+        self.setDefaultLayers()
         self.actual_ranges = None
-        self.images = None
+
+    def setDefaultLayers(self):
+        defaultContent = '{"type": "FeatureCollection", "features": []}'
+        for ld in LAYER_LEVELS:
+            with open(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % ld), 'w') as f:
+                f.write(defaultContent)
+                defLyr = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % ld),"Mapillary "+ld, "ogr")
+                defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
+            setattr(self, ld+'Layer', defLyr)
 
     def transformToWGS84(self, pPoint):
         # transformation from the current SRS to WGS84
@@ -162,7 +173,7 @@ class mapillary_coverage:
             y_range = ranges[1]
 
             overview_features = []
-            coverage_features = []
+            sequences_features = []
             images_features = []
 
             for y in range(y_range[0], y_range[1] + 1):
@@ -198,10 +209,40 @@ class mapillary_coverage:
                         if "mapillary-sequence-overview" in json_data:
                             overview_features = overview_features + json_data["mapillary-sequence-overview"]["features"]
                         elif "mapillary-sequences" in json_data:
-                            coverage_features = coverage_features + json_data["mapillary-sequences"]["features"]
-                        if "mapillary-images" in json_data:
+                            sequences_features = sequences_features + json_data["mapillary-sequences"]["features"]
+                        if "mapillary-images" in json_data and zoom_level==14:
                             images_features = images_features + json_data["mapillary-images"]["features"]
 
+            for level in LAYER_LEVELS:
+                geojson_file = os.path.join(self.cache_dir, "mapillary_%s.geojson" % level)
+                try:
+                    QgsProject.instance().removeMapLayer(getattr(self, level+'Layer').id())
+                except:
+                    pass
+                if  locals()[level+'_features']:
+                    setattr(self,level,True)
+                    geojson = {
+                        "type": "FeatureCollection",
+                        "features": locals()[level+'_features']
+                    }
+
+                    with open(geojson_file, 'w') as outfile:
+                        json.dump(geojson, outfile)
+
+                    defLyr = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % level),"Mapillary " + level, "ogr")
+                    defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
+                    if self.iface.mapCanvas().scale() < 1000:
+                        suff = '1'
+                    else:
+                        suff = '0'
+                    defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s%s.qml" % (level, suff)))
+                    QgsProject.instance().addMapLayer(defLyr)
+                    QgsProject.instance().layerTreeRoot().findLayer(defLyr.id()).setExpanded(False)
+                    setattr(self, level + 'Layer', defLyr)
+                else:
+                    setattr(self, level, False)
+
+            '''
             geojson_overview_file = os.path.join(self.cache_dir, "mapillary_overview.geojson")
             if overview_features:
                 self.overview = True
@@ -246,6 +287,8 @@ class mapillary_coverage:
                 self.images = None
                 if os.path.exists(geojson_images_file):
                     os.remove(geojson_images_file)
+            '''
+
         else:
             pass
             #print ("SAME RANGES")
@@ -253,8 +296,8 @@ class mapillary_coverage:
     def has_overview(self):
         return self.overview
 
-    def has_coverage(self):
-        return self.coverage
+    def has_sequences(self):
+        return self.sequences
 
     def has_images(self):
         return self.images
@@ -283,5 +326,13 @@ class mapillary_coverage:
             self.mapillary_images_layer = None
         return self.mapillary_images_layer
 
+    def getActiveLevels(self):
+        activeLevels = {}
+        for level in LAYER_LEVELS:
+            if getattr(self,level):
+                activeLevels[level] = getattr(self, level+'Layer')
+        return activeLevels
+
     def update_coverage(self):
         self.download_tiles()
+        return self.has_overview(), self.has_sequences(), self.has_images()

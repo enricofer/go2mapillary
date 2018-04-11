@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/go2mapillary.iml" afterPath="$PROJECT_DIR$/.idea/go2mapillary.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/res/mapillaryLayer0.qml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/res/mapillaryLayer1.qml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/res/mapillaryLayer2.qml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/res/mapillaryLayer3.qml" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_coverage.py" afterPath="$PROJECT_DIR$/mapillary_coverage.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/mapillaryLayer2.qml" afterPath="$PROJECT_DIR$/res/mapillaryLayer2.qml" />
     </list>
     <ignored path="go2mapillary.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,12 +28,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1382">
-              <caret line="457" column="113" lean-forward="true" selection-start-line="457" selection-start-column="113" selection-end-line="457" selection-end-column="113" />
-              <folding />
+            <state relative-caret-position="6443">
+              <caret line="406" column="19" lean-forward="false" selection-start-line="406" selection-start-column="19" selection-end-line="406" selection-end-column="19" />
+              <folding>
+                <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -39,7 +43,7 @@
       <file leaf-file-name="getTiles.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getTiles.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1513">
+            <state relative-caret-position="1377">
               <caret line="89" column="31" lean-forward="false" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -48,12 +52,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3757">
-              <caret line="235" column="26" lean-forward="false" selection-start-line="235" selection-start-column="20" selection-end-line="235" selection-end-column="26" />
-              <folding />
+            <state relative-caret-position="960">
+              <caret line="259" column="0" lean-forward="false" selection-start-line="259" selection-start-column="0" selection-end-line="259" selection-end-column="0" />
+              <folding>
+                <element signature="e#1132#1143#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -89,6 +95,7 @@
       <find>mapillaryCurrentKey</find>
       <find>mapillaryViewer</find>
       <find>viewerConnection</find>
+      <find>maptool</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -100,11 +107,11 @@
         <option value="$PROJECT_DIR$/py_tiled_layer/tiles.py" />
         <option value="$PROJECT_DIR$/GlobalMapTiles.py" />
         <option value="$PROJECT_DIR$/identifygeometry.py" />
-        <option value="$PROJECT_DIR$/mapillary_coverage.py" />
         <option value="$PROJECT_DIR$/getTiles.py" />
         <option value="$PROJECT_DIR$/mapillary_viewer.py" />
         <option value="$PROJECT_DIR$/metadata.txt" />
         <option value="$PROJECT_DIR$/mapillary_explorer.py" />
+        <option value="$PROJECT_DIR$/mapillary_coverage.py" />
       </list>
     </option>
   </component>
@@ -310,7 +317,6 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19529086" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32971507" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32930845" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972324" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -322,6 +328,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32875264" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -373,7 +380,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5916">
           <caret line="375" column="66" lean-forward="false" selection-start-line="375" selection-start-column="66" selection-end-line="375" selection-end-column="66" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -391,7 +400,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#1132#1143#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -421,7 +432,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4930">
           <caret line="317" column="61" lean-forward="false" selection-start-line="317" selection-start-column="61" selection-end-line="317" selection-end-column="61" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -445,7 +458,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="317" column="114" lean-forward="false" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -469,7 +484,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="317" column="114" lean-forward="false" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -493,7 +510,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="317" column="114" lean-forward="false" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -517,7 +536,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="317" column="114" lean-forward="false" selection-start-line="317" selection-start-column="114" selection-end-line="317" selection-end-column="114" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -541,7 +562,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -564,7 +587,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -587,7 +612,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -610,7 +637,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -626,7 +655,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -642,7 +673,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -650,7 +683,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -663,36 +698,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/getTiles.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1513">
-          <caret line="89" column="31" lean-forward="false" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/metadata.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="522">
           <caret line="38" column="18" lean-forward="true" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/identifygeometry.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="48" column="9" lean-forward="false" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3757">
-          <caret line="235" column="26" lean-forward="false" selection-start-line="235" selection-start-column="20" selection-end-line="235" selection-end-column="26" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -704,11 +713,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/getTiles.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1377">
+          <caret line="89" column="31" lean-forward="false" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/identifygeometry.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="48" column="9" lean-forward="false" selection-start-line="48" selection-start-column="9" selection-end-line="48" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1382">
-          <caret line="457" column="113" lean-forward="true" selection-start-line="457" selection-start-column="113" selection-end-line="457" selection-end-column="113" />
-          <folding />
+        <state relative-caret-position="6443">
+          <caret line="406" column="19" lean-forward="false" selection-start-line="406" selection-start-column="19" selection-end-line="406" selection-end-column="19" />
+          <folding>
+            <marker date="1523396426000" expanded="true" signature="6424:7786" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="960">
+          <caret line="259" column="0" lean-forward="false" selection-start-line="259" selection-start-column="0" selection-end-line="259" selection-end-column="0" />
+          <folding>
+            <element signature="e#1132#1143#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
