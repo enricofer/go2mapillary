@@ -32,9 +32,9 @@ import mercantile
 import tempfile
 
 from qgis.PyQt.QtCore import QSettings, Qt
-from qgis.PyQt.QtWidgets import QProgressBar, QApplication
+from qgis.PyQt.QtWidgets import QProgressBar, QApplication, QAction
 
-from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
 from qgis.gui import QgsMessageBar
 
 SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
@@ -161,8 +161,9 @@ class mapillary_coverage:
 
     expire_time = datetime.timedelta(hours=12)
 
-    def __init__(self,iface):
-        self.iface = iface
+    def __init__(self,module):
+        self.module = module
+        self.iface = module.iface
         self.cache_dir = os.path.join(tempfile.gettempdir(),'go2mapillary')
         print ("CACHE_DIR", self.cache_dir)
         if not os.path.exists(self.cache_dir):
@@ -271,6 +272,7 @@ class mapillary_coverage:
 
             progress.stop('loading complete')
 
+
             for level in LAYER_LEVELS:
                 geojson_file = os.path.join(self.cache_dir, "mapillary_%s.geojson" % level)
                 try:
@@ -292,6 +294,9 @@ class mapillary_coverage:
                     defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
                     QgsProject.instance().addMapLayer(defLyr)
                     QgsProject.instance().layerTreeRoot().findLayer(defLyr.id()).setExpanded(False)
+                    self.iface.addCustomActionForLayerType(getattr(self.module,'filterAction_'+level), None, QgsMapLayer.VectorLayer, allLayers=False)
+                    self.module.filterDialog.applySqlFilter(layer=defLyr)
+                    self.iface.addCustomActionForLayer(getattr(self.module,'filterAction_'+level), defLyr)
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)

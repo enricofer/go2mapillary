@@ -78,7 +78,7 @@ class mapillaryViewer(QObject):
             #QNetworkProxy.setApplicationProxy(proxy)
         
         #self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
-        self.page = os.path.join('https://enricofer.github.io/go2mapillary/res/browser.html')
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
         self.openLocation('')
         self.enabled = True
         print (self.page)

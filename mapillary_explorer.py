@@ -42,6 +42,7 @@ from qgis.core import (QgsExpressionContextUtils,
 # Import the code for the DockWidget
 from .mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from .mapillary_viewer import mapillaryViewer
+from .mapillary_filter import mapillaryFilter
 from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
 from .identifygeometry import IdentifyGeometry
 from .geojson_request import geojson_request
@@ -209,7 +210,14 @@ class go2mapillary:
         #QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.mapSelectionTool = None
-        self.coverage = mapillary_coverage(self.iface)
+        self.coverage = mapillary_coverage(self)
+        self.filterDialog = mapillaryFilter(self)
+        self.filterAction_images = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
+        self.filterAction_sequences = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
+        self.filterAction_overview = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
+        self.filterAction_images.triggered.connect(self.filter_images_func)
+        self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
+        self.filterAction_overview.triggered.connect(self.filter_overview_func)
 
 
     #--------------------------------------------------------------------------
@@ -234,6 +242,16 @@ class go2mapillary:
         # remove the toolbar
         del self.toolbar
         self.dockwidget.hide()
+
+    def filter_images_func(self):
+        print (dir(self))
+        self.filterDialog.show('images')
+
+    def filter_sequences_func(self):
+        self.filterDialog.show('sequences')
+
+    def filter_overview_func(self):
+        self.filterDialog.show("overview")
 
     def toggleViewer(self,mapTool):
         if mapTool != self.mapSelectionTool:
