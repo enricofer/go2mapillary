@@ -11,7 +11,7 @@ name=go2mapillary
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.98
 description=mapillary explorer
-version=1.5
+version=1.5.1
 author=Enrico Ferreguti
 email=enricofer@gmail.com
 

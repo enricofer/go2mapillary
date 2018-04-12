@@ -25,7 +25,8 @@ import sys
 import requests
 
 
-from qgis.PyQt.QtCore import QSettings, QgsMessageLog, Qgis
+from qgis.PyQt.QtCore import QSettings
+from qgis.core import QgsMessageLog, Qgis
 
 ROOT = 'https://a.mapillary.com/v3/'
 CLIENT_ID = 'ZUZ1MWdOaW1IXzRucVgxNzhwWTBlZzoyNWJjODcwMWIzNzNjNGQ0'
