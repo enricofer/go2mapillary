@@ -105,7 +105,7 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 sqlFilter += ' and '
             sqlFilter += '("pano" = 1)'
 
-        print("sqlFilter", sqlFilter)
+        #print("sqlFilter", sqlFilter)
         if not layer:
             layer = getattr(self.module.coverage,level+'Layer')
         layer.setSubsetString(sqlFilter)
@@ -126,25 +126,26 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 min_timestamp = feat['captured_at']
             if feat['captured_at'] > max_timestamp:
                 max_timestamp = feat['captured_at']
-            if max<200 and not feat['userkey'] in userkeys:
+            if max<100 and not feat['userkey'] in userkeys:
                 userkeys.append(feat['userkey'])
                 max += 1
 
         user_search = self.mapillaryApi.users(userkeys=','.join(userkeys))
-        usermap = {}
-        for user in user_search:
-            usermap[user['username']] = user['key']
-        self.usersSearchFilter.clear()
-        for user in sorted(usermap.keys()):
-            self.usersSearchFilter.addItem(user, usermap[user])
+        if user_search:
+            usermap = {}
+            for user in user_search:
+                usermap[user['username']] = user['key']
+            self.usersSearchFilter.clear()
+            for user in sorted(usermap.keys()):
+                self.usersSearchFilter.addItem(user, usermap[user])
 
-        if not self.date_group.isChecked():
-            mintime = QDateTime()
-            mintime.setTime_t(min_timestamp/1000)
-            self.fromDateWidget.setDate(mintime.date())
-            maxtime = QDateTime()
-            maxtime.setTime_t(max_timestamp/1000)
-            self.toDateWidget.setDate(maxtime.date())
+            if not self.date_group.isChecked():
+                mintime = QDateTime()
+                mintime.setTime_t(min_timestamp/1000)
+                self.fromDateWidget.setDate(mintime.date())
+                maxtime = QDateTime()
+                maxtime.setTime_t(max_timestamp/1000)
+                self.toDateWidget.setDate(maxtime.date())
 
     def addUserAction(self):
         userCell = QtWidgets.QTableWidgetItem(self.usersSearchFilter.currentText())

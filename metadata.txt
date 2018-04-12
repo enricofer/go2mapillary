@@ -11,7 +11,7 @@ name=go2mapillary
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.98
 description=mapillary explorer
-version=1.4
+version=1.5
 author=Enrico Ferreguti
 email=enricofer@gmail.com
 
@@ -28,6 +28,7 @@ changelog= 1.1 metadata max min versions, gui improvement, cache relocation
  1.2 QgsPointXY api break issue fixed
  1.3 qgisMinimumVersion to 2.99
  1.4 qgisMinimumVersion to 3.0 - crs transformation issue fixed
+ 1.5 code cleanup, levels rendering issues fixed, progress bar and filtering new feature
 
 # Tags are comma separated with spaces allowed
 tags=webservice, service, mapillary, browser, street view, explorer

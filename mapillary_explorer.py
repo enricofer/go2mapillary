@@ -244,7 +244,6 @@ class go2mapillary:
         self.dockwidget.hide()
 
     def filter_images_func(self):
-        print (dir(self))
         self.filterDialog.show('images')
 
     def filter_sequences_func(self):
@@ -332,7 +331,7 @@ class go2mapillary:
                 self.mapRefreshed()
 
     def changeMapillary_images(self, feature):
-        print("changeMapillary_images")
+        #print("changeMapillary_images")
         self.viewer.openLocation(feature['key'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", feature['key'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
@@ -340,13 +339,13 @@ class go2mapillary:
         self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_sequences(self, feature):
-        print("changeMapillary_sequences")
+        #print("changeMapillary_sequences")
         self.viewer.openLocation(feature['ikey'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['key'])
         self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_overview(self, feature):
-        print("changeMapillary_overview")
+        #print("changeMapillary_overview")
         self.viewer.openLocation(feature['ikey'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
         self.coverage.overviewLayer.triggerRepaint()

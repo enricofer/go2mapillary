@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QObject, QUrl, pyqtSignal
+from PyQt5.QtCore import QSettings, QObject, QUrl, pyqtSignal, QDir
 from PyQt5.QtGui import *
 from PyQt5.QtWebKit import QWebSettings
 from qgis.PyQt.QtNetwork import QNetworkProxy
@@ -77,16 +77,15 @@ class mapillaryViewer(QObject):
             proxy.setPassword(proxyPassword)
             #QNetworkProxy.setApplicationProxy(proxy)
         
-        #self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
-        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
+        self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
+        #self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
         self.openLocation('')
         self.enabled = True
         print (self.page)
     
     def openLocation(self, key):
         self.locationKey = key
-        print (QUrl(self.page+'?key='+key))
-        self.viewport.load(QUrl(self.page+'?key='+key)) #'file:///'+
+        self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
 
     def getJSONmessage(self,status):
         try:

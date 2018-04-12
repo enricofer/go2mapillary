@@ -25,11 +25,10 @@ import sys
 import requests
 
 
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtCore import QSettings, QgsMessageLog, Qgis
 
 ROOT = 'https://a.mapillary.com/v3/'
 CLIENT_ID = 'ZUZ1MWdOaW1IXzRucVgxNzhwWTBlZzoyNWJjODcwMWIzNzNjNGQ0'
-#CLIENT_SECRET = 'ODkwNGFlYmQ5ZmQ2MGNhMjQ1YjZmMjE2ZjY1NTY3ZTM='
 
 def getProxiesConf():
     s = QSettings() #getting proxy from qgis options settings
@@ -66,13 +65,9 @@ class mapillaryApi:
         return self.proto_method('map_features', **kwargs)
 
     def proto_method(self, endpoint, **kwargs):
-        print (kwargs)
-        parameters = {'client_id': CLIENT_ID}
-        for name, value in kwargs.items():
-            parameters[name] = value
-
-        res = requests.get(ROOT+endpoint, params=parameters, proxies=getProxiesConf())
+        kwargs['client_id'] =  CLIENT_ID
+        res = requests.get(ROOT+endpoint, params=kwargs, proxies=getProxiesConf())
         if res.status_code == 200:
             return res.json()
         else:
-            pass #raise exception
+            QgsMessageLog.logMessage("mapillary connection error: %d" % res.status_code, tag="go2mapillary",level=Qgis.Info)

@@ -165,7 +165,7 @@ class mapillary_coverage:
         self.module = module
         self.iface = module.iface
         self.cache_dir = os.path.join(tempfile.gettempdir(),'go2mapillary')
-        print ("CACHE_DIR", self.cache_dir)
+        QgsMessageLog.logMessage("CACHE_DIR"+self.cache_dir, tag="go2mapillary",level=Qgis.Info)
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
         self.setDefaultLayers()
@@ -202,13 +202,12 @@ class mapillary_coverage:
 
         ranges = getTileRange(bounds, zoom_level)
 
-        #print ("ZOOM_LEVEL", zoom_level, "RANGES", self.actual_ranges, ranges)
         if not self.actual_ranges or not (
                                     ranges[0][0]==self.actual_ranges[0][0] and
                                     ranges[0][1]==self.actual_ranges[0][1] and
                                     ranges[1][0]==self.actual_ranges[1][0] and
                                     ranges[1][1]==self.actual_ranges[1][1]):
-            print ("ZOOM_LEVEL", zoom_level, "NEW RANGES", ranges, "LAST RANGES", self.actual_ranges)
+            #print ("ZOOM_LEVEL", zoom_level, "NEW RANGES", ranges, "LAST RANGES", self.actual_ranges)
             self.actual_ranges = ranges
             x_range = ranges[0]
             y_range = ranges[1]
