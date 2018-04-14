@@ -22,18 +22,23 @@
 """
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction, QDockWidget
-from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon, QColor
 from qgis.PyQt.QtNetwork import QNetworkProxy
 
 from qgis.core import (QgsExpressionContextUtils,
                        QgsNetworkAccessManager,
                        QgsProject,
+                       QgsGeometry,
                        QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
                        QgsPoint,
+                       QgsPointXY,
                        QgsVectorLayer,
                        QgsRasterLayer,
-                       QgsDataSourceUri,)
+                       QgsDataSourceUri,
+                       QgsWkbTypes,)
+
+from qgis.gui import QgsRubberBand,QgsVertexMarker
 
 #from qgis.utils import *
 # Initialize Qt resources from file resources.py
@@ -50,6 +55,69 @@ from .geojson_request import geojson_request
 import os.path
 import json
 
+
+
+class mapillary_cursor():
+
+    def transformToWGS84(self, pPoint):
+        # transformation from the current SRS to WGS84
+        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs()  # get current crs
+        crsSrc = crcMappaCorrente
+        crsDest = QgsCoordinateReferenceSystem(4326)  # WGS 84
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
+        return xform.transform(pPoint)  # forward transformation: src -> dest
+
+    def transformToCurrentSRS(self, pPoint):
+        # transformation from the current SRS to WGS84
+        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs()  # get current crs
+        crsDest = crcMappaCorrente
+        crsSrc = QgsCoordinateReferenceSystem(4326)  # WGS 84
+        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
+        return xform.transform(pPoint)  # forward transformation: src -> dest
+
+    def __init__(self,parentInstance):
+        self.parentInstance = parentInstance
+        self.iface = parentInstance.iface
+        self.mapCanvas = self.iface.mapCanvas()
+        self.lineOfSight = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
+        self.pointOfView = QgsVertexMarker(self.mapCanvas)
+        self.cursor = QgsVertexMarker(self.mapCanvas)
+        self.lineOfSight.setColor(QColor("#36AF6C"))
+        self.pointOfView.setColor(QColor("#36AF6C"))
+        self.cursor.setColor(QColor("#36AF6C"))
+        self.lineOfSight.setWidth(1)
+        self.pointOfView.setIconType(QgsRubberBand.ICON_CIRCLE)
+        self.cursor.setIconType(QgsRubberBand.ICON_CIRCLE)
+        self.pointOfView.setIconSize(25)
+        self.cursor.setIconSize(25)
+        self.cursor.setPenWidth(2)
+        self.pointOfView.setPenWidth(2)
+
+    def draw(self,pointOfView_coords,cursor_coords,endOfSight_coords):
+        self.cursor.show()
+        self.pointOfView.show()
+        self.lineOfSight.reset()
+        pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
+        cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
+        endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
+        #print ('cursor',cursor_coords[0],cursor_coords[1],cursor.x(),cursor.y())
+        self.pointOfView.setCenter (pointOfView)
+        self.cursor.setCenter (cursor)
+        self.lineOfSight.addPoint(pointOfView)
+        self.lineOfSight.addPoint(cursor)
+        self.lineOfSight.addPoint(endOfSight)
+        self.cursor.updatePosition()
+
+    def delete(self):
+        self.cursor.hide()
+        self.pointOfView.hide()
+        self.lineOfSight.reset()
+
+    def sample(self,sample_coords):
+        samplePoint = self.transformToCurrentSRS(QgsPointXY(sample_coords[1],sample_coords[0]))
+        sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
+        print(sampleDevicePoint.x(),sampleDevicePoint.y())
+        clickEvent = QgsMapMouseEvent(self.iface.mapCanvas(),)
 
 class go2mapillary:
     """QGIS Plugin Implementation."""
@@ -218,6 +286,7 @@ class go2mapillary:
         self.filterAction_images.triggered.connect(self.filter_images_func)
         self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
         self.filterAction_overview.triggered.connect(self.filter_overview_func)
+        self.sampleLocation = mapillary_cursor(self)
 
 
     #--------------------------------------------------------------------------
@@ -257,33 +326,26 @@ class go2mapillary:
             self.viewer.disable()
 
     def viewerConnection(self, message):
+        #print (message)
         if message:
+            if message["transport"] == "move_cursor":
+                #print('moving',message)
+                self.sampleLocation.draw(message["pov"],message["cursor"],message["endOfSight"])
+            if message["transport"] == "disable_cursor":
+                print('deleting')
+                self.sampleLocation.delete()
             if message["transport"] == "view":
+                self.sampleLocation.delete()
                 self.currentLocation = message
                 try:
                     QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", self.currentLocation['key'])
                     self.coverage.imagesLayer.triggerRepaint()
                 except:
                     pass
-            elif message["transport"] == "focusOn":
+            if message["transport"] == "focusOn":
+                self.sampleLocation.delete()
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
-
-    def transformToWGS84(self, pPoint):
-        # transformation from the current SRS to WGS84
-        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
-        crsSrc = crcMappaCorrente
-        crsDest = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
-        return xform.transform(pPoint) # forward transformation: src -> dest
-
-    def transformToCurrentSRS(self, pPoint):
-        # transformation from the current SRS to WGS84
-        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
-        crsDest = crcMappaCorrente
-        crsSrc = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
-        return xform.transform(pPoint) # forward transformation: src -> dest
 
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)

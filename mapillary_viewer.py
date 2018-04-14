@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QObject, QUrl, pyqtSignal, QDir
+from PyQt5.QtCore import QSettings, QObject, QUrl, QDir, pyqtSignal, pyqtProperty, pyqtSlot
 from PyQt5.QtGui import *
 from PyQt5.QtWebKit import QWebSettings
 from qgis.PyQt.QtNetwork import QNetworkProxy
@@ -28,6 +28,7 @@ from qgis.PyQt.QtNetwork import QNetworkProxy
 from qgis.core import QgsNetworkAccessManager
 
 import os
+import sys
 import json
 
 
@@ -38,7 +39,8 @@ class mapillaryViewer(QObject):
     def __init__(self, viewport):
         super(mapillaryViewer, self).__init__()
         self.viewport = viewport
-        self.viewport.statusBarMessage.connect(self.getJSONmessage)
+        #self.viewport.statusBarMessage.connect(self.getJSONmessage)
+        self.viewport.page().mainFrame().javaScriptWindowObjectCleared.connect(self.registerJS)
         WS = self.viewport.settings()
         WS.setAttribute(QWebSettings.JavascriptEnabled,True)
         WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
@@ -77,17 +79,20 @@ class mapillaryViewer(QObject):
             proxy.setPassword(proxyPassword)
             #QNetworkProxy.setApplicationProxy(proxy)
         
-        self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
+        self.page = os.path.join(os.path.dirname(__file__),'res','browser_test.html')
         #self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
         self.openLocation('')
         self.enabled = True
-        print (self.page)
-    
+
+    def registerJS(self):
+        self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
+
     def openLocation(self, key):
         self.locationKey = key
         self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
 
-    def getJSONmessage(self,status):
+    @pyqtSlot(str)
+    def JSONmessage(self,status):
         try:
             message = json.JSONDecoder().decode(status)
         except:
@@ -102,7 +107,6 @@ class mapillaryViewer(QObject):
 
     def disable(self):
         js = 'document.getElementById("focus").classList.remove("hidden");'
-        print (self.viewport)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
         self.enabled = None
 
