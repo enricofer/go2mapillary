@@ -29,6 +29,7 @@ from qgis.core import (QgsExpressionContextUtils,
                        QgsNetworkAccessManager,
                        QgsProject,
                        QgsGeometry,
+                       QgsFeature,
                        QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
                        QgsPoint,
@@ -92,10 +93,13 @@ class mapillary_cursor():
         self.sightDirection.setLineStyle(Qt.DashLine)
         self.pointOfView.setIconType(QgsRubberBand.ICON_CIRCLE)
         self.cursor.setIconType(QgsRubberBand.ICON_CIRCLE)
-        self.pointOfView.setIconSize(25)
-        self.cursor.setIconSize(25)
+        self.pointOfView.setIconSize(20)
+        self.cursor.setIconSize(20)
         self.cursor.setPenWidth(2)
         self.pointOfView.setPenWidth(2)
+        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=key:string(20)&field=note:string(50)&index=yes","Mapillary samples","memory")
+        self.samplesLayer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_samples.qml"))
+
 
     def draw(self,pointOfView_coords,orig_pointOfView_coords,cursor_coords,endOfSight_coords):
         self.cursor.show()
@@ -118,12 +122,31 @@ class mapillary_cursor():
         self.cursor.hide()
         self.pointOfView.hide()
         self.lineOfSight.reset()
+        self.sightDirection.reset()
 
-    def sample(self,sample_coords):
-        samplePoint = self.transformToCurrentSRS(QgsPointXY(sample_coords[1],sample_coords[0]))
-        sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
-        print(sampleDevicePoint.x(),sampleDevicePoint.y())
-        clickEvent = QgsMapMouseEvent(self.iface.mapCanvas(),)
+    def sample(self,id,key,sample_coords):
+        samplePoint = QgsPointXY(sample_coords[1],sample_coords[0])
+        #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
+        if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
+            QgsProject.instance().addMapLayer(self.samplesLayer)
+        sampleFeat = QgsFeature(self.samplesLayer.fields())
+        sampleFeat['id'] = id
+        sampleFeat['key'] = key
+        sampleFeat.setGeometry(QgsGeometry.fromPointXY(samplePoint))
+        self.samplesLayer.dataProvider().addFeatures([sampleFeat])
+        self.samplesLayer.triggerRepaint()
+
+    def getSamplesList(self):
+        samples = []
+        id = 1
+        for feat in self.samplesLayer.getFeatures():
+            samples.append({
+                "id":id,
+                "latLon":{
+                    'lat':feat.geometry().asPoint().y(),
+                    'lon':feat.geometry().asPoint().x(),
+                }
+            })
 
 class go2mapillary:
     """QGIS Plugin Implementation."""
@@ -303,6 +326,8 @@ class go2mapillary:
         """Removes the plugin menu item and icon from QGIS GUI."""
 
         self.coverage.removeLevels()
+        self.sampleLocation.delete()
+        QgsProject.instance().removeMapLayer(self.sampleLocation.samplesLayer.id())
 
         try:
             self.canvas.extentsChanged.disconnect(self.mapChanged)
@@ -340,6 +365,10 @@ class go2mapillary:
             if message["transport"] == "disable_cursor":
                 print('deleting')
                 self.sampleLocation.delete()
+            if message["transport"] == "create_marker":
+                print('creating')
+                self.sampleLocation.sample(message['id'],message['key'],message['markerPos'])
+
             if message["transport"] == "view":
                 self.sampleLocation.delete()
                 self.currentLocation = message

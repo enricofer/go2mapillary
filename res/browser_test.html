@@ -116,10 +116,11 @@
         function Q_create_marker(id,markerPos){
             var viewPar = {
                 "transport":"create_marker",
+                "key":key_param,
                 "id":id,
                 "markerPos":markerPos
             };
-            sendMessage(JSON.stringify(viewPar));
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
         }
 
         function Q_drag_marker(id,markerPos){
@@ -175,11 +176,6 @@
                     sequence: true,
                 },
             });
-
-        var mmly = new Mapillary
-          .Viewer('mly', // container id
-                  'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
-                  null);
 
         const mapNodePosition = {
             line: L.polyline([[0, 0], [0, 0]], {color: '#0ff', weight: 1}),

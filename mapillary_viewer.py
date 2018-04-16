@@ -41,6 +41,7 @@ class mapillaryViewer(QObject):
         self.viewport = viewport
         #self.viewport.statusBarMessage.connect(self.getJSONmessage)
         self.viewport.page().mainFrame().javaScriptWindowObjectCleared.connect(self.registerJS)
+        self.locationKey = None
         WS = self.viewport.settings()
         WS.setAttribute(QWebSettings.JavascriptEnabled,True)
         WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
@@ -87,10 +88,16 @@ class mapillaryViewer(QObject):
     def registerJS(self):
         self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
 
+
+
     def openLocation(self, key):
+        if not self.locationKey:
+            print('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))
+            self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
+        else:
+            js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
+            self.viewport.page().mainFrame().evaluateJavaScript(js)
         self.locationKey = key
-        print('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))
-        self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
 
 
 
