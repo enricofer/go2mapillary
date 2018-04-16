@@ -5,10 +5,10 @@
     <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
-    <script src='https://unpkg.com/mapillary-js@2.10.0/dist/mapillary.min.js'></script>
+    <link rel='stylesheet' href='https://unpkg.com/mapillary-js@2.11.1/dist/mapillary.min.css' />
     <link href='https://unpkg.com/leaflet@1.0.1/dist/leaflet.css' rel='stylesheet' />
 
-    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.10.0/dist/mapillary.min.css'>
+    <script src='https://unpkg.com/mapillary-js@2.11.1/dist/mapillary.min.js'></script>
     <script src='https://unpkg.com/leaflet@1.0.1/dist/leaflet.js'></script>
 
       <style>
@@ -95,13 +95,12 @@
             sendMessage(window.status = JSON.stringify(viewPar));
         }
 
-        function Q_move_cursor(pov,cursor,endOfSight,origina_pov){
+        function Q_move_cursor(pov,cursor,endOfSight){
             var viewPar = {
                 "transport":"move_cursor",
                 "endOfSight": endOfSight,
                 "cursor": cursor,
-                "pov":pov,
-                "orig_pov":pov
+                "pov":pov
             };
             sendMessage(JSON.stringify(viewPar));
         }
@@ -164,38 +163,15 @@
             {
                 component: {
                     marker: {
-                        visibleBBoxSize: 200,
+                        visibleBBoxSize: 100,
                     },
                     mouse: {
                         doubleClickZoom: false,
-                        dragPan: true,
-                        scrollZoom: true,
-                        touchZoom: false,
                     },
-                    sequence: true,
                 },
             });
 
-        var mmly = new Mapillary
-          .Viewer('mly', // container id
-                  'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
-                  null);
-
-        const mapNodePosition = {
-            line: L.polyline([[0, 0], [0, 0]], {color: '#0ff', weight: 1}),
-            originalPos: L.circleMarker([0, 0], { radius: 7, color: '#0ff' }),
-            pos: L.circleMarker([0, 0], { radius: 7, color: '#00f' }),
-        };
-
         mly.on(Mapillary.Viewer.nodechanged, function (node) {
-
-            const latLon = [node.latLon.lat, node.latLon.lon];
-            const originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
-
-            mapNodePosition.line.setLatLngs([originalLatLon, latLon]);
-            mapNodePosition.originalPos.setLatLng(originalLatLon);
-            mapNodePosition.pos.setLatLng(latLon);
-
             var viewPar = {
                 "transport":"view",
                 "lat":node.latLon.lat,
@@ -211,13 +187,9 @@
             function() { /* noop */ },
             function(e) { console.error(e); });
 
-        // Get marker component
-        const markerComponent = mly.getComponent('marker');
-
 
         // Show original latLon and latLon (if computed exist it will differ) of current
         // viewer node on map. Show line linking the two points together
-        /*
         const mapNodePosition = {
             line: L.polyline([[0, 0], [0, 0]], {color: '#0ff', weight: 1}),
             originalPos: L.circleMarker([0, 0], { radius: 7, color: '#0ff' }),
@@ -242,6 +214,10 @@
         });
 
 
+        // Get marker component
+        const markerComponent = mly.getComponent('marker');
+
+
         // Show a flat circle marker in the viewer when hovering the map
         var mapHoverViewerMarker;
 
@@ -264,7 +240,6 @@
         map.on('mousemove', onMapMouseEvent);
         map.on('mouseover', onMapMouseEvent);
         map.on('mouseout', removeMapHoverViewerMarker);
-        */
 
 
         // Show a flat circle marker in the viewer and a corresponding map marker when hovering the viewer
@@ -280,7 +255,6 @@
             },
         };
 
-        /*
         const addMapIndicator = function() {
             if (!map.hasLayer(indicator.mapLine)) {
                 indicator.mapLine.addTo(map);
@@ -300,7 +274,6 @@
                 map.removeLayer(indicator.mapMarker);
             }
         }
-        */
 
         const removeViewerIndicator = function() {
             if (!!indicator.viewerMarker && markerComponent.has(indicator.viewerMarker.id)) {
@@ -310,12 +283,10 @@
         }
 
         const setViewerIndicatorMarker = function(latLon) {
-            //const viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
             const viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
                 indicator.id,
-                latLon
-                ,{ color: '#0f0' }
-            );
+                latLon,
+                { color: '#0f0' });
 
             markerComponent.add([viewerMarker]);
 
@@ -327,7 +298,7 @@
 
             if (latLon == null) {
                 Q_disable_cursor()
-                //removeMapIndicator();
+                removeMapIndicator();
                 removeViewerIndicator();
                 return;
             }
@@ -337,18 +308,18 @@
                 [posLatLng.lat, posLatLng.lng],
                 [latLon.lat, latLon.lon],
                 [
-                    posLatLng.lat + 100 * (latLon.lat - posLatLng.lat),
-                    posLatLng.lng + 100 * (latLon.lon - posLatLng.lng),
+                    posLatLng.lat + 5 * (latLon.lat - posLatLng.lat),
+                    posLatLng.lng + 5 * (latLon.lon - posLatLng.lng),
                 ],
             ];
 
 
-            //indicator.mapLine.setLatLngs(lineString);
-            //indicator.mapMarker.setLatLng([latLon.lat, latLon.lon]);
+            indicator.mapLine.setLatLngs(lineString);
+            indicator.mapMarker.setLatLng([latLon.lat, latLon.lon]);
 
             setViewerIndicatorMarker({ lat: latLon.lat, lon: latLon.lon });
 
-            //addMapIndicator();
+            addMapIndicator();
             Q_move_cursor(lineString[1],lineString[0],lineString[2])
         }
 
@@ -375,7 +346,7 @@
         mly.on(Mapillary.Viewer.mouseout, function(event) {
             indicator.state.lastPos = null;
             removeViewerIndicator();
-            //removeMapIndicator();
+            removeMapIndicator();
         });
 
         mly.on(Mapillary.Viewer.movestart, function(event) { indicator.state.moving = true; });
@@ -392,7 +363,7 @@
             // Remove indicators when dragging marker in the viewer
             indicator.state.dragging = true;
             removeViewerIndicator();
-            //removeMapIndicator();
+            removeMapIndicator();
         });
 
         markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragend, function() {
@@ -420,7 +391,6 @@
             markerComponent.add([marker]);
         }
 
-        /*
         const handleMapMarkerDrag = function(mapMarker) {
             // Listen to map events and act to move map and viewer markers accordingly
             mapMarker.on({
@@ -456,25 +426,21 @@
             });
         }
 
-        */
-
         const createMarker = function(latLon) {
             const id = (addedMarkerId++).toString();
 
             addOrReplaceViewerMarker(id, latLon);
 
-            /*
             const mapMarker =
                 L.circleMarker(
                     [latLon.lat, latLon.lon],
                     { radius: 5, color: '#f00', draggable: 'true', id: id })
                 .addTo(map);
-            */
 
             Q_create_marker(id,[latLon.lat, latLon.lon])
 
             mapMarkers[id] = mapMarker;
-            //handleMapMarkerDrag(mapMarker);
+            handleMapMarkerDrag(mapMarker);
         }
 
         mly.on(Mapillary.Viewer.click, function(e) {
@@ -488,7 +454,6 @@
             });
         });
 
-        /*
         const mapOnClick = function(e) {
             if (!e.latlng) { return; }
 
@@ -509,7 +474,6 @@
 
             Q_drag_marker(e.marker.id,[e.marker.latLon.lat, e.marker.latLon.lon])
         });
-        */
 
 
         // Trigger render on browser window resize

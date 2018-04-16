@@ -80,7 +80,7 @@ class mapillaryViewer(QObject):
             #QNetworkProxy.setApplicationProxy(proxy)
         
         self.page = os.path.join(os.path.dirname(__file__),'res','browser_test.html')
-        #self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
+        #self.page = os.path.join(os.path.dirname(__file__),'res','browser_test_cursor.html')
         self.openLocation('')
         self.enabled = True
 
@@ -89,7 +89,10 @@ class mapillaryViewer(QObject):
 
     def openLocation(self, key):
         self.locationKey = key
+        print('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))
         self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
+
+
 
     @pyqtSlot(str)
     def JSONmessage(self,status):

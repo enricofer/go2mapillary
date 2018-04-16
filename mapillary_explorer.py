@@ -80,12 +80,16 @@ class mapillary_cursor():
         self.iface = parentInstance.iface
         self.mapCanvas = self.iface.mapCanvas()
         self.lineOfSight = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
+        self.sightDirection = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
         self.pointOfView = QgsVertexMarker(self.mapCanvas)
         self.cursor = QgsVertexMarker(self.mapCanvas)
+        self.sightDirection.setColor(QColor("#36AF6C"))
         self.lineOfSight.setColor(QColor("#36AF6C"))
         self.pointOfView.setColor(QColor("#36AF6C"))
         self.cursor.setColor(QColor("#36AF6C"))
-        self.lineOfSight.setWidth(1)
+        self.lineOfSight.setWidth(2)
+        self.sightDirection.setWidth(1)
+        self.sightDirection.setLineStyle(Qt.DashLine)
         self.pointOfView.setIconType(QgsRubberBand.ICON_CIRCLE)
         self.cursor.setIconType(QgsRubberBand.ICON_CIRCLE)
         self.pointOfView.setIconSize(25)
@@ -93,10 +97,11 @@ class mapillary_cursor():
         self.cursor.setPenWidth(2)
         self.pointOfView.setPenWidth(2)
 
-    def draw(self,pointOfView_coords,cursor_coords,endOfSight_coords):
+    def draw(self,pointOfView_coords,orig_pointOfView_coords,cursor_coords,endOfSight_coords):
         self.cursor.show()
         self.pointOfView.show()
         self.lineOfSight.reset()
+        self.sightDirection.reset()
         pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
         cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
         endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
@@ -105,7 +110,8 @@ class mapillary_cursor():
         self.cursor.setCenter (cursor)
         self.lineOfSight.addPoint(pointOfView)
         self.lineOfSight.addPoint(cursor)
-        self.lineOfSight.addPoint(endOfSight)
+        self.sightDirection.addPoint(pointOfView)
+        self.sightDirection.addPoint(endOfSight)
         self.cursor.updatePosition()
 
     def delete(self):
@@ -330,7 +336,7 @@ class go2mapillary:
         if message:
             if message["transport"] == "move_cursor":
                 #print('moving',message)
-                self.sampleLocation.draw(message["pov"],message["cursor"],message["endOfSight"])
+                self.sampleLocation.draw(message["pov"],message["orig_pov"],message["cursor"],message["endOfSight"])
             if message["transport"] == "disable_cursor":
                 print('deleting')
                 self.sampleLocation.delete()
