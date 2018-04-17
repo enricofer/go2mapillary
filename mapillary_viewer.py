@@ -80,7 +80,7 @@ class mapillaryViewer(QObject):
             proxy.setPassword(proxyPassword)
             #QNetworkProxy.setApplicationProxy(proxy)
         
-        self.page = os.path.join(os.path.dirname(__file__),'res','browser_test.html')
+        self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
         #self.page = os.path.join(os.path.dirname(__file__),'res','browser_test_cursor.html')
         self.openLocation('')
         self.enabled = True

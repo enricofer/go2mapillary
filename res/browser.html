@@ -1,13 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset=utf-8>
-    <title>mapillary-js preview</title>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.js'></script>
-    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.5.0/dist/mapillary.min.css'>
-    <style>
 
+    <script src='https://unpkg.com/mapillary-js@2.10.0/dist/mapillary.min.js'></script>
+
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.10.0/dist/mapillary.min.css'>
+
+      <style>
         .hidden{
             visibility: hidden;
         }
@@ -47,77 +49,302 @@
         }
 
         html, body { margin: 0; padding: 0; height: 100%; }
-        #mly { height: 100%; }
+          #mly { position: absolute; width: 100%; height: 100%; }
+      </style>
+</head>
 
-    </style>
-  </head>
-    <body style="margin:0px;">
-    <div id="mly"></div>
+<body style="margin:0px;">
+    <div id='mly'></div>
+    <div id='map'></div>
     <div id="location" class="" ></div>
     <div id="focus" class="hidden" onclick="focusOn()"><span id="message">click to enable<br/>go2mapillary maptool</span></div>
     <div id="splash" class="hidden" onclick="focusOn()"></div>
     <script>
 
-    function focusOn(){
-        var viewPar = {
-            "transport":"focusOn",
+        var lastMsg = Date.now()
+
+        function sendMessage (msg){
+            if (Date.now()-lastMsg > 200){
+                QgisConnection.JSONmessage(msg);
+                lastMsg = Date.now();
+            }
+        }
+
+        function focusOn(){
+            var viewPar = {
+                "transport":"focusOn",
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function Q_enable_cursor(pos,originalPos){
+            var viewPar = {
+                "transport":"enable_cursor",
+                "originalPos": originalPos,
+                "pos": pos
+            };
+            sendMessage(window.status = JSON.stringify(viewPar));
+        }
+
+        function Q_move_cursor(pov,cursor,endOfSight,origina_pov){
+            var viewPar = {
+                "transport":"move_cursor",
+                "endOfSight": endOfSight,
+                "cursor": cursor,
+                "pov":pov,
+                "orig_pov":pov
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function Q_disable_cursor(){
+            var viewPar = {
+                "transport":"disable_cursor",
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_create_marker(id,markerPos){
+            var viewPar = {
+                "transport":"create_marker",
+                "key":key_param,
+                "id":id,
+                "markerPos":markerPos
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_drag_marker(id,markerPos){
+            var viewPar = {
+                "transport":"drag_marker",
+                "id":id,
+                "markerPos":markerPos
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function gup(name)
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
         };
-        window.status = JSON.stringify(viewPar);
-        var focusElement = document.getElementById("focus");
-    }
 
-    function gup(name)
-    {
-      name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-      var regexS = "[\\?&]"+name+"=([^&#]*)";
-      var regex = new RegExp( regexS );
-      var results = regex.exec( window.location.href );
-      if( results == null )
-        return "";
-      else
-        return results[1];
-    };
+        var key_param = gup('key');
 
-    var key_param = gup('key');
+        if (key_param == '') {
+            //key_param = 'lGR_tpysmbwfQCRhgX2etw'
+            document.getElementById("splash").classList.remove("hidden");
+            document.getElementById("focus").classList.remove("disabled");
+            document.getElementById("mly").classList.add("hidden");
+        } else {
+            document.getElementById("splash").classList.add("hidden");
+            document.getElementById("focus").classList.remove("disabled");
+            document.getElementById("mly").classList.remove("hidden");
+        }
 
-    if (key_param == '') {
-        //key_param = 'lGR_tpysmbwfQCRhgX2etw'
-        document.getElementById("splash").classList.remove("hidden");
-        document.getElementById("focus").classList.remove("disabled");
-        document.getElementById("mly").classList.add("hidden");
-    } else {
-        document.getElementById("splash").classList.add("hidden");
-        document.getElementById("focus").classList.remove("disabled");
-        document.getElementById("mly").classList.remove("hidden");
-    }
 
-    console.log(key_param);
+        var mly = new Mapillary.Viewer(
+            'mly',
+            'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh',
+            null,
+            {
+                component: {
+                    marker: {
+                        visibleBBoxSize: 200,
+                    },
+                    mouse: {
+                        doubleClickZoom: false,
+                        dragPan: true,
+                        scrollZoom: true,
+                        touchZoom: false,
+                    },
+                    sequence: true,
+                },
+            });
 
-    var mly = new Mapillary
-      .Viewer('mly', // container id
-              'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh', // your Client ID
-              null);
+        const mapNodePosition = {};
 
-    mly.on(Mapillary.Viewer.nodechanged, function (node) {
-        var viewPar = {
-            "transport":"view",
-            "lat":node.latLon.lat,
-            "lon":node.latLon.lon,
-            "key":node.key,
-            "ca":node.ca
-            //"sequence":node.sequence
+        mly.on(Mapillary.Viewer.nodechanged, function (node) {
+
+            const latLon = [node.latLon.lat, node.latLon.lon];
+            const originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
+
+            mapNodePosition.line = [node.originalLatLon, node.latLon];
+            mapNodePosition.originalPos = node.originalLatLon;
+            mapNodePosition.pos = node.latLon;
+
+            var viewPar = {
+                "transport":"view",
+                "lat":node.latLon.lat,
+                "lon":node.latLon.lon,
+                "key":node.key,
+                "ca":node.ca,
+                //"sequence":node.sequenceKey(),
+                //"originalLat":node.originalLatLon.lat,
+                //"originallon":node.originalLatLon.lon,
+                //"capturedAt":node.capturedAt()
+            };
+            sendMessage(JSON.stringify(viewPar));
+        })
+
+        mly.moveToKey(key_param).then(
+            function() { /* noop */ },
+            function(e) { console.error(e); });
+
+        // Get marker component
+        const markerComponent = mly.getComponent('marker');
+
+        // Show a flat circle marker in the viewer and a corresponding map marker when hovering the viewer
+        const indicator = {
+            id: "indicator-id",
+            viewerMarker: null,
+            state: {
+                dragging: false,
+                lastPos: null,
+                moving: false,
+            },
         };
-        console.log(viewPar);
-        window.status = JSON.stringify(viewPar);
-        document.getElementById("location").innerHTML = JSON.stringify(viewPar) + '';
-    })
 
-    mly.moveToKey(key_param)
-        .then(
-            function(node) { console.log(node.key); },
-            function(error) { console.error(error); });
+        const removeViewerIndicator = function() {
+            if (!!indicator.viewerMarker && markerComponent.has(indicator.viewerMarker.id)) {
+                markerComponent.remove([indicator.viewerMarker.id]);
+                indicator.viewerMarker = null;
+            }
+        }
 
-    window.addEventListener("resize", function() { mly.resize(); });
+        const setViewerIndicatorMarker = function(latLon) {
+            //const viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
+            const viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
+                indicator.id,
+                latLon
+                ,{ color: '#0f0' }
+            );
+
+            markerComponent.add([viewerMarker]);
+
+            indicator.viewerMarker = viewerMarker;
+        }
+
+        const moveIndicatorMarker = function(latLon) {
+            console.log(latLon);
+            if (indicator.state.dragging) { return; }
+
+            if (latLon == null) {
+                Q_disable_cursor()
+                removeViewerIndicator();
+                return;
+            }
+
+            const posLatLng = mapNodePosition.pos;
+            const lineString = [
+                [posLatLng.lat, posLatLng.lon],
+                [latLon.lat, latLon.lon],
+                [
+                    posLatLng.lat + 100 * (latLon.lat - posLatLng.lat),
+                    posLatLng.lon + 100 * (latLon.lon - posLatLng.lon),
+                ],
+            ];
+
+            setViewerIndicatorMarker({ lat: latLon.lat, lon: latLon.lon });
+
+            Q_move_cursor(lineString[1],lineString[0],lineString[2])
+        }
+
+        const onViewerMouseEvent = function(event) {
+            indicator.state.lastPos = event.pixelPoint;
+            moveIndicatorMarker(event.latLon);
+
+        }
+
+        mly.on(Mapillary.Viewer.mouseup, onViewerMouseEvent);
+        mly.on(Mapillary.Viewer.mouseover, onViewerMouseEvent);
+        mly.on(Mapillary.Viewer.mousedown, onViewerMouseEvent);
+
+        mly.on(Mapillary.Viewer.mousemove, function(event) {
+            // Store last mouse position for later unprojection
+            indicator.state.lastPos = event.pixelPoint;
+
+            if (indicator.state.moving || indicator.state.dragging) { return; }
+
+            moveIndicatorMarker(event.latLon);
+        });
+
+
+        mly.on(Mapillary.Viewer.mouseout, function(event) {
+            indicator.state.lastPos = null;
+            removeViewerIndicator();
+        });
+
+        mly.on(Mapillary.Viewer.movestart, function(event) { indicator.state.moving = true; });
+        mly.on(Mapillary.Viewer.moveend, function(event) {
+            indicator.state.moving = false;
+
+            if (!indicator.state.lastPos) { return; }
+
+            // Unproject the last position and move indicator marker if latLon exist
+            mly.unproject(indicator.state.lastPos).then(moveIndicatorMarker);
+        });
+
+        markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragstart, function() {
+            // Remove indicators when dragging marker in the viewer
+            indicator.state.dragging = true;
+            removeViewerIndicator();
+        });
+
+        markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragend, function() {
+            indicator.state.dragging = false;
+
+            if (!indicator.state.lastPos) { return; }
+
+            // Unproject the last position and move indicator marker if latLon exist
+            mly.unproject(indicator.state.lastPos).then(moveIndicatorMarker);
+        });
+
+
+        // Create markers on click in map or viewer
+        var addedMarkerId = 0;
+        const mapMarkers = {};
+
+        const addOrReplaceViewerMarker = function(id, latLon) {
+            // Create an interactive marker to be able to drag it in viewer
+            // and retrieve it with getMarkerIdAt method
+            const marker = new Mapillary.MarkerComponent.SimpleMarker(
+                id,
+                latLon,
+                { interactive: true });
+
+            markerComponent.add([marker]);
+        }
+
+        const createMarker = function(latLon) {
+            const id = (addedMarkerId++).toString();
+
+            addOrReplaceViewerMarker(id, latLon);
+
+            Q_create_marker(id,[latLon.lat, latLon.lon])
+
+            mapMarkers[id] = mapMarker;
+        }
+
+        mly.on(Mapillary.Viewer.click, function(e) {
+            if (!e.latLon) { return; }
+
+            markerComponent.getMarkerIdAt(e.pixelPoint).then(function(markerId) {
+                // Only create a new marker if no interactive markers are hovered
+                if (markerId != null) { return; }
+
+                createMarker(e.latLon);
+            });
+        });
+
+        // Trigger render on browser window resize
+        window.addEventListener("resize", function() { mly.resize(); });
     </script>
-  </body>
+</body>
 </html>
