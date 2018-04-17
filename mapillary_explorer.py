@@ -129,6 +129,7 @@ class mapillary_cursor():
         #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
         if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
             QgsProject.instance().addMapLayer(self.samplesLayer)
+            self.parentInstance.reorderLegendInterface()
         sampleFeat = QgsFeature(self.samplesLayer.fields())
         sampleFeat['id'] = id
         sampleFeat['key'] = key
@@ -327,10 +328,20 @@ class go2mapillary:
 
         self.coverage.removeLevels()
         self.sampleLocation.delete()
-        QgsProject.instance().removeMapLayer(self.sampleLocation.samplesLayer.id())
+        self.removeMapillaryLayerGroup()
+
+        try:
+            QgsProject.instance().removeMapLayer(self.sampleLocation.samplesLayer.id())
+        except:
+            pass
 
         try:
             self.canvas.extentsChanged.disconnect(self.mapChanged)
+        except:
+            pass
+
+        try:
+            self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
         except:
             pass
 
@@ -392,11 +403,13 @@ class go2mapillary:
             pass
 
         enabledLevels = self.coverage.update_coverage()
+        self.reorderLegendInterface()
 
         for level,layer in enabledLevels.items():
             if not (level == 'sequences' and 'images' in enabledLevels.keys()):
                 self.mapSelectionTool = IdentifyGeometry(self.canvas, layer)
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
+
 
 
     def run(self):
@@ -421,6 +434,8 @@ class go2mapillary:
                 self.pluginIsActive = False
                 self.coverage.removeLevels()
                 self.canvas.extentsChanged.disconnect(self.mapChanged)
+                self.removeMapillaryLayerGroup()
+                self.reorderLegendInterface()
             else:
                 self.dockwidget.show()
                 self.canvas.setMapTool(self.mapSelectionTool)
@@ -447,5 +462,38 @@ class go2mapillary:
         QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
         self.coverage.overviewLayer.triggerRepaint()
 
-        
-        
+    def removeMapillaryLayerGroup(self):
+        mapillaryGroup = self.getMapillaryLayerGroup()
+        QgsProject.instance().layerTreeRoot().removeChildNode(mapillaryGroup)
+
+    def getMapillaryLayerGroup(self):
+        legendRoot = QgsProject.instance().layerTreeRoot()
+        mapillaryGroupName = 'Mapillary'
+        mapillaryGroup = legendRoot.findGroup(mapillaryGroupName)
+        if not mapillaryGroup:
+            mapillaryGroup = legendRoot.insertGroup(0, mapillaryGroupName)
+        mapillaryGroup.setExpanded(False)
+        return mapillaryGroup
+
+    def reorderLegendInterface(self):
+        mapillaryLayers = self.coverage.getActiveLayers() + [self.sampleLocation.samplesLayer]
+        print (mapillaryLayers)
+        legendRoot = QgsProject.instance().layerTreeRoot()
+        mapillaryGroup = self.getMapillaryLayerGroup()
+
+        for layer in mapillaryLayers:
+            try:
+                layerNode = legendRoot.findLayer(layer)
+                print ('GROUP',layerNode.parent())
+            except:
+                layerNode = None
+            if layerNode:# and layerNode.parent() != mapillaryGroup:
+                print ('moving',layer.name())
+                cloned_node = layerNode.clone()
+                mapillaryGroup.insertChildNode(0, cloned_node)
+                if layerNode.parent():
+                    layerNode.parent().removeChildNode(layerNode)
+                else:
+                    legendRoot.removeChildNode(layerNode)
+
+

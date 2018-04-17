@@ -108,8 +108,11 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
         #print("sqlFilter", sqlFilter)
         if not layer:
             layer = getattr(self.module.coverage,level+'Layer')
-        layer.setSubsetString(sqlFilter)
-        layer.triggerRepaint()
+        try:
+            layer.setSubsetString(sqlFilter)
+            layer.triggerRepaint()
+        except:
+            pass
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

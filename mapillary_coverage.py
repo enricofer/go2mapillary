@@ -140,8 +140,11 @@ class progressBar:
         QApplication.processEvents()
 
     def setProgress(self,value):
-        self.progressBar.setValue(value)
-        QApplication.processEvents()
+        try:
+            self.progressBar.setValue(value)
+            QApplication.processEvents()
+        except:
+            pass
 
     def setMsg(self,msg):
         self.widget.setText(msg)
@@ -289,13 +292,17 @@ class mapillary_coverage:
                         json.dump(geojson, outfile)
                     defLyr = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % level),"Mapillary " + level, "ogr")
                     defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s.qml" % level))
-                    QgsExpressionContextUtils.setLayerVariable(defLyr, "mapillaryCurrentKey", "noKey")
+                    QgsExpressionContextUtils.setLayerVariable(defLyr, "mapillaryCurrentKey", self.module.viewer.locationKey)
                     defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
                     QgsProject.instance().addMapLayer(defLyr)
-                    QgsProject.instance().layerTreeRoot().findLayer(defLyr.id()).setExpanded(False)
                     self.iface.addCustomActionForLayerType(getattr(self.module,'filterAction_'+level), None, QgsMapLayer.VectorLayer, allLayers=False)
                     self.module.filterDialog.applySqlFilter(layer=defLyr)
                     self.iface.addCustomActionForLayer(getattr(self.module,'filterAction_'+level), defLyr)
+                    legendLayerNode = QgsProject.instance().layerTreeRoot().findLayer(defLyr.id())
+                    legendLayerNode.setExpanded(False)
+                    #clone_node = legendLayerNode.clone()
+                    #self.module.getMapillaryLayerGroup().insertChildNode(0, clone_node)
+                    #QgsProject.instance().layerTreeRoot().removeChildNode(legendLayerNode)
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)
@@ -327,6 +334,13 @@ class mapillary_coverage:
             if getattr(self,level):
                 activeLevels[level] = getattr(self, level+'Layer')
         return activeLevels
+
+    def getActiveLayers(self):
+        levels = []
+        for level in LAYER_LEVELS:
+            if getattr(self,level):
+                levels.append(getattr(self, level+'Layer'))
+        return levels
 
     def update_coverage(self):
         self.download_tiles()

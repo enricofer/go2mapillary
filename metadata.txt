@@ -11,11 +11,11 @@ name=go2mapillary
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.98
 description=mapillary explorer
-version=1.5.1
+version=2.0
 author=Enrico Ferreguti
 email=enricofer@gmail.com
 
-about=Explore Mapillary photos on qgis 3 map  http://www.mapillary.com
+about=Explore Mapillary images on QGIS3:  http://www.mapillary.com
 
 tracker=https://github.com/enricofer/go2mapillary/issues
 repository=https://github.com/enricofer/go2mapillary

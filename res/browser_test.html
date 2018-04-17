@@ -64,13 +64,14 @@
     <div id="splash" class="hidden" onclick="focusOn()"></div>
     <script>
         // Setup map
-        var map = L.map('map').setView([56.04351888068181, 12.695600612967427], 18);
-        var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-        var osm = new L.TileLayer(osmUrl, { maxZoom: 19, attribution: osmAttrib});
+        //var map = L.map('map').setView([56.04351888068181, 12.695600612967427], 18);
+        //var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        //var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+        //var osm = new L.TileLayer(osmUrl, { maxZoom: 19, attribution: osmAttrib});
+        //map.addLayer(osm);
+        //map.keyboard.disable();
+
         var lastMsg = Date.now()
-        map.addLayer(osm);
-        map.keyboard.disable();
 
         function sendMessage (msg){
             if (Date.now()-lastMsg > 200){
@@ -266,8 +267,8 @@
         // Show a flat circle marker in the viewer and a corresponding map marker when hovering the viewer
         const indicator = {
             id: "indicator-id",
-            mapLine: L.polyline([[0, 0], [0, 0]], { color: '#0f0', weight: 1, id: "indicator-id-line" }),
-            mapMarker: L.circleMarker([0, 0], { radius: 5, color: '#0f0', id: "indicator-id-circle" }),
+            //mapLine: L.polyline([[0, 0], [0, 0]], { color: '#0f0', weight: 1, id: "indicator-id-line" }),
+            //mapMarker: L.circleMarker([0, 0], { radius: 5, color: '#0f0', id: "indicator-id-circle" }),
             viewerMarker: null,
             state: {
                 dragging: false,
