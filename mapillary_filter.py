@@ -26,7 +26,11 @@ import sys
 import datetime
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import pyqtSignal, QDate, QDateTime
+from PyQt5.QtCore import pyqtSignal, QDate, QDateTime, QPoint
+
+
+from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, Qgis
+from qgis.gui import QgsMapTool
 
 from .mapillary_api import mapillaryApi
 
@@ -48,12 +52,14 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.module = module
+        self.iface = module.iface
         self.setWindowTitle("go2mapillary filter")
         self.fromDateWidget.setDate(QDate(2014, 1, 1))
         self.toDateWidget.setDate(QDate.currentDate())
         self.buttonBox.accepted.connect(self.setFilter)
         self.addUserFilter.clicked.connect(self.addUserAction)
         self.removeUserFilter.clicked.connect(self.removeUserAction)
+        self.sampleButton.clicked.connect(self.sampleOnCanvasAction)
         self.level = None
         self.mapillaryApi = mapillaryApi()
         self.setFilter()
@@ -69,16 +75,22 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
         self.filter = {
             'byDate':{
                 'enabled': self.date_group.isChecked(),
-                'from':  QDateTime(self.fromDateWidget.date()).toTime_t()*1000,
-                'to': QDateTime(self.toDateWidget.date()).toTime_t()*1000
+                'from':  self.fromDateWidget.dateTime().toTime_t()*1000, #QDateTime(self.fromDateWidget.date()).toTime_t()*1000,
+                'to': self.toDateWidget.dateTime().toTime_t()*1000 #QDateTime(self.toDateWidget.date()).toTime_t()*1000
             },
             'byUser':{
                 'enabled': self.users_group.isChecked(),
                 'users': users_list,
                 'userkeys': userkeys_list,
             },
+            'lookAt':{
+                'enabled': self.looking_at_group.isChecked(),
+                'lat':float(self.lat_widget.text() or '0'),
+                'lon':float(self.lon_widget.text() or '0')
+            },
             'onlyPanorama': self.onlyPanorama.isChecked()
         }
+        print (self.filter)
         for level in ['images','sequences','overview']:
             self.applySqlFilter(level)
 
@@ -100,12 +112,33 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 sqlFilter += ' and '
             userkeys_list = ','.join(self.filter['byUser']['userkeys'])
             sqlFilter += '("userkey" in (%s))' % userkeys_list
+        if self.filter['lookAt']['enabled'] and self.filter['lookAt']['lat'] and self.filter['lookAt']['lon']:
+            bbox = "%f,%f,%f,%f" % (
+                self.filter['lookAt']["lon"]-0.005,
+                self.filter['lookAt']["lat"]-0.005,
+                self.filter['lookAt']["lon"]+0.005,
+                self.filter['lookAt']["lat"]+0.005,
+            )
+            lookat = '%f,%f' % (
+                self.filter['lookAt']["lon"],
+                self.filter['lookAt']["lat"],
+            )
+            res = self.mapillaryApi.images(bbox=bbox,lookat=lookat)
+            if res:
+                keys_looking_at = ""
+                for feat in res["features"]:
+                    keys_looking_at += "'%s'," % feat["properties"]["key"]
+                if keys_looking_at:
+                    if sqlFilter:
+                        sqlFilter += ' and '
+                    sqlFilter += '("key" in (%s))' % keys_looking_at[:-1]
+
         if self.filter['onlyPanorama']:
             if sqlFilter:
                 sqlFilter += ' and '
             sqlFilter += '("pano" = 1)'
 
-        #print("sqlFilter", sqlFilter)
+        print("sqlFilter", sqlFilter)
         if not layer:
             layer = getattr(self.module.coverage,level+'Layer')
         try:
@@ -145,10 +178,10 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
             if not self.date_group.isChecked():
                 mintime = QDateTime()
                 mintime.setTime_t(min_timestamp/1000)
-                self.fromDateWidget.setDate(mintime.date())
+                self.fromDateWidget.setDateTime(mintime)
                 maxtime = QDateTime()
                 maxtime.setTime_t(max_timestamp/1000)
-                self.toDateWidget.setDate(maxtime.date())
+                self.toDateWidget.setDateTime(maxtime)
 
     def addUserAction(self):
         userCell = QtWidgets.QTableWidgetItem(self.usersSearchFilter.currentText())
@@ -166,3 +199,33 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 selected_rows.add(item.row())
             for row_idx in list(selected_rows):
                 self.userFiltersTable.removeRow(row_idx)
+
+    def sampleOnCanvasAction(self):
+        sampleTool = samplePointOnCanvas(self.iface.mapCanvas())
+        sampleTool.pointClicked.connect(self.clickedOnCanvasAction)
+        self.iface.mapCanvas().setMapTool(sampleTool)
+        self.hide()
+
+    def clickedOnCanvasAction(self,clickedPoint):
+        self.iface.mapCanvas().setMapTool(self.module.mapSelectionTool)
+        crsCanvas = self.module.iface.mapCanvas().mapSettings().destinationCrs() # get current crs
+        crsWGS84 = QgsCoordinateReferenceSystem(4326)  # WGS 84
+        xform = QgsCoordinateTransform(crsCanvas, crsWGS84, QgsProject.instance())
+        wgs84point = xform.transform(clickedPoint)
+        self.lon_widget.setText(str(wgs84point.x()))
+        self.lat_widget.setText(str(wgs84point.y()))
+        super(mapillaryFilter, self).show()
+        self.raise_()
+
+
+class samplePointOnCanvas(QgsMapTool):
+
+    pointClicked = pyqtSignal(QgsPointXY)
+
+    def canvasPressEvent(self, event):
+        px = event.pos().x()
+        py = event.pos().y()
+        pressedPoint = QPoint(px, py)
+        self.pointClicked.emit(self.toMapCoordinates(pressedPoint))
+
+

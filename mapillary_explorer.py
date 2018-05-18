@@ -37,6 +37,8 @@ from qgis.core import (QgsExpressionContextUtils,
                        QgsVectorLayer,
                        QgsRasterLayer,
                        QgsDataSourceUri,
+                       QgsExpression,
+                       QgsFeatureRequest,
                        QgsWkbTypes,)
 
 from qgis.gui import QgsRubberBand,QgsVertexMarker
@@ -49,7 +51,9 @@ from qgis.gui import QgsRubberBand,QgsVertexMarker
 from .mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from .mapillary_viewer import mapillaryViewer
 from .mapillary_filter import mapillaryFilter
+from.mapillary_settings import mapillarySettings
 from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
+from .mapillary_image_info import mapillaryImageInfo
 from .identifygeometry import IdentifyGeometry
 from .geojson_request import geojson_request
 
@@ -97,7 +101,7 @@ class mapillary_cursor():
         self.cursor.setIconSize(20)
         self.cursor.setPenWidth(2)
         self.pointOfView.setPenWidth(2)
-        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=key:string(20)&field=note:string(50)&index=yes","Mapillary samples","memory")
+        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=type:string(10)&field=key:string(20)&field=note:string(50)&field=img_coords:string(50)&index=yes","Mapillary samples","memory")
         self.samplesLayer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_samples.qml"))
 
 
@@ -124,15 +128,18 @@ class mapillary_cursor():
         self.lineOfSight.reset()
         self.sightDirection.reset()
 
-    def sample(self,id,key,sample_coords):
+    def sample(self, type, id,key,sample_coords, img_coords=None):
         samplePoint = QgsPointXY(sample_coords[1],sample_coords[0])
         #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
         if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
             QgsProject.instance().addMapLayer(self.samplesLayer)
             self.parentInstance.reorderLegendInterface()
         sampleFeat = QgsFeature(self.samplesLayer.fields())
+        sampleFeat['type'] = type
         sampleFeat['id'] = id
         sampleFeat['key'] = key
+        if img_coords:
+            sampleFeat['img_coords'] = img_coords
         sampleFeat.setGeometry(QgsGeometry.fromPointXY(samplePoint))
         self.samplesLayer.dataProvider().addFeatures([sampleFeat])
         self.samplesLayer.triggerRepaint()
@@ -148,6 +155,20 @@ class mapillary_cursor():
                     'lon':feat.geometry().asPoint().x(),
                 }
             })
+
+    def restoreTags(self,key):
+        exp = QgsExpression('"type" = \'tag\' and "key" = \'%s\'' % key)
+        print (exp)
+        tags = []
+        for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
+            tags.append({
+                'id': feat['id'],
+                'key': feat['key'],
+                'note': feat['note'],
+                'geometry': json.loads(feat['img_coords'])
+            })
+        print (tags)
+        return tags
 
 class go2mapillary:
     """QGIS Plugin Implementation."""
@@ -303,8 +324,9 @@ class go2mapillary:
         self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         self.canvas.mapToolSet.connect(self.toggleViewer)
-        self.viewer = mapillaryViewer(self.dlg.webView)
+        self.viewer = mapillaryViewer(self)
         self.viewer.messageArrived.connect(self.viewerConnection)
+        self.viewer.openFilter.connect(self.filter_images_func)
         #QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.mapSelectionTool = None
@@ -317,6 +339,7 @@ class go2mapillary:
         self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
         self.filterAction_overview.triggered.connect(self.filter_overview_func)
         self.sampleLocation = mapillary_cursor(self)
+        self.settings = mapillarySettings(self)
 
 
     #--------------------------------------------------------------------------
@@ -371,14 +394,14 @@ class go2mapillary:
         #print (message)
         if message:
             if message["transport"] == "move_cursor":
-                #print('moving',message)
+                print('moving',message)
                 self.sampleLocation.draw(message["pov"],message["orig_pov"],message["cursor"],message["endOfSight"])
             if message["transport"] == "disable_cursor":
                 print('deleting')
                 self.sampleLocation.delete()
             if message["transport"] == "create_marker":
                 print('creating')
-                self.sampleLocation.sample(message['id'],message['key'],message['markerPos'])
+                self.sampleLocation.sample("marker",message['id'],message['key'],message['markerPos'])
 
             if message["transport"] == "view":
                 self.sampleLocation.delete()
@@ -392,6 +415,14 @@ class go2mapillary:
                 self.sampleLocation.delete()
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
+            if message["transport"] == "open_settings":
+                self.settings.open()
+            if message["transport"] == "image_info":
+                mapillaryImageInfo.openKey(self,message["key"])
+            if message["transport"] == "store_tag":
+                print (message)
+                self.sampleLocation.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
+
 
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
@@ -434,7 +465,7 @@ class go2mapillary:
                 self.pluginIsActive = False
                 self.coverage.removeLevels()
                 self.canvas.extentsChanged.disconnect(self.mapChanged)
-                self.removeMapillaryLayerGroup()
+                #self.removeMapillaryLayerGroup()
                 self.reorderLegendInterface()
             else:
                 self.dockwidget.show()

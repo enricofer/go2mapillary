@@ -28,6 +28,7 @@
         }
 
         .separator{
+            width: 4px;
             display:inline-block;
         }
 
@@ -120,14 +121,14 @@
         .slider-content {
             position: absolute;
             background-color: rgba(24,25,28,.3);
-            width: 120px;
+            width: 106px;
             height: 19.3px;
             border: none;
             cursor: pointer;
             cursor: pointer;
             position:absolute;
             text-align: center;
-            -webkit-transform: translate(-156px);
+            -webkit-transform: translate(-140px);
             -webkit-transition: width .15s ease-out;
             border-radius: 5px;
             display: inline-block;
@@ -160,21 +161,19 @@
     <div id="menu" class="dropdown hidden">
       <a href="#" id="menu_button" class="dropbtn qgis_menu"><i class="fa fa-bars qgis_menu"></i></a>
       <div id="myDropdown" class="hidden slider-content">
-        <a onclick="imageInfo()" id="infoButton"  class="choice itemDisabled" href="#" title="Current image info"><i class="fa fa-info"></i></a>
-        <a onclick="openSettings()" id="enableTagsButton" class="choice itemDisabled" href="#" title="tag image"><i class="fa fa-cog"></i></a>
         <a onclick="filterCanvas()" id="filterCanvasButton"  class="choice itemDisabled" href="#" title="Filter mapillary images"><i class="fa fa-filter"></i></a>
-        <a onclick="addTag()" id="enableTagsButton" class="choice itemDisabled" href="#" title="tag image"><i class="fa fa-tag"></i></a>
+        <a onclick="imageInfo()" id="infoButton"  class="choice itemDisabled" href="#" title="Current image info"><i class="fa fa-info"></i></a>
         <div class="separator"></div>
         <a onclick="enableZoom()" id="enableZoomButton" class="choice itemEnabled" href="#" title="Enable double click zoom"><i class="fa fa-search"></i></a>
         <a onclick="enableCompare()" id="compareButton"  class="choice itemDisabled" href="#" title="Enable compare images"><i class="fa fa-clone"></i></a>
         <a onclick="enableMarkers()" id="enableMarkersButton" class="choice itemDisabled" href="#" title="Enable markers"><i class="fa fa-map-marker"></i></a>
+        <a onclick="enableTags()" id="enableTagsButton" class="choice itemDisabled" href="#" title="Enable tags"><i class="fa fa-tag"></i></a>
       </div>
     </div>
     <script>
         "use strict";
-
-        var lastMsg = Date.now();
-        var addedTagsId = 0;
+        
+        var lastMsg = Date.now()
 
         function sendMessage (msg){
             if (Date.now()-lastMsg > 200){
@@ -227,18 +226,6 @@
             QgisConnection.JSONmessage(JSON.stringify(viewPar));
         }
 
-        function Q_store_tag(geom,id,loc){
-            var g = geom.getVertices2d();
-            var viewPar = {
-                "transport":"store_tag",
-                "key": key_param,
-                "geometry":geom.getVertices2d(),
-                "id":id,
-                "loc":loc,
-            };
-            QgisConnection.JSONmessage(JSON.stringify(viewPar));
-        }
-
         function Q_drag_marker(id,markerPos){
             var viewPar = {
                 "transport":"drag_marker",
@@ -246,21 +233,6 @@
                 "markerPos":markerPos
             };
             sendMessage(JSON.stringify(viewPar));
-        }
-
-        function Q_image_info(key){
-            var viewPar = {
-                "transport":"image_info",
-                "key":key_param,
-            };
-            QgisConnection.JSONmessage(JSON.stringify(viewPar));
-        }
-
-        function Q_settings(){
-            var viewPar = {
-                "transport":"open_settings",
-            };
-            QgisConnection.JSONmessage(JSON.stringify(viewPar));
         }
 
         function gup(name)
@@ -302,7 +274,6 @@
                     sequence: true,
                     stats:true,
                     loading:true,
-                    tag:true,
                     slider:false,
                 },
             }
@@ -322,22 +293,14 @@
         }
 
 
-        function updateTags (json_tags){
-            var tagComponent = mly.getComponent("tag");
-            console.log(tagComponent.getAll());
-            tagComponent.removeAll();
-            var key_tags = JSON.parse(json_tags);
-            console.log(key_tags)
-            if (key_tags != undefined){
-                for (var i=0; i<key_tags.length; i++) {
-                    var tag_def = key_tags[i];
-                    var polygonGeometry = new Mapillary.TagComponent.PolygonGeometry(tag_def['geometry']);
-                    var tag = new Mapillary.TagComponent.OutlineTag(tag_def['id'], polygonGeometry, { editable: false });
-                    tagComponent.add([tag]);
-                }
-            }
+        function test_changeImgKey (key){
+            key_param = key;
+            mly.moveToKey.currentKey = key
+            mly.moveToKey(key_param).then(
+                function() { /* noop */ },
+                function(e) { console.error(e); });     
         }
-
+        
         var mapNodePosition = {};
 
         mly.on(Mapillary.Viewer.nodechanged, function (node) {
@@ -348,8 +311,6 @@
             mapNodePosition.line = [node.originalLatLon, node.latLon];
             mapNodePosition.originalPos = node.originalLatLon;
             mapNodePosition.pos = node.latLon;
-
-            console.log(node.key)
 
             var viewPar = {
                 "transport":"view",
@@ -367,22 +328,16 @@
             var menuContainer = document.getElementById("menu")
             var sequenceContainer = document.querySelectorAll(".SequenceContainer")
             menuContainer.classList.remove("hidden");
-
-            key_param = node.key;
-            mly.currentKey = node.key
-
-            QgisConnection.restoreTags(key_param)
-
+            //sequenceContainer[0].appendChild(menuContainer);
         })
 
-
+        
         var mHandler = new markersHandler(mly);
         var cHandler = new compareHandler(mly);
         var zHandler = new zoomHandler(mly);
-        //var tHandler = new tagsHandler(mly);
         var currentHandler = zHandler;
         zHandler.subscribe();
-
+        
         changeImgKey(key_param);
 
         // Trigger render on browser window resize
@@ -390,14 +345,6 @@
 
         function filterCanvas() {
             QgisConnection.openFilterDialog()
-        }
-
-        function imageInfo() {
-            Q_image_info();
-        }
-
-        function openSettings() {
-            Q_settings();
         }
 
         function toggleMenuButton(buttonId) {
@@ -413,7 +360,7 @@
                 }
             }
         }
-
+        
         function enableCompare() {
             toggleMenuButton('compareButton');
             currentHandler.unsubscribe();
@@ -435,23 +382,8 @@
             currentHandler = mHandler;
         }
 
-        function addTag(){
-            currentHandler.unsubscribe();
-            mly.deactivateComponent("mouse");
-            var tagComponent = mly.getComponent("tag");
-            tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreateRect);
-            tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
-                addedTagsId ++;
-                console.log(addedTagsId);
-                var tag = new Mapillary.TagComponent.OutlineTag(addedTagsId, geometry, { editable: false });
-                tagComponent.add([tag]);
-                Q_store_tag(geometry,addedTagsId,[mapNodePosition.pos.lat,mapNodePosition.pos.lon]);
-                mly.activateComponent("mouse");
-                var mouseComponent = mly.getComponent("mouse");
-                mouseComponent.doubleClickZoom.enable();
-                mouseComponent.dragPan.enable();
-                currentHandler.subscribe();
-            })
+        function enableTags() {
+            toggleMenuButton('enableTagsButton');
         }
 
         // Close the dropdown menu if the user clicks outside of it
@@ -467,13 +399,13 @@
               buttonMenu.classList.remove("hidden");
           }
         }
-
+        
         function zoomHandler(mViewer) {
             this.mViewer = mViewer;
             this.isActive = false;
-
+            
             var that = this;
-
+        
             this.subscribe = function () {
                 that.isActive = true;
                 that.mViewer.activateComponent("mouse");
@@ -481,76 +413,34 @@
                 that.mouseComponent.doubleClickZoom.enable();
                 that.mouseComponent.dragPan.enable();
             }
-
+        
             this.unsubscribe = function () {
                 that.mViewer.deactivateComponent("mouse");
                 //that.mouseComponent = null;
                 that.isActive = false;
             }
         }
-
-        function popupsHandler(mViewer){
-            this.mViewer = mViewer;
-            this.isActive = false;
-            this.addedTagsId = 0;
-            var that = this;
-
-            this.removeTags = function () {
-                that.tagComponent.removeAll();
-            }
-
-            this.subscribe = function () {
-                that.isActive = true;
-                that.mViewer.activateComponent("popup");
-                that.tagComponent = that.mViewer.getComponent("popup");
-                that.tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
-                that.tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
-                    that.addedTagsId ++;
-                    console.log(that.addedTagsId);
-                    var id = "id-" + that.addedTagsId
-                    var tag = new Mapillary.TagComponent.OutlineTag(id, geometry, { editable: false, text: "tag" });
-                    that.tagComponent.add(tag);
-                    //that.mViewer.on(Mapillary.Viewer.nodechanged, that.removeTags);
-                    var span = document.createElement('span');
-                    span.innerHTML = 'parking meter';
-                    var popup = new Mapillary.PopupComponent.Popup();
-                    popup.setDOMContent(span);
-                    popup.setBasicPoint(geometry);
-                    that.popupComponent.add([popup]);
-                    that.mViewer.on(Mapillary.Viewer.nodechanged, that.removeTags);
-                })
-            }
-
-            this.unsubscribe = function () {
-                that.mViewer.deactivateComponent("popup");
-                that.tagComponent = null;
-                that.isActive = false;
-                //that.mViewer.off(Mapillary.Viewer.nodechanged, that.removeTags);
-            }
-
-        }
-
+        
         function compareHandler(mViewer) {
             this.mViewer = mViewer;
             this.isActive = false;
-
+            
             var that = this;
-
+            
             this.changeBackgroundKey = function (key){
                 that.sliderComponent.setKeys({
                     foreground: that.mViewer.currentKey,
                     background: key
                 })
             }
-
+        
             this.subscribe = function () {
                 that.isActive = true;
                 that.mViewer.activateComponent("slider");
                 that.sliderComponent = that.mViewer.getComponent("slider");
                 that.changeBackgroundKey(that.mViewer.currentKey)
-
             }
-
+        
             this.unsubscribe = function () {
                 that.mViewer.deactivateComponent("slider");
                 that.sliderComponent = null;
@@ -686,12 +576,6 @@
                 that.mViewer.activateComponent('marker');
                 that.markerComponent = that.mViewer.getComponent('marker');
                 that.isActive = true;
-
-                that.mViewer.activateComponent("mouse");
-                that.mouseComponent = that.mViewer.getComponent("mouse");
-                that.mouseComponent.doubleClickZoom.enable();
-                that.mouseComponent.dragPan.enable();
-
                 that.mViewer.on(Mapillary.Viewer.mouseup, that.onViewerMouseEvent);
                 that.mViewer.on(Mapillary.Viewer.mouseover, that.onViewerMouseEvent);
                 that.mViewer.on(Mapillary.Viewer.mousedown, that.onViewerMouseEvent);
@@ -724,7 +608,6 @@
 
             this.unsubscribe = function(){
                 that.mViewer.deactivateComponent('marker');
-                that.mViewer.deactivateComponent("mouse");
                 that.isActive = false;
                 that.mViewer.off(Mapillary.Viewer.mouseup, that.onViewerMouseEvent);
                 that.mViewer.off(Mapillary.Viewer.mouseover, that.onViewerMouseEvent);

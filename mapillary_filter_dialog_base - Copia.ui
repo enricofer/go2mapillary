@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>341</width>
-    <height>502</height>
+    <height>340</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,7 +45,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDateTimeEdit" name="fromDateWidget">
+         <widget class="QDateEdit" name="fromDateWidget">
           <property name="calendarPopup">
            <bool>true</bool>
           </property>
@@ -63,7 +63,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDateTimeEdit" name="toDateWidget">
+         <widget class="QDateEdit" name="toDateWidget">
           <property name="calendarPopup">
            <bool>true</bool>
           </property>
@@ -189,62 +189,6 @@
           <string>userkey</string>
          </property>
         </column>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="looking_at_group">
-     <property name="title">
-      <string>looking at</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="margin">
-       <number>6</number>
-      </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>lon</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lon_widget"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>lat</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lat_widget"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="sampleButton">
-        <property name="text">
-         <string>sample on map canvas</string>
-        </property>
        </widget>
       </item>
      </layout>
@@ -382,7 +326,7 @@
      <y>50</y>
     </hint>
     <hint type="destinationlabel">
-     <x>141</x>
+     <x>239</x>
      <y>45</y>
     </hint>
    </hints>
@@ -398,7 +342,7 @@
      <y>50</y>
     </hint>
     <hint type="destinationlabel">
-     <x>141</x>
+     <x>239</x>
      <y>71</y>
     </hint>
    </hints>

@@ -56,6 +56,9 @@ class mapillaryApi:
     def sequences(self, **kwargs):
         return self.proto_method('sequences', **kwargs)
 
+    def image(self, key):
+        return self.proto_method('images/'+key)
+
     def images(self, **kwargs):
         return self.proto_method('images', **kwargs)
 

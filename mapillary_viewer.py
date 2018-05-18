@@ -35,10 +35,12 @@ import json
 class mapillaryViewer(QObject):
 
     messageArrived = pyqtSignal(dict)
+    openFilter = pyqtSignal()
 
-    def __init__(self, viewport):
+    def __init__(self, parentInstance):
         super(mapillaryViewer, self).__init__()
-        self.viewport = viewport
+        self.parentInstance = parentInstance
+        self.viewport = parentInstance.dlg.webView
         #self.viewport.statusBarMessage.connect(self.getJSONmessage)
         self.viewport.page().mainFrame().javaScriptWindowObjectCleared.connect(self.registerJS)
         self.locationKey = None
@@ -95,11 +97,10 @@ class mapillaryViewer(QObject):
             print('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))
             self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
         else:
-            js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
+            #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
+            js = 'this.changeImgKey("%s")' % key
             self.viewport.page().mainFrame().evaluateJavaScript(js)
         self.locationKey = key
-
-
 
     @pyqtSlot(str)
     def JSONmessage(self,status):
@@ -109,6 +110,17 @@ class mapillaryViewer(QObject):
             message = None
         if message:
             self.messageArrived.emit(message)
+
+    @pyqtSlot(str)
+    def restoreTags(self,key):
+        print ('restoreTags')
+        if key:
+            js = "this.updateTags('%s')" % json.dumps(self.parentInstance.sampleLocation.restoreTags(key))
+            self.viewport.page().mainFrame().evaluateJavaScript(js)
+
+    @pyqtSlot()
+    def openFilterDialog(self):
+        self.openFilter.emit()
 
     def enable(self):
         js = 'document.getElementById("focus").classList.add("hidden");'
