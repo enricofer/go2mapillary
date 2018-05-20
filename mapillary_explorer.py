@@ -51,7 +51,8 @@ from qgis.gui import QgsRubberBand,QgsVertexMarker
 from .mapillary_explorer_dockwidget import go2mapillaryDockWidget
 from .mapillary_viewer import mapillaryViewer
 from .mapillary_filter import mapillaryFilter
-from.mapillary_settings import mapillarySettings
+from .mapillary_settings import mapillarySettings
+from .mapillary_form import mapillaryForm
 from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
 from .mapillary_image_info import mapillaryImageInfo
 from .identifygeometry import IdentifyGeometry
@@ -101,8 +102,9 @@ class mapillary_cursor():
         self.cursor.setIconSize(20)
         self.cursor.setPenWidth(2)
         self.pointOfView.setPenWidth(2)
-        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=type:string(10)&field=key:string(20)&field=note:string(50)&field=img_coords:string(50)&index=yes","Mapillary samples","memory")
+        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=type:string(10)&field=cat:string(20)&field=key:string(20)&field=note:string(100)&field=img_coords:string(100)&index=yes","Mapillary samples","memory")
         self.samplesLayer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_samples.qml"))
+        self.samplesLayer.featureAdded.connect(self.newAddedFeat)
 
 
     def draw(self,pointOfView_coords,orig_pointOfView_coords,cursor_coords,endOfSight_coords):
@@ -129,6 +131,7 @@ class mapillary_cursor():
         self.sightDirection.reset()
 
     def sample(self, type, id,key,sample_coords, img_coords=None):
+        self.samplesLayer.startEditing()
         samplePoint = QgsPointXY(sample_coords[1],sample_coords[0])
         #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
         if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
@@ -141,8 +144,19 @@ class mapillary_cursor():
         if img_coords:
             sampleFeat['img_coords'] = img_coords
         sampleFeat.setGeometry(QgsGeometry.fromPointXY(samplePoint))
-        self.samplesLayer.dataProvider().addFeatures([sampleFeat])
+        #self.samplesLayer.dataProvider().addFeatures([sampleFeat])
+        self.samplesLayer.addFeature(sampleFeat)
+        self.samplesLayer.commitChanges()
+
+    def newAddedFeat(self,featId):
+        if featId < 0:
+            return
+        print ("added", featId)
         self.samplesLayer.triggerRepaint()
+        if self.parentInstance.sample_settings.settings['auto_open_form']:
+            newFeat = self.samplesLayer.getFeature(featId)
+            print (newFeat)
+            self.parentInstance.samples_form.open(newFeat)
 
     def getSamplesList(self):
         samples = []
@@ -161,10 +175,16 @@ class mapillary_cursor():
         print (exp)
         tags = []
         for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
+            if feat['cat']:
+                color = self.parentInstance.sample_settings.settings['categories'][feat['cat']]
+            else:
+                color = '#ffffff'
             tags.append({
                 'id': feat['id'],
                 'key': feat['key'],
                 'note': feat['note'],
+                'cat': feat['cat'],
+                'color': color,
                 'geometry': json.loads(feat['img_coords'])
             })
         print (tags)
@@ -339,7 +359,8 @@ class go2mapillary:
         self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
         self.filterAction_overview.triggered.connect(self.filter_overview_func)
         self.sampleLocation = mapillary_cursor(self)
-        self.settings = mapillarySettings(self)
+        self.sample_settings = mapillarySettings(self)
+        self.samples_form = mapillaryForm(self)
 
 
     #--------------------------------------------------------------------------
@@ -391,6 +412,7 @@ class go2mapillary:
             self.viewer.disable()
 
     def viewerConnection(self, message):
+        print (self.sample_settings)
         #print (message)
         if message:
             if message["transport"] == "move_cursor":
@@ -416,7 +438,7 @@ class go2mapillary:
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
             if message["transport"] == "open_settings":
-                self.settings.open()
+                self.sample_settings.open()
             if message["transport"] == "image_info":
                 mapillaryImageInfo.openKey(self,message["key"])
             if message["transport"] == "store_tag":

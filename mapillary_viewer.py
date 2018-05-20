@@ -62,7 +62,6 @@ class mapillaryViewer(QObject):
         proxyPort = s.value("proxy/proxyPort", "" )
         proxyUser = s.value("proxy/proxyUser", "" )
         proxyPassword = s.value("proxy/proxyPassword", "" )
-        print (proxyEnabled+"; "+proxyType+"; "+proxyHost+"; " + proxyPort+"; " + proxyUser+"; " +proxyPassword)
         
         if proxyEnabled == "true": # test if there are proxy settings
             proxy = QNetworkProxy()
@@ -121,6 +120,21 @@ class mapillaryViewer(QObject):
     @pyqtSlot()
     def openFilterDialog(self):
         self.openFilter.emit()
+
+    def change_sample(self,featId):
+        feat = self.parentInstance.sampleLocation.samplesLayer.getFeature(featId)
+        if feat['cat']:
+            color = self.parentInstance.sample_settings.settings['categories'][feat['cat']]
+        else:
+            color = '#ffffff'
+        if feat['type'] == 'tag':
+            js = "this.changeTag('id-%s-%d','%s');" % (feat['key'],feat['id'],color)
+        elif feat['type'] == 'marker':
+            loc = feat.geometry().asPoint()
+            latlon = '{lat:%f,lon:%f}' % (loc.y(),loc.x())
+            js = "this.mHandler.addOrReplaceViewerMarker('id-%s-%s',%s,'%s');" % (feat['key'],feat['id'],latlon,color)
+        print(js)
+        self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def enable(self):
         js = 'document.getElementById("focus").classList.add("hidden");'

@@ -332,7 +332,7 @@
                 for (var i=0; i<key_tags.length; i++) {
                     var tag_def = key_tags[i];
                     var polygonGeometry = new Mapillary.TagComponent.PolygonGeometry(tag_def['geometry']);
-                    var tag = new Mapillary.TagComponent.OutlineTag(tag_def['id'], polygonGeometry, { editable: false });
+                    var tag = new Mapillary.TagComponent.OutlineTag(tag_def['id'], polygonGeometry, { editable: false, lineColor: tag_def['color'], lineWidth: 2 });
                     tagComponent.add([tag]);
                 }
             }
@@ -442,8 +442,8 @@
             tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreateRect);
             tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
                 addedTagsId ++;
-                console.log(addedTagsId);
-                var tag = new Mapillary.TagComponent.OutlineTag(addedTagsId, geometry, { editable: false });
+                var tagId = 'id-' + key_param + '-' + addedTagsId;
+                var tag = new Mapillary.TagComponent.OutlineTag(tagId, geometry, { editable: false });
                 tagComponent.add([tag]);
                 Q_store_tag(geometry,addedTagsId,[mapNodePosition.pos.lat,mapNodePosition.pos.lon]);
                 mly.activateComponent("mouse");
@@ -451,6 +451,15 @@
                 mouseComponent.doubleClickZoom.enable();
                 mouseComponent.dragPan.enable();
                 currentHandler.subscribe();
+            })
+        }
+        
+        function changeTag(tagId,color){
+            var tagComponent = mly.getComponent("tag");
+            var tag = tagComponent.get(tagId);
+            tag.setOptions({
+                'lineColor': color,
+                'lineWidth': 2,
             })
         }
 
@@ -648,35 +657,35 @@
                 if (!that.indicator.state.lastPos) { return; }
                 that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
             }
+            
+            this.changeMarker  = function(id, latLon, color) {
+                that.markerComponent.remove(id);
+                that.addOrReplaceViewerMarker(id, latLon, color);
+            }
 
-            this.addOrReplaceViewerMarker = function(id, latLon) {
+            this.addOrReplaceViewerMarker = function(id, latLon, color) {
                 // Create an interactive marker to be able to drag it in viewer
                 // and retrieve it with getMarkerIdAt method
                 var marker = new Mapillary.MarkerComponent.SimpleMarker(
                     id,
                     latLon,
-                    { interactive: true });
-
+                    { interactive: true, color: color, ballColor: color});
                 that.markerComponent.add([marker]);
             }
 
             this.createMarker = function(latLon) {
-                var id = (this.addedMarkerId++).toString();
-
-                that.addOrReplaceViewerMarker(id, latLon);
-
-                window.Q_create_marker(id,[latLon.lat, latLon.lon])
-
+                this.addedMarkerId++
+                var id = 'id-' + key_param + '-' + this.addedMarkerId;
+                that.addOrReplaceViewerMarker(id, latLon, '#ffffff');
+                window.Q_create_marker(this.addedMarkerId,[latLon.lat, latLon.lon])
                 that.mapMarkers[id] = mapMarker;
             }
 
             this.onViewerClick = function(e) {
                 if (!e.latLon) { return; }
-
                 that.markerComponent.getMarkerIdAt(e.pixelPoint).then(function(markerId) {
                     // Only create a new marker if no interactive markers are hovered
                     if (markerId != null) { return; }
-
                     that.createMarker(e.latLon);
                 });
             }
