@@ -2,14 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/go2mapillary.iml" afterPath="$PROJECT_DIR$/.idea/go2mapillary.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
-      <change beforePath="$PROJECT_DIR$/mapillary_settings.py" afterPath="$PROJECT_DIR$/mapillary_settings.py" />
-      <change beforePath="$PROJECT_DIR$/mapillary_settings_dialog_base.ui" afterPath="$PROJECT_DIR$/mapillary_settings_dialog_base.ui" />
-      <change beforePath="$PROJECT_DIR$/mapillary_viewer.py" afterPath="$PROJECT_DIR$/mapillary_viewer.py" />
-      <change beforePath="$PROJECT_DIR$/res/browser.html" afterPath="$PROJECT_DIR$/res/browser.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/go2mapillary.iml" afterPath="$PROJECT_DIR$/.idea/go2mapillary.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/identifygeometry.py" afterPath="$PROJECT_DIR$/identifygeometry.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_form.py" afterPath="$PROJECT_DIR$/mapillary_form.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_settings.py" afterPath="$PROJECT_DIR$/mapillary_settings.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_viewer.py" afterPath="$PROJECT_DIR$/mapillary_viewer.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/browser.html" afterPath="$PROJECT_DIR$/res/browser.html" />
     </list>
     <ignored path="go2mapillary.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,16 +24,17 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="go2mapillary" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="mapillary_form.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mapillary_form.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_form.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="411">
-              <caret line="61" column="83" lean-forward="false" selection-start-line="61" selection-start-column="25" selection-end-line="61" selection-end-column="83" />
+            <state relative-caret-position="476">
+              <caret line="68" column="23" lean-forward="false" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -41,7 +43,7 @@
       <file leaf-file-name="mapillary_filter.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_filter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="822">
+            <state relative-caret-position="1836">
               <caret line="119" column="50" lean-forward="false" selection-start-line="119" selection-start-column="50" selection-end-line="119" selection-end-column="50" />
               <folding>
                 <element signature="e#1140#1149#0" expanded="true" />
@@ -53,7 +55,7 @@
       <file leaf-file-name="mapillary_image_info.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_image_info.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
+            <state relative-caret-position="493">
               <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="30" selection-end-column="119" />
               <folding />
             </state>
@@ -73,7 +75,7 @@
       <file leaf-file-name="mapillary_api.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_api.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="954">
+            <state relative-caret-position="901">
               <caret line="59" column="46" lean-forward="false" selection-start-line="59" selection-start-column="46" selection-end-line="59" selection-end-column="46" />
               <folding>
                 <element signature="e#1132#1141#0" expanded="true" />
@@ -82,11 +84,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_viewer.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mapillary_viewer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="537">
-              <caret line="135" column="8" lean-forward="false" selection-start-line="135" selection-start-column="8" selection-end-line="135" selection-end-column="8" />
+            <state relative-caret-position="612">
+              <caret line="113" column="19" lean-forward="false" selection-start-line="113" selection-start-column="8" selection-end-line="113" selection-end-column="19" />
               <folding>
                 <element signature="e#1130#1221#0" expanded="true" />
               </folding>
@@ -97,8 +99,8 @@
       <file leaf-file-name="mapillary_settings.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="900">
-              <caret line="61" column="28" lean-forward="false" selection-start-line="61" selection-start-column="28" selection-end-line="61" selection-end-column="28" />
+            <state relative-caret-position="493">
+              <caret line="104" column="84" lean-forward="true" selection-start-line="104" selection-start-column="84" selection-end-line="104" selection-end-column="84" />
               <folding>
                 <element signature="e#1140#1149#0" expanded="true" />
               </folding>
@@ -106,11 +108,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="mapillary_cursor.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mapillary_cursor.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="561">
+              <caret line="228" column="74" lean-forward="true" selection-start-line="228" selection-start-column="74" selection-end-line="232" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="78" column="34" lean-forward="true" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+            <state relative-caret-position="595">
+              <caret line="236" column="85" lean-forward="true" selection-start-line="236" selection-start-column="85" selection-end-line="236" selection-end-column="85" />
               <folding>
                 <element signature="e#1132#1224#0" expanded="true" />
               </folding>
@@ -142,6 +154,9 @@
       <find>QgsVectorLayer</find>
       <find>addMapLayer</find>
       <find>mapillaryViewer</find>
+      <find>IdentifyGeometry</find>
+      <find>sampleLocation</find>
+      <find>applySettings</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -152,7 +167,6 @@
       <list>
         <option value="$PROJECT_DIR$/py_tiled_layer/tiles.py" />
         <option value="$PROJECT_DIR$/GlobalMapTiles.py" />
-        <option value="$PROJECT_DIR$/identifygeometry.py" />
         <option value="$PROJECT_DIR$/getTiles.py" />
         <option value="$PROJECT_DIR$/mapillary_explorer_dockwidget.py" />
         <option value="$PROJECT_DIR$/metadata.txt" />
@@ -160,16 +174,19 @@
         <option value="$PROJECT_DIR$/mapillary_api.py" />
         <option value="$PROJECT_DIR$/mapillary_image_info.py" />
         <option value="$PROJECT_DIR$/mapillary_filter.py" />
-        <option value="$PROJECT_DIR$/mapillary_settings.py" />
-        <option value="$PROJECT_DIR$/mapillary_form.py" />
-        <option value="$PROJECT_DIR$/mapillary_explorer.py" />
+        <option value="$PROJECT_DIR$/identifygeometry.py" />
         <option value="$PROJECT_DIR$/mapillary_viewer.py" />
+        <option value="$PROJECT_DIR$/mapillary_settings.py" />
+        <option value="$PROJECT_DIR$/mapillary_explorer.py" />
+        <option value="$PROJECT_DIR$/mapillary_cursor.py" />
+        <option value="$PROJECT_DIR$/mapillary_form.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
-    <option name="width" value="1924" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
     <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
@@ -187,101 +204,195 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
-          <expand>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_api.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_api.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillaryApi" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_explorer.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_explorer.py" type="8704e2dd:PyFileNode" />
-              <item name="go2mapillary" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_explorer.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillary_cursor" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_filter.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_filter.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillaryFilter" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_form.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_form.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillaryForm" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_image_info.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_settings.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_settings.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillarySettings" type="dd8bbb05:PyElementNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_viewer.py" type="8704e2dd:PyFileNode" />
-            </path>
-            <path>
-              <item name="go2mapillary" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go2mapillary" type="462c0819:PsiDirectoryNode" />
-              <item name="mapillary_viewer.py" type="8704e2dd:PyFileNode" />
-              <item name="mapillaryViewer" type="dd8bbb05:PyElementNode" />
-            </path>
-          </expand>
-          <select />
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_viewer.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillaryViewer" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_settings.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillarySettings" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_image_info.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_form.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillaryForm" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_filter.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_filter.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillaryFilter" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_explorer.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_api.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillaryApi" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mapillary_api.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="go2mapillary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="identifygeometry.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IdentifyGeometry" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -455,27 +566,46 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="0" width="1924" height="1056" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19254984" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.192348" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32971507" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972324" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32769555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32971507" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32972324" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.192348" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32769555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -495,16 +625,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4930">
-          <caret line="317" column="61" lean-forward="false" selection-start-line="317" selection-start-column="61" selection-end-line="317" selection-end-column="61" />
-          <folding>
-            <element signature="e#1132#1224#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/py_tiled_layer/tilelayer.py" />
     <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -517,7 +637,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -543,7 +662,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -569,7 +687,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -595,7 +712,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -621,7 +737,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -646,7 +761,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -671,7 +785,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -696,7 +809,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="54" column="37" lean-forward="false" selection-start-line="54" selection-start-column="37" selection-end-line="54" selection-end-column="37" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -714,7 +826,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="48" column="105" lean-forward="false" selection-start-line="48" selection-start-column="105" selection-end-line="48" selection-end-column="105" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -732,7 +843,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="47" column="102" lean-forward="false" selection-start-line="47" selection-start-column="102" selection-end-line="47" selection-end-column="102" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -791,9 +901,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3114">
           <caret line="188" column="33" lean-forward="false" selection-start-line="188" selection-start-column="33" selection-end-line="189" selection-end-column="62" />
-          <folding>
-            <element signature="e#1132#1141#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -801,23 +908,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
           <caret line="33" column="26" lean-forward="false" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="26" />
-          <folding>
-            <element signature="e#1142#1151#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/identifygeometry.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="595">
-          <caret line="38" column="4" lean-forward="false" selection-start-line="38" selection-start-column="4" selection-end-line="38" selection-end-column="43" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_api.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
+        <state relative-caret-position="901">
           <caret line="59" column="46" lean-forward="false" selection-start-line="59" selection-start-column="46" selection-end-line="59" selection-end-column="46" />
           <folding>
             <element signature="e#1132#1141#0" expanded="true" />
@@ -825,10 +921,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_settings.py">
+    <entry file="file://$PROJECT_DIR$/mapillary_filter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="61" column="28" lean-forward="false" selection-start-line="61" selection-start-column="28" selection-end-line="61" selection-end-column="28" />
+        <state relative-caret-position="1836">
+          <caret line="119" column="50" lean-forward="false" selection-start-line="119" selection-start-column="50" selection-end-line="119" selection-end-column="50" />
           <folding>
             <element signature="e#1140#1149#0" expanded="true" />
           </folding>
@@ -837,34 +933,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_image_info.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
+        <state relative-caret-position="493">
           <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="30" selection-end-column="119" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_filter.py">
+    <entry file="file://$PROJECT_DIR$/identifygeometry.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="119" column="50" lean-forward="false" selection-start-line="119" selection-start-column="50" selection-end-line="119" selection-end-column="50" />
-          <folding>
-            <element signature="e#1140#1149#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_form.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="61" column="83" lean-forward="false" selection-start-line="61" selection-start-column="25" selection-end-line="61" selection-end-column="83" />
-          <folding />
+        <state relative-caret-position="714">
+          <caret line="50" column="154" lean-forward="false" selection-start-line="50" selection-start-column="154" selection-end-line="50" selection-end-column="154" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="78" column="34" lean-forward="true" selection-start-line="78" selection-start-column="34" selection-end-line="78" selection-end-column="34" />
+        <state relative-caret-position="595">
+          <caret line="236" column="85" lean-forward="true" selection-start-line="236" selection-start-column="85" selection-end-line="236" selection-end-column="85" />
           <folding>
             <element signature="e#1132#1224#0" expanded="true" />
           </folding>
@@ -873,11 +958,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="135" column="8" lean-forward="false" selection-start-line="135" selection-start-column="8" selection-end-line="135" selection-end-column="8" />
+        <state relative-caret-position="612">
+          <caret line="113" column="19" lean-forward="false" selection-start-line="113" selection-start-column="8" selection-end-line="113" selection-end-column="19" />
           <folding>
             <element signature="e#1130#1221#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="104" column="84" lean-forward="true" selection-start-line="104" selection-start-column="84" selection-end-line="104" selection-end-column="84" />
+          <folding>
+            <element signature="e#1140#1149#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_cursor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="228" column="74" lean-forward="true" selection-start-line="228" selection-start-column="74" selection-end-line="232" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_form.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="68" column="23" lean-forward="false" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="23" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -453,7 +453,7 @@
                 currentHandler.subscribe();
             })
         }
-        
+
         function changeTag(tagId,color){
             var tagComponent = mly.getComponent("tag");
             var tag = tagComponent.get(tagId);
@@ -657,10 +657,14 @@
                 if (!that.indicator.state.lastPos) { return; }
                 that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
             }
-            
+
             this.changeMarker  = function(id, latLon, color) {
                 that.markerComponent.remove(id);
                 that.addOrReplaceViewerMarker(id, latLon, color);
+            }
+
+            this.removeMarker  = function(id) {
+                that.markerComponent.remove(id);
             }
 
             this.addOrReplaceViewerMarker = function(id, latLon, color) {

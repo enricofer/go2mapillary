@@ -121,6 +121,12 @@ class mapillaryViewer(QObject):
     def openFilterDialog(self):
         self.openFilter.emit()
 
+    def removeTag(self,type,key,id):
+        if type == 'tag':
+            self.restoreTags(key)
+        elif type == 'marker':
+            js = "this.mHandler.removeMarker('id-%s-%s');" % (key,id)
+
     def change_sample(self,featId):
         feat = self.parentInstance.sampleLocation.samplesLayer.getFeature(featId)
         if feat['cat']:

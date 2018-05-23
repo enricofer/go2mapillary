@@ -42,7 +42,7 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
 
-    def __init__(self,module, parent=None):
+    def __init__(self,parentInstance, parent=None):
         """Constructor."""
         super(mapillarySettings, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -51,10 +51,11 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.module = module
-        self.iface = module.iface
+        self.parentInstance = parentInstance
+        self.iface = parentInstance.iface
         self.setWindowTitle("go2mapillary settings")
         self.fileWidget.setStorageMode(QgsFileWidget.SaveFile)
+        self.fileWidget.setFilter("SHP files (*.shp)")
         self.buttonBox.accepted.connect(self.applySettings)
         self.addCategoryButton.clicked.connect(self.addCategoryAction)
         self.removeCategoryButton.clicked.connect(self.removeCategoryAction)
@@ -101,7 +102,7 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
         for row in range(0,self.tableWidget.rowCount()):
             categories[self.tableWidget.item(row,1).text()[:20]] = self.tableWidget.item(row,0).background().color().name()
         self.settings['categories'] = categories
-
+        self.parentInstance.sampleLocation.update_ds(self.settings['sample_source'])
         QgsExpressionContextUtils.setGlobalVariable("mapillarySettings", json.dumps(self.settings))
 
 

@@ -38,16 +38,17 @@ class IdentifyGeometry(QgsMapToolIdentify):
 
     geomIdentified = pyqtSignal(QgsFeature)
 
-    def __init__(self, canvas, targetLayer):
-        self.canvas = canvas
+    def __init__(self, parentInstance, targetLayer):
+        self.parentInstance = parentInstance
+        self.canvas = parentInstance.canvas
         self.targetLayer = targetLayer
-        QgsMapToolIdentify.__init__(self, canvas)
+        QgsMapToolIdentify.__init__(self, self.canvas)
         self.setCursor(QCursor())
 
     def canvasReleaseEvent(self, mouseEvent):
         #results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer],self.AllLayers)
         try:
-            results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer],self.AllLayers)
+            results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer, self.parentInstance.sampleLocation.samplesLayer],self.AllLayers)
         except:
             results = []
         if len(results) > 0:

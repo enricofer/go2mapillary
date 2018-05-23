@@ -61,21 +61,44 @@ class mapillaryForm(QtWidgets.QDialog, FORM_CLASS):
         self.comboBox.clear()
         for cat,color in self.parentInstance.sample_settings.settings['categories'].items():
             self.comboBox.addItem(cat,color)
-        self.keyEdit.setText(feat['key'])
-        self.typeEdit.setText(feat['type'])
-        cat_idx = self.comboBox.findText(feat['cat'])
+        self.keyEdit.setText(str(feat['key']))
+        self.typeEdit.setText(str(feat['type']))
+        if feat['cat']:
+            cat_idx = self.comboBox.findText(str(feat['cat']))
+        else:
+            cat_idx = 0
         self.comboBox.setCurrentIndex(cat_idx)
-        self.noteEdit.setPlainText(feat['note'])
+        if feat['note']:
+            self.noteEdit.setPlainText(str(feat['note']))
+        else:
+            self.noteEdit.setPlainText("")
         self.currentFeat = feat
         super(mapillaryForm, self).open()
 
     def applyForm(self):
         cat_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('cat')
         note_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('note')
-        attrs = {cat_idx: self.comboBox.currentText(), note_idx: self.noteEdit.toPlainText()[:99]}
+        color_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('color')
+
+        if self.currentFeat['cat']:
+            color = self.parentInstance.sample_settings.settings['categories'][str(self.currentFeat['cat'])]
+        else:
+            color = '#ffffff'
+
+        attrs = {
+            cat_idx: self.comboBox.currentText(),
+            note_idx: self.noteEdit.toPlainText()[:99],
+            color_idx:color
+        }
+
         print ({self.currentFeat.id():attrs})
         print(self.parentInstance.sampleLocation.samplesLayer.dataProvider().changeAttributeValues({ self.currentFeat.id() : attrs }))
         self.parentInstance.viewer.change_sample(self.currentFeat.id())
 
     def deleteFeatureAction(self):
+        key = self.currentFeat['key']
+        id = self.currentFeat['id']
+        type = self.currentFeat['type']
         self.parentInstance.sampleLocation.samplesLayer.dataProvider().deleteFeatures([self.currentFeat.id()])
+        self.parentInstance.sampleLocation.samplesLayer.triggerRepaint()
+        self.close()

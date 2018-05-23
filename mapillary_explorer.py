@@ -56,139 +56,13 @@ from .mapillary_form import mapillaryForm
 from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
 from .mapillary_image_info import mapillaryImageInfo
 from .identifygeometry import IdentifyGeometry
+from .mapillary_cursor import mapillary_cursor
 from .geojson_request import geojson_request
 
 import os.path
 import json
 
 
-
-class mapillary_cursor():
-
-    def transformToWGS84(self, pPoint):
-        # transformation from the current SRS to WGS84
-        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs()  # get current crs
-        crsSrc = crcMappaCorrente
-        crsDest = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
-        return xform.transform(pPoint)  # forward transformation: src -> dest
-
-    def transformToCurrentSRS(self, pPoint):
-        # transformation from the current SRS to WGS84
-        crcMappaCorrente = self.iface.mapCanvas().mapSettings().destinationCrs()  # get current crs
-        crsDest = crcMappaCorrente
-        crsSrc = QgsCoordinateReferenceSystem(4326)  # WGS 84
-        xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
-        return xform.transform(pPoint)  # forward transformation: src -> dest
-
-    def __init__(self,parentInstance):
-        self.parentInstance = parentInstance
-        self.iface = parentInstance.iface
-        self.mapCanvas = self.iface.mapCanvas()
-        self.lineOfSight = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
-        self.sightDirection = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
-        self.pointOfView = QgsVertexMarker(self.mapCanvas)
-        self.cursor = QgsVertexMarker(self.mapCanvas)
-        self.sightDirection.setColor(QColor("#36AF6C"))
-        self.lineOfSight.setColor(QColor("#36AF6C"))
-        self.pointOfView.setColor(QColor("#36AF6C"))
-        self.cursor.setColor(QColor("#36AF6C"))
-        self.lineOfSight.setWidth(2)
-        self.sightDirection.setWidth(1)
-        self.sightDirection.setLineStyle(Qt.DashLine)
-        self.pointOfView.setIconType(QgsRubberBand.ICON_CIRCLE)
-        self.cursor.setIconType(QgsRubberBand.ICON_CIRCLE)
-        self.pointOfView.setIconSize(20)
-        self.cursor.setIconSize(20)
-        self.cursor.setPenWidth(2)
-        self.pointOfView.setPenWidth(2)
-        self.samplesLayer = QgsVectorLayer("Point?crs=epsg:4326&field=id:integer&field=type:string(10)&field=cat:string(20)&field=key:string(20)&field=note:string(100)&field=img_coords:string(100)&index=yes","Mapillary samples","memory")
-        self.samplesLayer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_samples.qml"))
-        self.samplesLayer.featureAdded.connect(self.newAddedFeat)
-
-
-    def draw(self,pointOfView_coords,orig_pointOfView_coords,cursor_coords,endOfSight_coords):
-        self.cursor.show()
-        self.pointOfView.show()
-        self.lineOfSight.reset()
-        self.sightDirection.reset()
-        pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
-        cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
-        endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
-        #print ('cursor',cursor_coords[0],cursor_coords[1],cursor.x(),cursor.y())
-        self.pointOfView.setCenter (pointOfView)
-        self.cursor.setCenter (cursor)
-        self.lineOfSight.addPoint(pointOfView)
-        self.lineOfSight.addPoint(cursor)
-        self.sightDirection.addPoint(pointOfView)
-        self.sightDirection.addPoint(endOfSight)
-        self.cursor.updatePosition()
-
-    def delete(self):
-        self.cursor.hide()
-        self.pointOfView.hide()
-        self.lineOfSight.reset()
-        self.sightDirection.reset()
-
-    def sample(self, type, id,key,sample_coords, img_coords=None):
-        self.samplesLayer.startEditing()
-        samplePoint = QgsPointXY(sample_coords[1],sample_coords[0])
-        #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
-        if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
-            QgsProject.instance().addMapLayer(self.samplesLayer)
-            self.parentInstance.reorderLegendInterface()
-        sampleFeat = QgsFeature(self.samplesLayer.fields())
-        sampleFeat['type'] = type
-        sampleFeat['id'] = id
-        sampleFeat['key'] = key
-        if img_coords:
-            sampleFeat['img_coords'] = img_coords
-        sampleFeat.setGeometry(QgsGeometry.fromPointXY(samplePoint))
-        #self.samplesLayer.dataProvider().addFeatures([sampleFeat])
-        self.samplesLayer.addFeature(sampleFeat)
-        self.samplesLayer.commitChanges()
-
-    def newAddedFeat(self,featId):
-        if featId < 0:
-            return
-        print ("added", featId)
-        self.samplesLayer.triggerRepaint()
-        if self.parentInstance.sample_settings.settings['auto_open_form']:
-            newFeat = self.samplesLayer.getFeature(featId)
-            print (newFeat)
-            self.parentInstance.samples_form.open(newFeat)
-
-    def getSamplesList(self):
-        samples = []
-        id = 1
-        for feat in self.samplesLayer.getFeatures():
-            samples.append({
-                "id":id,
-                "latLon":{
-                    'lat':feat.geometry().asPoint().y(),
-                    'lon':feat.geometry().asPoint().x(),
-                }
-            })
-
-    def restoreTags(self,key):
-        exp = QgsExpression('"type" = \'tag\' and "key" = \'%s\'' % key)
-        print (exp)
-        tags = []
-        for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
-            if feat['cat']:
-                color = self.parentInstance.sample_settings.settings['categories'][feat['cat']]
-            else:
-                color = '#ffffff'
-            tags.append({
-                'id': feat['id'],
-                'key': feat['key'],
-                'note': feat['note'],
-                'cat': feat['cat'],
-                'color': color,
-                'geometry': json.loads(feat['img_coords'])
-            })
-        print (tags)
-        return tags
 
 class go2mapillary:
     """QGIS Plugin Implementation."""
@@ -360,6 +234,7 @@ class go2mapillary:
         self.filterAction_overview.triggered.connect(self.filter_overview_func)
         self.sampleLocation = mapillary_cursor(self)
         self.sample_settings = mapillarySettings(self)
+        self.sampleLocation.update_ds(self.sample_settings.settings['sample_source'])
         self.samples_form = mapillaryForm(self)
 
 
@@ -460,7 +335,7 @@ class go2mapillary:
 
         for level,layer in enabledLevels.items():
             if not (level == 'sequences' and 'images' in enabledLevels.keys()):
-                self.mapSelectionTool = IdentifyGeometry(self.canvas, layer)
+                self.mapSelectionTool = IdentifyGeometry(self, layer)
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
 
 
@@ -495,25 +370,35 @@ class go2mapillary:
                 self.canvas.extentsChanged.connect(self.mapChanged)
                 self.mapRefreshed()
 
+    def openAttrDialog(self,feature):
+        if feature.fields().indexFromName('cat') != -1:
+            if self.sample_settings.settings['auto_open_form']:
+                self.samples_form.open(feature)
+            return True
+
+
     def changeMapillary_images(self, feature):
         #print("changeMapillary_images")
+        if not self.openAttrDialog(feature):
+            QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
         self.viewer.openLocation(feature['key'])
         QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", feature['key'])
-        QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
         self.coverage.imagesLayer.triggerRepaint()
         self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_sequences(self, feature):
         #print("changeMapillary_sequences")
-        self.viewer.openLocation(feature['ikey'])
-        QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['key'])
-        self.coverage.sequencesLayer.triggerRepaint()
+        if not self.openAttrDialog(feature):
+            self.viewer.openLocation(feature['ikey'])
+            QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['key'])
+            self.coverage.sequencesLayer.triggerRepaint()
 
     def changeMapillary_overview(self, feature):
         #print("changeMapillary_overview")
-        self.viewer.openLocation(feature['ikey'])
-        QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
-        self.coverage.overviewLayer.triggerRepaint()
+        if not self.openAttrDialog(feature):
+            self.viewer.openLocation(feature['ikey'])
+            QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
+            self.coverage.overviewLayer.triggerRepaint()
 
     def removeMapillaryLayerGroup(self):
         mapillaryGroup = self.getMapillaryLayerGroup()
