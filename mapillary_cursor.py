@@ -111,7 +111,6 @@ class mapillary_cursor():
         self.checkForTemplateFields(samples_lyr)
         return samples_lyr
 
-
     def getFieldFromDefinition(self, field_type):
         type_pack = field_type[1].split("|")
         if field_type[2]:
@@ -182,13 +181,17 @@ class mapillary_cursor():
         self.lineOfSight.reset()
         self.sightDirection.reset()
 
+    def addSampleLayerToCanvas(self):
+        if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
+            QgsProject.instance().addMapLayer(self.samplesLayer)
+            self.restoreMarkers()
+
+
     def sample(self, type, id,key,sample_coords, img_coords=None):
         self.samplesLayer.startEditing()
         samplePoint = QgsPointXY(sample_coords[1],sample_coords[0])
         #sampleDevicePoint = self.iface.mapCanvas().getCoordinateTransform().transform(samplePoint.x(),samplePoint.y())
-        if not QgsProject.instance().mapLayer(self.samplesLayer.id()):
-            QgsProject.instance().addMapLayer(self.samplesLayer)
-            self.parentInstance.reorderLegendInterface()
+        self.addSampleLayerToCanvas()
         sampleFeat = QgsFeature(self.samplesLayer.fields())
         sampleFeat['type'] = type
         sampleFeat['id'] = id
@@ -224,13 +227,13 @@ class mapillary_cursor():
 
     def restoreTags(self,key):
         exp = QgsExpression('"type" = \'tag\' and "key" = \'%s\'' % key)
-        print (exp)
         tags = []
         for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
             if feat['cat']:
                 color = self.parentInstance.sample_settings.settings['categories'][str(feat['cat'])]
             else:
                 color = '#ffffff'
+
             tags.append({
                 'id': str(feat['id']),
                 'key': str(feat['key']),
@@ -241,3 +244,25 @@ class mapillary_cursor():
             })
         print (tags)
         return tags
+
+    def restoreMarkers(self):
+        if self.parentInstance.sample_settings.settings['sample_source'] != 'memory':
+            exp = QgsExpression('"type" = \'marker\'')
+            print ("RESTORE MARKERS")
+            markersDef = []
+            for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
+                if feat['cat']:
+                    color = self.parentInstance.sample_settings.settings['categories'][str(feat['cat'])]
+                else:
+                    color = '#ffffff'
+                markersDef.append({
+                    'key': str(feat['key']),
+                    'id': str(feat['id']),
+                    'color': color,
+                    'loc': {
+                        'lon': feat.geometry().asPoint().x(),
+                        'lat': feat.geometry().asPoint().y()
+                    }
+                })
+
+            self.parentInstance.viewer.addMarkers(markersDef)

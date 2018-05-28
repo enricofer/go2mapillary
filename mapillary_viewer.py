@@ -121,11 +121,20 @@ class mapillaryViewer(QObject):
     def openFilterDialog(self):
         self.openFilter.emit()
 
-    def removeTag(self,type,key,id):
-        if type == 'tag':
-            self.restoreTags(key)
-        elif type == 'marker':
-            js = "this.mHandler.removeMarker('id-%s-%s');" % (key,id)
+    def addTag(self,key,id,color,loc):
+        self.restoreTags(key)
+
+    def addMarkers(self,markers_def):
+        js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
+        js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
+        self.viewport.page().mainFrame().evaluateJavaScript(js)
+
+    def removeTag(self,key):
+        self.restoreTags(key)
+
+    def removeMarker (self,key,id):
+        js = "this.mHandler.removeMarker('id-%s-%s');" % (key,id)
+        self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def change_sample(self,featId):
         feat = self.parentInstance.sampleLocation.samplesLayer.getFeature(featId)

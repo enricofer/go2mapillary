@@ -305,8 +305,11 @@ class go2mapillary:
                 self.currentLocation = message
                 try:
                     QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", self.currentLocation['key'])
+                    if self.sample_settings.settings['sample_source'] != 'memory':
+                        self.sampleLocation.addSampleLayerToCanvas()
                     self.coverage.imagesLayer.triggerRepaint()
-                except:
+                except Exception as e:
+                    print ("error opening key %s: %s" % (self.currentLocation['key'],e))
                     pass
             if message["transport"] == "focusOn":
                 self.sampleLocation.delete()

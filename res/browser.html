@@ -632,7 +632,6 @@
             this.onViewerMouseEvent = function(event) {
                 that.indicator.state.lastPos = event.pixelPoint;
                 that.moveIndicatorMarker(event.latLon);
-
             }
 
             this.onViewerMousemove = function(event) {
@@ -658,9 +657,22 @@
                 that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
             }
 
+            this.restoreMarkers = function(definition) {
+                console.log('RESTORE MARKERS')
+                that.markerComponent.removeAll()
+                for (var i=0; i<definition.length; i++) {
+                    var marker_def = definition[i];
+                    console.log(marker_def);
+                    that.addOrReplaceViewerMarker(marker_def.id,marker_def.loc,marker_def.color)
+                }
+            }
+
             this.changeMarker  = function(id, latLon, color) {
+                that.mViewer.activateComponent('marker');
+                that.markerComponent = that.mViewer.getComponent('marker')
                 that.markerComponent.remove(id);
                 that.addOrReplaceViewerMarker(id, latLon, color);
+                that.mViewer.deactivateComponent('marker');
             }
 
             this.removeMarker  = function(id) {
