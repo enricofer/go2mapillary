@@ -4,21 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/mapillary_cursor.py" line="214" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/__init__.py" afterPath="$PROJECT_DIR$/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/identifygeometry.py" afterPath="$PROJECT_DIR$/identifygeometry.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_api.py" afterPath="$PROJECT_DIR$/mapillary_api.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_cursor.py" afterPath="$PROJECT_DIR$/mapillary_cursor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_filter.py" afterPath="$PROJECT_DIR$/mapillary_filter.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_form.py" afterPath="$PROJECT_DIR$/mapillary_form.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_image_info.py" afterPath="$PROJECT_DIR$/mapillary_image_info.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_settings.py" afterPath="$PROJECT_DIR$/mapillary_settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_viewer.py" afterPath="$PROJECT_DIR$/mapillary_viewer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/browser.html" afterPath="$PROJECT_DIR$/res/browser.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/mapillary_images.qml" afterPath="$PROJECT_DIR$/res/mapillary_images.qml" />
-    </list>
+    <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="" />
     <ignored path="go2mapillary.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -130,8 +116,8 @@
       <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="319" column="50" lean-forward="false" selection-start-line="319" selection-start-column="50" selection-end-line="319" selection-end-column="50" />
+            <state relative-caret-position="120">
+              <caret line="353" column="57" lean-forward="true" selection-start-line="353" selection-start-column="57" selection-end-line="354" selection-end-column="34" />
               <folding>
                 <element signature="e#1132#1224#0" expanded="true" />
               </folding>
@@ -659,7 +645,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1924" height="1056" extended-state="1" />
+    <frame x="-8" y="-8" width="1924" height="1056" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.192348" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -1078,8 +1064,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="319" column="50" lean-forward="false" selection-start-line="319" selection-start-column="50" selection-end-line="319" selection-end-column="50" />
+        <state relative-caret-position="120">
+          <caret line="353" column="57" lean-forward="true" selection-start-line="353" selection-start-column="57" selection-end-line="354" selection-end-column="34" />
           <folding>
             <element signature="e#1132#1224#0" expanded="true" />
           </folding>
