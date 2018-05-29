@@ -25,6 +25,14 @@ import os
 import site
 import sys
 
+from qgis.PyQt.QtWidgets import QMessageBox
+
+try:
+    from PyQt5.QtWebKitWidgets import QWebView
+    QTWK_ENABLED = True
+except ImportError:
+    QTWK_ENABLED = False
+
 sys.path.append(os.path.dirname(__file__))
 
 site.addsitedir(os.path.join(os.path.dirname(__file__),'extlibs'))
@@ -37,5 +45,20 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .mapillary_explorer import go2mapillary
-    return go2mapillary(iface)
+    if QTWK_ENABLED:
+        from .mapillary_explorer import go2mapillary
+        return go2mapillary(iface)
+    else:
+        QMessageBox.critical(None, "Can't install go2mapillary" ,
+                             'QtWebKitWidgets python bindings module is required for plugin execution \nManually install it from console typing: sudo apt install python3-pyqt5.qtwebkit')
+        return fakePlugin()
+
+class fakePlugin:
+    def __init__(self):
+        pass
+
+    def initGui(self):
+        pass
+
+    def unload(self):
+        pass
