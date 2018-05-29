@@ -76,9 +76,9 @@ class mapillaryForm(QtWidgets.QDialog, FORM_CLASS):
         super(mapillaryForm, self).open()
 
     def applyForm(self):
-        cat_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('cat')
-        note_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('note')
-        color_idx = self.parentInstance.sampleLocation.samplesLayer.fields().indexFromName('color')
+        cat_idx = self.parentInstance.sample_cursor.samplesLayer.fields().indexFromName('cat')
+        note_idx = self.parentInstance.sample_cursor.samplesLayer.fields().indexFromName('note')
+        color_idx = self.parentInstance.sample_cursor.samplesLayer.fields().indexFromName('color')
 
         if self.currentFeat['cat']:
             color = self.parentInstance.sample_settings.settings['categories'][str(self.currentFeat['cat'])]
@@ -91,14 +91,12 @@ class mapillaryForm(QtWidgets.QDialog, FORM_CLASS):
             color_idx:color
         }
 
-        print ({self.currentFeat.id():attrs})
-        print(self.parentInstance.sampleLocation.samplesLayer.dataProvider().changeAttributeValues({ self.currentFeat.id() : attrs }))
         self.parentInstance.viewer.change_sample(self.currentFeat.id())
 
     def deleteFeatureAction(self):
         key = self.currentFeat['key']
         id = self.currentFeat['id']
         type = self.currentFeat['type']
-        self.parentInstance.sampleLocation.samplesLayer.dataProvider().deleteFeatures([self.currentFeat.id()])
-        self.parentInstance.sampleLocation.samplesLayer.triggerRepaint()
+        self.parentInstance.sample_cursor.samplesLayer.dataProvider().deleteFeatures([self.currentFeat.id()])
+        self.parentInstance.sample_cursor.samplesLayer.triggerRepaint()
         self.close()

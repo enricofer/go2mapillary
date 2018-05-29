@@ -29,6 +29,7 @@
 
         .separator{
             display:inline-block;
+            width: 6px;
         }
 
         #focus {
@@ -90,6 +91,8 @@
             width: 19px;
             height: 19.3px;
             border: none;
+            padding-top: 1px;
+            padding-right: 1px;
             cursor: pointer;
             cursor: pointer;
             position:absolute;
@@ -120,19 +123,20 @@
         .slider-content {
             position: absolute;
             background-color: rgba(24,25,28,.3);
-            width: 120px;
-            height: 19.3px;
+            width: 226px;
+            height: 25px;
             border: none;
+            padding: 3px;
             cursor: pointer;
             cursor: pointer;
             position:absolute;
             text-align: center;
-            -webkit-transform: translate(-156px);
+            -webkit-transform: translate(-113px);
             -webkit-transition: width .15s ease-out;
             border-radius: 5px;
             display: inline-block;
             left:50%;
-            top: 15px;
+            top: 45px;
             z-index: 9999;
             vertical-align: middle;
         }
@@ -140,8 +144,7 @@
         /* Links inside the dropdown */
         .choice {
             text-decoration: none;
-            font-size: 15px !important;
-            padding-top: -2px !important;
+            font-size: 22px !important;
         }
 
         /* Change color of dropdown links on hover */
@@ -161,7 +164,10 @@
       <a href="#" id="menu_button" class="dropbtn qgis_menu"><i class="fa fa-bars qgis_menu"></i></a>
       <div id="myDropdown" class="hidden slider-content">
         <a onclick="imageInfo()" id="infoButton"  class="choice itemDisabled" href="#" title="Current image info"><i class="fa fa-info"></i></a>
-        <a onclick="openSettings()" id="enableTagsButton" class="choice itemDisabled" href="#" title="tag image"><i class="fa fa-cog"></i></a>
+        <a onclick="panTo()" id="centerButton"  class="choice itemDisabled" href="#" title="Center on map canvas"><i class="fa fa-bullseye"></i></a>
+        <a onclick="save()" id="saveButton"  class="choice itemDisabled" href="#" title="Save image to local file"><i class="fa fa-save"></i></a>
+        <a onclick="link()" id="linkButton" class="choice itemDisabled" href="#" title="Link to external browser"><i class="fa fa-link"></i></a>
+        <a onclick="openSettings()" id="openSettingsButton" class="choice itemDisabled" href="#" title="Settings"><i class="fa fa-cog"></i></a>
         <a onclick="filterCanvas()" id="filterCanvasButton"  class="choice itemDisabled" href="#" title="Filter mapillary images"><i class="fa fa-filter"></i></a>
         <a onclick="addTag()" id="enableTagsButton" class="choice itemDisabled" href="#" title="tag image"><i class="fa fa-tag"></i></a>
         <div class="separator"></div>
@@ -388,6 +394,18 @@
         // Trigger render on browser window resize
         window.addEventListener("resize", function() { mly.resize(); });
 
+        function save() {
+            QgisConnection.saveImg(key_param)
+        }
+
+        function link() {
+            QgisConnection.openBrowser(key_param)
+        }
+
+        function panTo() {
+            QgisConnection.locate(key_param)
+        }
+
         function filterCanvas() {
             QgisConnection.openFilterDialog()
         }
@@ -470,10 +488,10 @@
           var buttonMenu = document.getElementById("menu_button");
           if (event.target.classList.contains('qgis_menu')) {
               dropdown.classList.remove("hidden");
-              buttonMenu.classList.add("hidden");
+              //buttonMenu.classList.add("hidden");
           } else {
               dropdown.classList.add('hidden');
-              buttonMenu.classList.remove("hidden");
+              //buttonMenu.classList.remove("hidden");
           }
         }
 
@@ -550,6 +568,7 @@
                     foreground: that.mViewer.currentKey,
                     background: key
                 })
+                QgisConnection.setCompareKey(that.mViewer.currentKey)
             }
 
             this.subscribe = function () {
@@ -564,6 +583,7 @@
                 that.mViewer.deactivateComponent("slider");
                 that.sliderComponent = null;
                 that.isActive = false;
+                QgisConnection.setCompareKey('')
             }
         }
 

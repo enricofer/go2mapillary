@@ -102,7 +102,7 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
         for row in range(0,self.tableWidget.rowCount()):
             categories[self.tableWidget.item(row,1).text()[:20]] = self.tableWidget.item(row,0).background().color().name()
         self.settings['categories'] = categories
-        self.parentInstance.sampleLocation.update_ds(self.settings['sample_source'])
+        self.parentInstance.sample_cursor.update_ds(self.settings['sample_source'])
         QgsExpressionContextUtils.setGlobalVariable("mapillarySettings", json.dumps(self.settings))
 
 

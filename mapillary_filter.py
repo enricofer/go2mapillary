@@ -90,7 +90,6 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
             },
             'onlyPanorama': self.onlyPanorama.isChecked()
         }
-        print (self.filter)
         for level in ['images','sequences','overview']:
             self.applySqlFilter(level)
 
@@ -138,7 +137,6 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 sqlFilter += ' and '
             sqlFilter += '("pano" = 1)'
 
-        print("sqlFilter", sqlFilter)
         if not layer:
             layer = getattr(self.module.coverage,level+'Layer')
         try:

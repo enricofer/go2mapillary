@@ -23,26 +23,38 @@
 import os
 import sys
 import requests
+import webbrowser
 
 
 from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import QgsMessageLog, Qgis
 
 ROOT = 'https://a.mapillary.com/v3/'
 CLIENT_ID = 'ZUZ1MWdOaW1IXzRucVgxNzhwWTBlZzoyNWJjODcwMWIzNzNjNGQ0'
+DOWNLOAD_ENDPOINT = 'https://d1cuyjsrcm0gby.cloudfront.net/%s/thumb-2048.jpg'
+BROWSER_ENDPOINT = 'https://www.mapillary.com/app/?pKey=%s&focus=photo'
+
+def getProxySettings():
+    s = QSettings() #getting proxy from qgis options settings
+    if s.value("proxy/proxyEnabled", "") == "true":
+        return {
+            'type': s.value("proxy/proxyType", ""),
+            'host': s.value("proxy/proxyHost", ""),
+            'port': s.value("proxy/proxyPort", ""),
+            'user': s.value("proxy/proxyUser", ""),
+            'password': s.value("proxy/proxyPassword", "")
+        }
+    else:
+        return None
+
 
 def getProxiesConf():
-    s = QSettings() #getting proxy from qgis options settings
-    proxyEnabled = s.value("proxy/proxyEnabled", "")
-    proxyType = s.value("proxy/proxyType", "" )
-    proxyHost = s.value("proxy/proxyHost", "" )
-    proxyPort = s.value("proxy/proxyPort", "" )
-    proxyUser = s.value("proxy/proxyUser", "" )
-    proxyPassword = s.value("proxy/proxyPassword", "" )
-    if proxyEnabled == "true" and proxyType == 'HttpProxy': # test if there are proxy settings
+    proxy = getProxySettings()
+    if proxy and proxy['type'] == 'HttpProxy': # test if there are proxy settings
         proxyDict = {
-            "http"  : "http://%s:%s@%s:%s" % (proxyUser,proxyPassword,proxyHost,proxyPort),
-            "https" : "http://%s:%s@%s:%s" % (proxyUser,proxyPassword,proxyHost,proxyPort)
+            "http"  : "http://%s:%s@%s:%s" % (proxy['user'],proxy['password'],proxy['host'],proxy['port']),
+            "https" : "http://%s:%s@%s:%s" % (proxy['user'],proxy['password'],proxy['host'],proxy['port'])
         }
         return proxyDict
     else:
@@ -75,3 +87,14 @@ class mapillaryApi:
             return res.json()
         else:
             QgsMessageLog.logMessage("mapillary connection error: %d" % res.status_code, tag="go2mapillary",level=Qgis.Info)
+
+    def download(self,key):
+        res = requests.get(DOWNLOAD_ENDPOINT % key, proxies=getProxiesConf())
+        if res.status_code == 200:
+            fileName = QFileDialog.getSaveFileName(None,'Save mapillary Image',key+'.jpg',"JPG (*.jpg)")
+            if fileName:
+                with open(fileName[0], 'wb') as f:
+                    f.write(res.content)
+
+    def browser(self,key):
+        webbrowser.open_new_tab(BROWSER_ENDPOINT % key)

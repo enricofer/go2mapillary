@@ -23,7 +23,6 @@
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction, QDockWidget
 from qgis.PyQt.QtGui import QIcon, QColor
-from qgis.PyQt.QtNetwork import QNetworkProxy
 
 from qgis.core import (QgsExpressionContextUtils,
                        QgsNetworkAccessManager,
@@ -41,7 +40,6 @@ from qgis.core import (QgsExpressionContextUtils,
                        QgsFeatureRequest,
                        QgsWkbTypes,)
 
-from qgis.gui import QgsRubberBand,QgsVertexMarker
 
 #from qgis.utils import *
 # Initialize Qt resources from file resources.py
@@ -57,7 +55,7 @@ from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
 from .mapillary_image_info import mapillaryImageInfo
 from .identifygeometry import IdentifyGeometry
 from .mapillary_cursor import mapillary_cursor
-from .geojson_request import geojson_request
+#from .geojson_request import geojson_request
 
 import os.path
 import json
@@ -201,7 +199,6 @@ class go2mapillary:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         icon_path = os.path.join(self.plugin_dir,'res','icon.png')
         self.add_action(
             icon_path,
@@ -232,9 +229,9 @@ class go2mapillary:
         self.filterAction_images.triggered.connect(self.filter_images_func)
         self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
         self.filterAction_overview.triggered.connect(self.filter_overview_func)
-        self.sampleLocation = mapillary_cursor(self)
+        self.sample_cursor = mapillary_cursor(self)
         self.sample_settings = mapillarySettings(self)
-        self.sampleLocation.update_ds(self.sample_settings.settings['sample_source'])
+        self.sample_cursor.update_ds(self.sample_settings.settings['sample_source'])
         self.samples_form = mapillaryForm(self)
 
 
@@ -246,11 +243,11 @@ class go2mapillary:
         """Removes the plugin menu item and icon from QGIS GUI."""
 
         self.coverage.removeLevels()
-        self.sampleLocation.delete()
+        self.sample_cursor.delete()
         self.removeMapillaryLayerGroup()
 
         try:
-            QgsProject.instance().removeMapLayer(self.sampleLocation.samplesLayer.id())
+            QgsProject.instance().removeMapLayer(self.sample_cursor.samplesLayer.id())
         except:
             pass
 
@@ -287,32 +284,28 @@ class go2mapillary:
             self.viewer.disable()
 
     def viewerConnection(self, message):
-        print (self.sample_settings)
         #print (message)
         if message:
             if message["transport"] == "move_cursor":
-                print('moving',message)
-                self.sampleLocation.draw(message["pov"],message["orig_pov"],message["cursor"],message["endOfSight"])
+                self.sample_cursor.draw(message["pov"], message["orig_pov"], message["cursor"], message["endOfSight"])
             if message["transport"] == "disable_cursor":
-                print('deleting')
-                self.sampleLocation.delete()
+                self.sample_cursor.delete()
             if message["transport"] == "create_marker":
-                print('creating')
-                self.sampleLocation.sample("marker",message['id'],message['key'],message['markerPos'])
+                self.sample_cursor.sample("marker", message['id'], message['key'], message['markerPos'])
 
             if message["transport"] == "view":
-                self.sampleLocation.delete()
+                self.sample_cursor.delete()
                 self.currentLocation = message
                 try:
                     QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", self.currentLocation['key'])
                     if self.sample_settings.settings['sample_source'] != 'memory':
-                        self.sampleLocation.addSampleLayerToCanvas()
+                        self.sample_cursor.addSampleLayerToCanvas()
                     self.coverage.imagesLayer.triggerRepaint()
                 except Exception as e:
                     print ("error opening key %s: %s" % (self.currentLocation['key'],e))
                     pass
             if message["transport"] == "focusOn":
-                self.sampleLocation.delete()
+                self.sample_cursor.delete()
                 self.viewer.enable()
                 self.canvas.setMapTool(self.mapSelectionTool)
             if message["transport"] == "open_settings":
@@ -320,9 +313,11 @@ class go2mapillary:
             if message["transport"] == "image_info":
                 mapillaryImageInfo.openKey(self,message["key"])
             if message["transport"] == "store_tag":
-                print (message)
-                self.sampleLocation.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
+                self.sample_cursor.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
 
+    def setCompareKey(self,key):
+        QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCompareKey",key)
+        self.coverage.imagesLayer.triggerRepaint()
 
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
@@ -357,6 +352,7 @@ class go2mapillary:
             self.canvas.extentsChanged.connect(self.mapChanged)
             self.mapRefreshed()
             self.canvas.setMapTool(self.mapSelectionTool)
+            self.setCompareKey('')
 
         else:
             # toggle show/hide the widget
@@ -372,6 +368,7 @@ class go2mapillary:
                 self.canvas.setMapTool(self.mapSelectionTool)
                 self.canvas.extentsChanged.connect(self.mapChanged)
                 self.mapRefreshed()
+                self.setCompareKey('')
 
     def openAttrDialog(self,feature):
         if feature.fields().indexFromName('cat') != -1:
@@ -381,7 +378,7 @@ class go2mapillary:
 
 
     def changeMapillary_images(self, feature):
-        #print("changeMapillary_images")
+        print("changeMapillary_images")
         if not self.openAttrDialog(feature):
             QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
         self.viewer.openLocation(feature['key'])
@@ -417,7 +414,7 @@ class go2mapillary:
         return mapillaryGroup
 
     def reorderLegendInterface(self):
-        mapillaryLayers = self.coverage.getActiveLayers() + [self.sampleLocation.samplesLayer]
+        mapillaryLayers = self.coverage.getActiveLayers() + [self.sample_cursor.samplesLayer]
         print (mapillaryLayers)
         legendRoot = QgsProject.instance().layerTreeRoot()
         mapillaryGroup = self.getMapillaryLayerGroup()

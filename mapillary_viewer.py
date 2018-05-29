@@ -27,6 +27,10 @@ from qgis.PyQt.QtNetwork import QNetworkProxy
 
 from qgis.core import QgsNetworkAccessManager
 
+from .mapillary_api import getProxySettings, mapillaryApi
+
+from .mapillary_image_info import mapillaryImageInfo
+
 import os
 import sys
 import json
@@ -54,33 +58,8 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.PluginsEnabled,True)
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
-        
-        s = QSettings() #getting proxy from qgis options settings
-        proxyEnabled = s.value("proxy/proxyEnabled", "")
-        proxyType = s.value("proxy/proxyType", "" )
-        proxyHost = s.value("proxy/proxyHost", "" )
-        proxyPort = s.value("proxy/proxyPort", "" )
-        proxyUser = s.value("proxy/proxyUser", "" )
-        proxyPassword = s.value("proxy/proxyPassword", "" )
-        
-        if proxyEnabled == "true": # test if there are proxy settings
-            proxy = QNetworkProxy()
-            if proxyType == "DefaultProxy":
-               proxy.setType(QNetworkProxy.DefaultProxy)
-            elif proxyType == "Socks5Proxy":
-               proxy.setType(QNetworkProxy.Socks5Proxy)
-            elif proxyType == "HttpProxy":
-               proxy.setType(QNetworkProxy.HttpProxy)
-            elif proxyType == "HttpCachingProxy":
-               proxy.setType(QNetworkProxy.HttpCachingProxy)
-            elif proxyType == "FtpCachingProxy":
-               proxy.setType(QNetworkProxy.FtpCachingProxy)
-            proxy.setHostName(proxyHost)
-            proxy.setPort(int(proxyPort))
-            proxy.setUser(proxyUser)
-            proxy.setPassword(proxyPassword)
-            #QNetworkProxy.setApplicationProxy(proxy)
-        
+        self.mly_api = mapillaryApi()
+
         self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
         #self.page = os.path.join(os.path.dirname(__file__),'res','browser_test_cursor.html')
         self.openLocation('')
@@ -114,19 +93,34 @@ class mapillaryViewer(QObject):
     def restoreTags(self,key):
         print ('restoreTags')
         if key:
-            js = "this.updateTags('%s')" % json.dumps(self.parentInstance.sampleLocation.restoreTags(key))
+            js = "this.updateTags('%s')" % json.dumps(self.parentInstance.sample_cursor.restoreTags(key))
             self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     @pyqtSlot()
     def openFilterDialog(self):
         self.openFilter.emit()
 
+    @pyqtSlot(str)
+    def setCompareKey(self,key):
+        self.parentInstance.setCompareKey(key)
+
+    @pyqtSlot(str)
+    def saveImg(self,key):
+        self.mly_api.download(key)
+
+    @pyqtSlot(str)
+    def openBrowser(self,key):
+        self.mly_api.browser(key)
+
+    @pyqtSlot(str)
+    def locate(self,key):
+        mapillaryImageInfo.locate(self.parentInstance,key)
+
     def addTag(self,key,id,color,loc):
         self.restoreTags(key)
 
     def addMarkers(self,markers_def):
-        js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
-        js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
+        js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def removeTag(self,key):
@@ -137,7 +131,7 @@ class mapillaryViewer(QObject):
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def change_sample(self,featId):
-        feat = self.parentInstance.sampleLocation.samplesLayer.getFeature(featId)
+        feat = self.parentInstance.sample_cursor.samplesLayer.getFeature(featId)
         if feat['cat']:
             color = self.parentInstance.sample_settings.settings['categories'][feat['cat']]
         else:
@@ -148,7 +142,6 @@ class mapillaryViewer(QObject):
             loc = feat.geometry().asPoint()
             latlon = '{lat:%f,lon:%f}' % (loc.y(),loc.x())
             js = "this.mHandler.addOrReplaceViewerMarker('id-%s-%s',%s,'%s');" % (feat['key'],feat['id'],latlon,color)
-        print(js)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def enable(self):

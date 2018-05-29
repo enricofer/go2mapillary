@@ -101,7 +101,6 @@ class mapillary_cursor():
         #self.update_ds(self.parentInstance.sample_settings.settings['sample_source'])
 
     def getSamplesLayer(self, samples_datasource):
-        print ('getSamplesLayer')
         if samples_datasource != 'memory':
             if not os.path.exists(samples_datasource):
                 self.create_datasource_from_template(samples_datasource)
@@ -117,9 +116,6 @@ class mapillary_cursor():
             comment = field_type[2]
         else:
             comment = field_type[0]
-        nf = QgsField(name=field_type[0], type=int(type_pack[0]), len=int(type_pack[1]), prec=int(type_pack[2]),
-                 comment=comment)
-        print (type_pack,nf.name(),nf.length(),nf.type(),nf.precision())
         return QgsField(name=field_type[0], type=int(type_pack[0]), len=int(type_pack[1]), prec=int(type_pack[2]),comment=comment)
 
     def checkForTemplateFields(self, layer):
@@ -128,17 +124,12 @@ class mapillary_cursor():
         for field in layer.fields().toList():
             layerFieldNamesList.append(field.name())
 
-        print ('layer fields',layerFieldNamesList)
-
         for fieldDef in FIELDS_TEMPLATE:
             if not fieldDef[0] in layerFieldNamesList:
-                # print "Creating",fieldDef
                 layer.startEditing()
-                print('adding field',fieldDef,layer.addAttribute(self.getFieldFromDefinition(fieldDef)))
                 layer.commitChanges()
 
     def update_ds(self,ds):
-        print ('update_ds')
         if self.samples_datasource != ds:
             self.samples_datasource = ds
             self.samplesLayer = self.getSamplesLayer(ds)
@@ -149,10 +140,7 @@ class mapillary_cursor():
 
     def create_datasource_from_template(self, datasource):
         fieldSet = QgsFields()
-        for fieldDef in FIELDS_TEMPLATE:
-            print ("create",fieldDef[0],fieldSet.append(self.getFieldFromDefinition(fieldDef)))
 
-        print (datasource)
         writer = QgsVectorFileWriter(datasource, 'UTF-8', fieldSet, QgsWkbTypes.Point, QgsCoordinateReferenceSystem(4326),"ESRI Shapefile")
         if writer.hasError():
             print ("error",writer.errorMessage())
@@ -166,7 +154,6 @@ class mapillary_cursor():
         pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
         cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
         endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
-        #print ('cursor',cursor_coords[0],cursor_coords[1],cursor.x(),cursor.y())
         self.pointOfView.setCenter (pointOfView)
         self.cursor.setCenter (cursor)
         self.lineOfSight.addPoint(pointOfView)
@@ -206,11 +193,9 @@ class mapillary_cursor():
     def newAddedFeat(self,featId):
         if featId < 0:
             return
-        print ("added", featId)
         self.samplesLayer.triggerRepaint()
         if self.parentInstance.sample_settings.settings['auto_open_form']:
             newFeat = self.samplesLayer.getFeature(featId)
-            print (newFeat)
             self.parentInstance.samples_form.open(newFeat)
 
     def getSamplesList(self):
@@ -242,13 +227,11 @@ class mapillary_cursor():
                 'color': color,
                 'geometry': json.loads(feat['img_coords'])
             })
-        print (tags)
         return tags
 
     def restoreMarkers(self):
         if self.parentInstance.sample_settings.settings['sample_source'] != 'memory':
             exp = QgsExpression('"type" = \'marker\'')
-            print ("RESTORE MARKERS")
             markersDef = []
             for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
                 if feat['cat']:

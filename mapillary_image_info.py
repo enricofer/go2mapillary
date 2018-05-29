@@ -61,7 +61,6 @@ class mapillaryImageInfo(QtWidgets.QDialog, FORM_CLASS):
         self.label_project_key.hide()
         self.field_project_key.hide()
         res = self.mapillaryApi.image(key)
-        print (res)
         if res:
             self.field_latitude.setText(str(res["geometry"]["coordinates"][1]))
             self.field_longitude.setText(str(res["geometry"]["coordinates"][0]))
@@ -89,3 +88,9 @@ class mapillaryImageInfo(QtWidgets.QDialog, FORM_CLASS):
         #dialog.setWindowFlags(Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
         dialog.setup(key)
         dialog.exec_()
+
+    @staticmethod
+    def locate(module, key):
+        dialog = mapillaryImageInfo(module)
+        dialog.setup(key)
+        dialog.panToAction()

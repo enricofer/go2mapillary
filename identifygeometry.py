@@ -48,9 +48,10 @@ class IdentifyGeometry(QgsMapToolIdentify):
     def canvasReleaseEvent(self, mouseEvent):
         #results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer],self.AllLayers)
         try:
-            results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer, self.parentInstance.sampleLocation.samplesLayer],self.AllLayers)
+            results = self.identify(mouseEvent.x(), mouseEvent.y(), self.LayerSelection,[self.targetLayer, self.parentInstance.sample_cursor.samplesLayer],self.AllLayers)
         except:
             results = []
+        print (results)
         if len(results) > 0:
             print (results[0].mFeature.attributes())
             self.geomIdentified.emit(QgsFeature(results[0].mFeature))
