@@ -231,6 +231,11 @@ class mapillary_cursor():
             })
         return tags
 
+    def editSample(self,type,key,id):
+        exp = QgsExpression('"type" = \'%s\' and "key" = \'%s\' and "id" = \'%s\'' % (type,key,id))
+        for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
+            self.parentInstance.samples_form.open(feat)
+
     def restoreMarkers(self):
         if self.parentInstance.sample_settings.settings['sample_source'] != 'memory':
             exp = QgsExpression('"type" = \'marker\'')

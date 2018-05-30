@@ -113,6 +113,11 @@ class mapillaryViewer(QObject):
         self.mly_api.browser(key)
 
     @pyqtSlot(str)
+    def openMarkerForm(self,mly_id):
+        s,key,id = mly_id.split('-')
+        self.parentInstance.sample_cursor.editSample('marker',key,id)
+
+    @pyqtSlot(str)
     def locate(self,key):
         mapillaryImageInfo.locate(self.parentInstance,key)
 
@@ -120,17 +125,24 @@ class mapillaryViewer(QObject):
         self.restoreTags(key)
 
     def addMarkers(self,markers_def):
-        #js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
-        js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
-        js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
+        js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
+        #js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
+        #js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def removeTag(self,key):
         self.restoreTags(key)
 
     def removeMarker (self,key,id):
-        js = "this.mHandler.removeMarker('id-%s-%s');" % (key,id)
+        js = "this.mHandler.removeMarker(['id-%s-%s']);" % (key,id)
+        print ('REMOVE',js)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
+
+    def removeSample(self,type,key,id):
+        if type == 'tag':
+            self.removeTag()
+        elif type == 'marker':
+            self.removeMarker(key,id)
 
     def change_sample(self,featId):
         feat = self.parentInstance.sample_cursor.samplesLayer.getFeature(featId)

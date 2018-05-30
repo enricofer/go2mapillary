@@ -317,19 +317,23 @@ class go2mapillary:
                 self.sample_cursor.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
 
     def setCompareKey(self,key):
-        QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCompareKey",key)
-        self.coverage.imagesLayer.triggerRepaint()
+        try:
+            QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCompareKey",key)
+            self.coverage.imagesLayer.triggerRepaint()
+        except:
+            pass
 
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
 
-    def mapRefreshed(self):
+    def mapRefreshed(self, force=None):
         try:
             self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
         except:
             pass
 
-        enabledLevels = self.coverage.update_coverage()
+        enabledLevels = self.coverage.update_coverage(force=force)
+        print ('LEVELS',enabledLevels)
         self.reorderLegendInterface()
 
         for level,layer in enabledLevels.items():
@@ -351,7 +355,7 @@ class go2mapillary:
             self.dockwidget.show()
             #self.setupLayer('')
             self.canvas.extentsChanged.connect(self.mapChanged)
-            self.mapRefreshed()
+            self.mapRefreshed(force=True)
             self.canvas.setMapTool(self.mapSelectionTool)
             self.setCompareKey('')
 
@@ -360,16 +364,15 @@ class go2mapillary:
             if self.dockwidget.isVisible():
                 self.dockwidget.hide()
                 self.pluginIsActive = False
-                self.coverage.removeLevels()
+                #self.coverage.removeLevels()
                 self.canvas.extentsChanged.disconnect(self.mapChanged)
-                #self.removeMapillaryLayerGroup()
-                self.reorderLegendInterface()
+                self.removeMapillaryLayerGroup()
+                #self.reorderLegendInterface()
             else:
                 self.dockwidget.show()
+                self.mapRefreshed(force=True)
                 self.canvas.setMapTool(self.mapSelectionTool)
                 self.canvas.extentsChanged.connect(self.mapChanged)
-                self.mapRefreshed()
-                self.setCompareKey('')
 
     def openAttrDialog(self,feature):
         if feature.fields().indexFromName('cat') != -1:

@@ -191,8 +191,7 @@ class mapillary_coverage:
         xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
         return xform.transform(pPoint) # forward transformation: src -> dest
 
-    def download_tiles(self):
-
+    def download_tiles(self, force=None):
         #calculate zoom_level con current canvas extents
         ex = self.iface.mapCanvas().extent()
         wgs84_minimum = self.transformToWGS84(QgsPointXY (ex.xMinimum(),ex.yMinimum()))
@@ -205,7 +204,7 @@ class mapillary_coverage:
 
         ranges = getTileRange(bounds, zoom_level)
 
-        if not self.actual_ranges or not (
+        if force or not self.actual_ranges or not (
                                     ranges[0][0]==self.actual_ranges[0][0] and
                                     ranges[0][1]==self.actual_ranges[0][1] and
                                     ranges[1][0]==self.actual_ranges[1][0] and
@@ -342,6 +341,6 @@ class mapillary_coverage:
                 levels.append(getattr(self, level+'Layer'))
         return levels
 
-    def update_coverage(self):
-        self.download_tiles()
+    def update_coverage(self, force=None):
+        self.download_tiles(force=force)
         return self.getActiveLevels()

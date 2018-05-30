@@ -99,4 +99,5 @@ class mapillaryForm(QtWidgets.QDialog, FORM_CLASS):
         type = self.currentFeat['type']
         self.parentInstance.sample_cursor.samplesLayer.dataProvider().deleteFeatures([self.currentFeat.id()])
         self.parentInstance.sample_cursor.samplesLayer.triggerRepaint()
+        self.parentInstance.viewer.removeSample(type,key,id)
         self.close()

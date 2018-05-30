@@ -330,10 +330,8 @@
 
         function updateTags (json_tags){
             var tagComponent = mly.getComponent("tag");
-            console.log(tagComponent.getAll());
             tagComponent.removeAll();
             var key_tags = JSON.parse(json_tags);
-            console.log(key_tags)
             if (key_tags != undefined){
                 for (var i=0; i<key_tags.length; i++) {
                     var tag_def = key_tags[i];
@@ -483,7 +481,6 @@
 
         // Close the dropdown menu if the user clicks outside of it
         window.onclick = function(event) {
-          console.log("windows onclick")
           var dropdown = document.getElementById("myDropdown");
           var buttonMenu = document.getElementById("menu_button");
           if (event.target.classList.contains('qgis_menu')) {
@@ -533,7 +530,6 @@
                 that.tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
                 that.tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
                     that.addedTagsId ++;
-                    console.log(that.addedTagsId);
                     var id = "id-" + that.addedTagsId
                     var tag = new Mapillary.TagComponent.OutlineTag(id, geometry, { editable: false, text: "tag" });
                     that.tagComponent.add(tag);
@@ -678,12 +674,11 @@
             }
 
             this.restoreMarkers = function(definition) {
-                console.log('RESTORE MARKERS')
                 that.markerComponent.removeAll()
                 for (var i=0; i<definition.length; i++) {
                     var marker_def = definition[i];
-                    console.log(marker_def);
-                    that.addOrReplaceViewerMarker(marker_def.id,marker_def.loc,marker_def.color)
+                    var id = 'id-' + marker_def.key + '-' + marker_def.id;
+                    that.addOrReplaceViewerMarker(id,marker_def.loc,marker_def.color)
                 }
             }
 
@@ -718,10 +713,13 @@
             }
 
             this.onViewerClick = function(e) {
-                if (!e.latLon) { return; }
+                // if (!e.latLon) { return; }
                 that.markerComponent.getMarkerIdAt(e.pixelPoint).then(function(markerId) {
                     // Only create a new marker if no interactive markers are hovered
-                    if (markerId != null) { return; }
+                    if (markerId != null) {
+                        QgisConnection.openMarkerForm(markerId);
+                        return
+                    }
                     that.createMarker(e.latLon);
                 });
             }
