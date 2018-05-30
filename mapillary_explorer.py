@@ -294,7 +294,8 @@ class go2mapillary:
             if message["transport"] == "create_marker":
                 self.sample_cursor.sample("marker", message['id'], message['key'], message['markerPos'])
             if message["transport"] == "drag_marker":
-                s,key,id = message['id'].split('-')
+                print(message)
+                s,key,id = message['id'].split(':')
                 self.sample_cursor.moveMarker(key, id, message['markerPos'])
 
             if message["transport"] == "view":

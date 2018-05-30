@@ -59,11 +59,28 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         self.mly_api = mapillaryApi()
-
         self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
-        #self.page = os.path.join(os.path.dirname(__file__),'res','browser_test_cursor.html')
         self.openLocation('')
         self.enabled = True
+
+        proxy_conf = getProxySettings()
+        if proxy_conf:
+            proxy = QNetworkProxy()
+            if proxy_conf['type'] == "DefaultProxy":
+                proxy.setType(QNetworkProxy.DefaultProxy)
+            elif proxy_conf['type'] == "Socks5Proxy":
+                proxy.setType(QNetworkProxy.Socks5Proxy)
+            elif proxy_conf['type'] == "HttpProxy":
+                proxy.setType(QNetworkProxy.HttpProxy)
+            elif proxy_conf['type'] == "HttpCachingProxy":
+                proxy.setType(QNetworkProxy.HttpCachingProxy)
+            elif proxy_conf['type'] == "FtpCachingProxy":
+                proxy.setType(QNetworkProxy.FtpCachingProxy)
+            proxy.setHostName(proxy_conf['host'])
+            proxy.setPort(int(proxy_conf['port']))
+            proxy.setUser(proxy_conf['user'])
+            proxy.setPassword(proxy_conf['password'])
+            QNetworkProxy.setApplicationProxy(proxy)
 
     def registerJS(self):
         self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
@@ -114,7 +131,7 @@ class mapillaryViewer(QObject):
 
     @pyqtSlot(str)
     def openMarkerForm(self,mly_id):
-        s,key,id = mly_id.split('-')
+        s,key,id = mly_id.split(':')
         self.parentInstance.sample_cursor.editSample('marker',key,id)
 
     @pyqtSlot(str)
@@ -134,7 +151,7 @@ class mapillaryViewer(QObject):
         self.restoreTags(key)
 
     def removeMarker (self,key,id):
-        js = "this.mHandler.removeMarker(['id-%s-%s']);" % (key,id)
+        js = "this.mHandler.removeMarker(['id:%s:%s']);" % (key,id)
         print ('REMOVE',js)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
@@ -151,11 +168,11 @@ class mapillaryViewer(QObject):
         else:
             color = '#ffffff'
         if feat['type'] == 'tag':
-            js = "this.changeTag('id-%s-%d','%s');" % (feat['key'],feat['id'],color)
+            js = "this.changeTag('id:%s:%d','%s');" % (feat['key'],feat['id'],color)
         elif feat['type'] == 'marker':
             loc = feat.geometry().asPoint()
             latlon = '{lat:%f,lon:%f}' % (loc.y(),loc.x())
-            js = "this.mHandler.addOrReplaceViewerMarker('id-%s-%s',%s,'%s');" % (feat['key'],feat['id'],latlon,color)
+            js = "this.mHandler.addOrReplaceViewerMarker('id:%s:%s',%s,'%s');" % (feat['key'],feat['id'],latlon,color)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def enable(self):

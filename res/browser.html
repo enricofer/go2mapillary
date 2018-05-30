@@ -458,7 +458,7 @@
             tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreateRect);
             tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
                 addedTagsId ++;
-                var tagId = 'id-' + key_param + '-' + addedTagsId;
+                var tagId = 'id:' + key_param + ':' + addedTagsId;
                 var tag = new Mapillary.TagComponent.OutlineTag(tagId, geometry, { editable: false });
                 tagComponent.add([tag]);
                 Q_store_tag(geometry,addedTagsId,[mapNodePosition.pos.lat,mapNodePosition.pos.lon]);
@@ -511,46 +511,6 @@
                 //that.mouseComponent = null;
                 that.isActive = false;
             }
-        }
-
-        function popupsHandler(mViewer){
-            this.mViewer = mViewer;
-            this.isActive = false;
-            this.addedTagsId = 0;
-            var that = this;
-
-            this.removeTags = function () {
-                that.tagComponent.removeAll();
-            }
-
-            this.subscribe = function () {
-                that.isActive = true;
-                that.mViewer.activateComponent("popup");
-                that.tagComponent = that.mViewer.getComponent("popup");
-                that.tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreatePoint);
-                that.tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
-                    that.addedTagsId ++;
-                    var id = "id-" + that.addedTagsId
-                    var tag = new Mapillary.TagComponent.OutlineTag(id, geometry, { editable: false, text: "tag" });
-                    that.tagComponent.add(tag);
-                    //that.mViewer.on(Mapillary.Viewer.nodechanged, that.removeTags);
-                    var span = document.createElement('span');
-                    span.innerHTML = 'parking meter';
-                    var popup = new Mapillary.PopupComponent.Popup();
-                    popup.setDOMContent(span);
-                    popup.setBasicPoint(geometry);
-                    that.popupComponent.add([popup]);
-                    that.mViewer.on(Mapillary.Viewer.nodechanged, that.removeTags);
-                })
-            }
-
-            this.unsubscribe = function () {
-                that.mViewer.deactivateComponent("popup");
-                that.tagComponent = null;
-                that.isActive = false;
-                //that.mViewer.off(Mapillary.Viewer.nodechanged, that.removeTags);
-            }
-
         }
 
         function compareHandler(mViewer) {
@@ -677,7 +637,7 @@
                 that.markerComponent.removeAll()
                 for (var i=0; i<definition.length; i++) {
                     var marker_def = definition[i];
-                    var id = 'id-' + marker_def.key + '-' + marker_def.id;
+                    var id = 'id:' + marker_def.key + ':' + marker_def.id;
                     that.addOrReplaceViewerMarker(id,marker_def.loc,marker_def.color)
                 }
             }
@@ -706,7 +666,7 @@
 
             this.createMarker = function(latLon) {
                 this.addedMarkerId++
-                var id = 'id-' + key_param + '-' + this.addedMarkerId;
+                var id = 'id:' + key_param + ':' + this.addedMarkerId;
                 that.addOrReplaceViewerMarker(id, latLon, '#ffffff');
                 window.Q_create_marker(this.addedMarkerId,[latLon.lat, latLon.lon])
                 that.mapMarkers[id] = mapMarker;
