@@ -236,6 +236,15 @@ class mapillary_cursor():
         for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
             self.parentInstance.samples_form.open(feat)
 
+    def moveMarker(self,key,id,sample_coords):
+        exp = QgsExpression('"type" = \'marker\' and "key" = \'%s\' and "id" = \'%s\'' % (key,id))
+        for feat in self.samplesLayer.getFeatures(QgsFeatureRequest(exp)):
+            samplePoint = QgsPointXY(sample_coords[1], sample_coords[0])
+            self.samplesLayer.startEditing()
+            self.samplesLayer.changeGeometry(feat.id(),QgsGeometry.fromPointXY(samplePoint))
+            self.samplesLayer.commitChanges()
+            self.samplesLayer.triggerRepaint()
+
     def restoreMarkers(self):
         if self.parentInstance.sample_settings.settings['sample_source'] != 'memory':
             exp = QgsExpression('"type" = \'marker\'')

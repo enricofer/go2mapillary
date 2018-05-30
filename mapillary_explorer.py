@@ -293,6 +293,9 @@ class go2mapillary:
                 self.sample_cursor.delete()
             if message["transport"] == "create_marker":
                 self.sample_cursor.sample("marker", message['id'], message['key'], message['markerPos'])
+            if message["transport"] == "drag_marker":
+                s,key,id = message['id'].split('-')
+                self.sample_cursor.moveMarker(key, id, message['markerPos'])
 
             if message["transport"] == "view":
                 self.sample_cursor.delete()

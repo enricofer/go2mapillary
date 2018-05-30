@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="39afde00-a602-4f9a-a1ce-bd926926d113" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_coverage.py" afterPath="$PROJECT_DIR$/mapillary_coverage.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_cursor.py" afterPath="$PROJECT_DIR$/mapillary_cursor.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_explorer.py" afterPath="$PROJECT_DIR$/mapillary_explorer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_form.py" afterPath="$PROJECT_DIR$/mapillary_form.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mapillary_viewer.py" afterPath="$PROJECT_DIR$/mapillary_viewer.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/browser.html" afterPath="$PROJECT_DIR$/res/browser.html" />
     </list>
     <ignored path="go2mapillary.iws" />
@@ -41,10 +38,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mapillary_coverage.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1785">
+            <state relative-caret-position="-1428">
               <caret line="193" column="41" lean-forward="false" selection-start-line="193" selection-start-column="41" selection-end-line="193" selection-end-column="41" />
               <folding />
             </state>
@@ -90,7 +87,7 @@
       <file leaf-file-name="mapillary_viewer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
+            <state relative-caret-position="816">
               <caret line="115" column="22" lean-forward="false" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="22" />
               <folding>
                 <element signature="e#1130#1221#0" expanded="true" />
@@ -114,8 +111,8 @@
       <file leaf-file-name="mapillary_cursor.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mapillary_cursor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="233" column="18" lean-forward="false" selection-start-line="233" selection-start-column="8" selection-end-line="233" selection-end-column="18" />
+            <state relative-caret-position="498">
+              <caret line="243" column="92" lean-forward="false" selection-start-line="243" selection-start-column="92" selection-end-line="243" selection-end-column="92" />
               <folding>
                 <element signature="e#1132#1141#0" expanded="true" />
               </folding>
@@ -123,11 +120,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="mapillary_explorer.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3162">
-              <caret line="372" column="45" lean-forward="false" selection-start-line="372" selection-start-column="45" selection-end-line="372" selection-end-column="45" />
+            <state relative-caret-position="272">
+              <caret line="295" column="53" lean-forward="false" selection-start-line="295" selection-start-column="53" selection-end-line="295" selection-end-column="53" />
               <folding>
                 <element signature="e#1132#1224#0" expanded="true" />
               </folding>
@@ -198,10 +195,10 @@
         <option value="$PROJECT_DIR$/mapillary_settings.py" />
         <option value="$PROJECT_DIR$/identifygeometry.py" />
         <option value="$PROJECT_DIR$/mapillary_form.py" />
-        <option value="$PROJECT_DIR$/mapillary_cursor.py" />
         <option value="$PROJECT_DIR$/mapillary_viewer.py" />
-        <option value="$PROJECT_DIR$/mapillary_explorer.py" />
         <option value="$PROJECT_DIR$/mapillary_coverage.py" />
+        <option value="$PROJECT_DIR$/mapillary_cursor.py" />
+        <option value="$PROJECT_DIR$/mapillary_explorer.py" />
       </list>
     </option>
   </component>
@@ -941,16 +938,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_cursor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="233" column="18" lean-forward="false" selection-start-line="233" selection-start-column="8" selection-end-line="233" selection-end-column="18" />
-          <folding>
-            <element signature="e#1132#1141#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
@@ -961,9 +948,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1428">
+          <caret line="193" column="41" lean-forward="false" selection-start-line="193" selection-start-column="41" selection-end-line="193" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/mapillary_viewer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
+        <state relative-caret-position="816">
           <caret line="115" column="22" lean-forward="false" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="22" />
           <folding>
             <element signature="e#1130#1221#0" expanded="true" />
@@ -971,21 +966,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
+    <entry file="file://$PROJECT_DIR$/mapillary_cursor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3162">
-          <caret line="372" column="45" lean-forward="false" selection-start-line="372" selection-start-column="45" selection-end-line="372" selection-end-column="45" />
+        <state relative-caret-position="498">
+          <caret line="243" column="92" lean-forward="false" selection-start-line="243" selection-start-column="92" selection-end-line="243" selection-end-column="92" />
           <folding>
-            <element signature="e#1132#1224#0" expanded="true" />
+            <element signature="e#1132#1141#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mapillary_coverage.py">
+    <entry file="file://$PROJECT_DIR$/mapillary_explorer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1785">
-          <caret line="193" column="41" lean-forward="false" selection-start-line="193" selection-start-column="41" selection-end-line="193" selection-end-column="41" />
-          <folding />
+        <state relative-caret-position="272">
+          <caret line="295" column="53" lean-forward="false" selection-start-line="295" selection-start-column="53" selection-end-line="295" selection-end-column="53" />
+          <folding>
+            <element signature="e#1132#1224#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -753,13 +753,13 @@
                     that.removeViewerIndicator();
                 });
 
-                that.markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragend, function() {
+                that.markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragend, function(e) {
                     that.indicator.state.dragging = false;
-
                     if (!that.indicator.state.lastPos) { return; }
 
                     // Unproject the last position and move indicator marker if latLon exist
-                    that.mViewer.unproject(this.indicator.state.lastPos).then(this.moveIndicatorMarker);
+                    that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
+                    Q_drag_marker(e.marker.id,[e.marker.latLon.lat,e.marker.latLon.lon]);
                 });
 
                 that.mViewer.on(Mapillary.Viewer.click, that.onViewerClick);
