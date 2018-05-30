@@ -127,6 +127,7 @@ class mapillary_cursor():
         for fieldDef in FIELDS_TEMPLATE:
             if not fieldDef[0] in layerFieldNamesList:
                 layer.startEditing()
+                layer.addAttribute(self.getFieldFromDefinition(fieldDef))
                 layer.commitChanges()
 
     def update_ds(self,ds):
@@ -140,7 +141,8 @@ class mapillary_cursor():
 
     def create_datasource_from_template(self, datasource):
         fieldSet = QgsFields()
-
+        for fieldDef in FIELDS_TEMPLATE:
+            fieldSet.append(self.getFieldFromDefinition(fieldDef))
         writer = QgsVectorFileWriter(datasource, 'UTF-8', fieldSet, QgsWkbTypes.Point, QgsCoordinateReferenceSystem(4326),"ESRI Shapefile")
         if writer.hasError():
             print ("error",writer.errorMessage())
@@ -187,7 +189,7 @@ class mapillary_cursor():
             sampleFeat['img_coords'] = img_coords
         sampleFeat.setGeometry(QgsGeometry.fromPointXY(samplePoint))
         #self.samplesLayer.dataProvider().addFeatures([sampleFeat])
-        self.samplesLayer.addFeature(sampleFeat)
+        print ('',self.samplesLayer.addFeature(sampleFeat))
         self.samplesLayer.commitChanges()
 
     def newAddedFeat(self,featId):

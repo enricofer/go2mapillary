@@ -90,7 +90,7 @@ class mapillaryForm(QtWidgets.QDialog, FORM_CLASS):
             note_idx: self.noteEdit.toPlainText()[:99],
             color_idx:color
         }
-
+        self.parentInstance.sample_cursor.samplesLayer.dataProvider().changeAttributeValues({self.currentFeat.id(): attrs})
         self.parentInstance.viewer.change_sample(self.currentFeat.id())
 
     def deleteFeatureAction(self):

@@ -233,6 +233,7 @@ class go2mapillary:
         self.sample_settings = mapillarySettings(self)
         self.sample_cursor.update_ds(self.sample_settings.settings['sample_source'])
         self.samples_form = mapillaryForm(self)
+        self.iface.projectRead.connect(self.removeMapillaryLayerGroup)
 
 
     #--------------------------------------------------------------------------

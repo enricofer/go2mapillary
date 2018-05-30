@@ -120,7 +120,9 @@ class mapillaryViewer(QObject):
         self.restoreTags(key)
 
     def addMarkers(self,markers_def):
-        js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
+        #js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
+        js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
+        js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def removeTag(self,key):
