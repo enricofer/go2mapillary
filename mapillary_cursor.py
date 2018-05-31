@@ -58,6 +58,9 @@ FIELDS_TEMPLATE = (
     ("img_coords", "10|100|0", "img coords on mapillary screen"),
 )
 
+MLY_COLOR = '#36AF6C'
+CURSOR_COLOR = '#2B8E56'
+
 class mapillary_cursor():
 
     def transformToWGS84(self, pPoint):
@@ -84,10 +87,10 @@ class mapillary_cursor():
         self.sightDirection = QgsRubberBand(self.mapCanvas, QgsWkbTypes.LineGeometry)
         self.pointOfView = QgsVertexMarker(self.mapCanvas)
         self.cursor = QgsVertexMarker(self.mapCanvas)
-        self.sightDirection.setColor(QColor("#36AF6C"))
-        self.lineOfSight.setColor(QColor("#36AF6C"))
-        self.pointOfView.setColor(QColor("#36AF6C"))
-        self.cursor.setColor(QColor("#36AF6C"))
+        self.sightDirection.setColor(QColor(CURSOR_COLOR))
+        self.lineOfSight.setColor(QColor(CURSOR_COLOR))
+        self.pointOfView.setColor(QColor(CURSOR_COLOR))
+        self.cursor.setColor(QColor(CURSOR_COLOR))
         self.lineOfSight.setWidth(2)
         self.sightDirection.setWidth(1)
         self.sightDirection.setLineStyle(Qt.DashLine)

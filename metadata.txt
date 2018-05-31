@@ -29,6 +29,7 @@ changelog= 1.1 metadata max min versions, gui improvement, cache relocation
  1.3 qgisMinimumVersion to 2.99
  1.4 qgisMinimumVersion to 3.0 - crs transformation issue fixed
  1.5 code cleanup, levels rendering issues fixed, progress bar and filtering new feature
+ 2.0 compare and sampling (markers and tags) new features
 
 # Tags are comma separated with spaces allowed
 tags=webservice, service, mapillary, browser, street view, explorer

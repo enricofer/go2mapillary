@@ -294,7 +294,6 @@ class go2mapillary:
             if message["transport"] == "create_marker":
                 self.sample_cursor.sample("marker", message['id'], message['key'], message['markerPos'])
             if message["transport"] == "drag_marker":
-                print(message)
                 s,key,id = message['id'].split(':')
                 self.sample_cursor.moveMarker(key, id, message['markerPos'])
 
@@ -337,7 +336,6 @@ class go2mapillary:
             pass
 
         enabledLevels = self.coverage.update_coverage(force=force)
-        print ('LEVELS',enabledLevels)
         self.reorderLegendInterface()
 
         for level,layer in enabledLevels.items():
@@ -386,7 +384,7 @@ class go2mapillary:
 
 
     def changeMapillary_images(self, feature):
-        print("changeMapillary_images")
+        #print("changeMapillary_images")
         if not self.openAttrDialog(feature):
             QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
         self.viewer.openLocation(feature['key'])
@@ -423,18 +421,16 @@ class go2mapillary:
 
     def reorderLegendInterface(self):
         mapillaryLayers = self.coverage.getActiveLayers() + [self.sample_cursor.samplesLayer]
-        print (mapillaryLayers)
+        #print (mapillaryLayers)
         legendRoot = QgsProject.instance().layerTreeRoot()
         mapillaryGroup = self.getMapillaryLayerGroup()
 
         for layer in mapillaryLayers:
             try:
                 layerNode = legendRoot.findLayer(layer)
-                print ('GROUP',layerNode.parent())
             except:
                 layerNode = None
             if layerNode:# and layerNode.parent() != mapillaryGroup:
-                print ('moving',layer.name())
                 cloned_node = layerNode.clone()
                 mapillaryGroup.insertChildNode(0, cloned_node)
                 if layerNode.parent():
