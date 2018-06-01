@@ -41,6 +41,8 @@ SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
 
 LAYER_LEVELS = ['overview', 'sequences', 'images']
 
+CACHE_EXPIRE_HOURS = 24
+
 def deg2num(lat_deg, lon_deg, zoom):
     lat_rad = math.radians(lat_deg)
     n = 2.0 ** zoom
@@ -162,7 +164,7 @@ class progressBar:
 
 class mapillary_coverage:
 
-    expire_time = datetime.timedelta(hours=12)
+    expire_time = datetime.timedelta(hours=CACHE_EXPIRE_HOURS)
 
     def __init__(self,module):
         self.module = module
@@ -202,9 +204,12 @@ class mapillary_coverage:
         if zoom_level > 14:
             zoom_level = 14
 
-        ranges = getTileRange(bounds, zoom_level)
+        try:
+            ranges = getTileRange(bounds, zoom_level)
+        except ValueError:
+            return
 
-        if force or not self.actual_ranges or not (
+        if not self.actual_ranges or not (
                                     ranges[0][0]==self.actual_ranges[0][0] and
                                     ranges[0][1]==self.actual_ranges[0][1] and
                                     ranges[1][0]==self.actual_ranges[1][0] and
@@ -219,6 +224,8 @@ class mapillary_coverage:
             images_features = []
 
             progress = progressBar(self, 'go2mapillary')
+
+            start_time = datetime.datetime.now()
 
             for y in range(y_range[0], y_range[1] + 1):
                 for x in range(x_range[0], x_range[1] + 1):
@@ -271,6 +278,7 @@ class mapillary_coverage:
                         if "mapillary-images" in json_data and zoom_level==14:
                             images_features = images_features + json_data["mapillary-images"]["features"]
 
+            print("loading time", datetime.datetime.now() - start_time)
             progress.stop('loading complete')
 
 
@@ -299,9 +307,6 @@ class mapillary_coverage:
                     self.iface.addCustomActionForLayer(getattr(self.module,'filterAction_'+level), defLyr)
                     legendLayerNode = QgsProject.instance().layerTreeRoot().findLayer(defLyr.id())
                     legendLayerNode.setExpanded(False)
-                    #clone_node = legendLayerNode.clone()
-                    #self.module.getMapillaryLayerGroup().insertChildNode(0, clone_node)
-                    #QgsProject.instance().layerTreeRoot().removeChildNode(legendLayerNode)
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)

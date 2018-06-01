@@ -356,8 +356,11 @@ class go2mapillary:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
             #self.setupLayer('')
-            self.canvas.extentsChanged.connect(self.mapChanged)
+            if not QgsProject.instance().mapLayers():
+                self.canvas.setCenter(QgsPointXY(0,0))
+                self.canvas.zoomScale(70000000.00)
             self.mapRefreshed(force=True)
+            self.canvas.extentsChanged.connect(self.mapChanged)
             self.canvas.setMapTool(self.mapSelectionTool)
             self.setCompareKey('')
 
