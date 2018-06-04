@@ -2,7 +2,8 @@
 #### a QGIS3 plugin for browsing mapillary street level imagery
 ![main dialog](./docs/screen2.png)
 
-The plugin allows to browse mapillary street level imagery and interact with mapillary service for analysis and information extraction from within QGIS.
+The plugin allows to browse mapillary street level imagery and interact with mapillary service for analysis and information extraction from within QGIS. Download it from QGIS plugins repository: [](http://plugins.qgis.org/plugins/go2mapillary/)
+The application is build around [MapillaryJS library](https://mapillary.github.io/mapillary-js/), the javascript interface to mapillary imagery running inside QT5 QWebView widget. In some cases (linux platforms), python bindings to Qt5 have to manually installed: `sudo apt-get install python3-pyqt5.qtwebkit`
 
 ### Activation
 Once installed the main plugin dialog can be activated/deactivated clicking on go2mapillary tool button. While the main dialog appears on the left docking area, the plugin downloads the mapillary coverage for the current map canvas extent. The download and caching progress of mapillary coverage vector tiles appears as user message bar on the top of map canvas. The mapillary coverage is stored in three layers: images, sequences and overview grouped in mapillary legend folder which visibility depends from map canvas scale.
