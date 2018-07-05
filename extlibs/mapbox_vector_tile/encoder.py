@@ -1,4 +1,4 @@
-from mapbox_vector_tile.polygon import make_it_valid
+from .polygon import make_it_valid
 from numbers import Number
 from past.builtins import long
 from past.builtins import unicode

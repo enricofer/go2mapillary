@@ -23,7 +23,7 @@
 import os
 import sys
 from shapely.geometry import Polygon
-import mapbox_vector_tile
+from go2mapillary.extlibs import mapbox_vector_tile
 import requests
 import math
 import json
@@ -49,7 +49,7 @@ def deg2num(lat_deg, lon_deg, zoom):
     xtile = int((lon_deg + 180.0) / 360.0 * n)
     ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
     return (xtile, ytile)
-    
+
 def num2deg(xtile, ytile, zoom):
     n = 2.0 ** zoom
     lon_deg = xtile / n * 360.0 - 180.0
@@ -63,7 +63,7 @@ def ZoomForPixelSize(pixelSize):
         if pixelSize > (180 / 256.0 / 2**i):
             return i-1 if i!=0 else 0 # We don't want to scale up
 
-#get the range of tiles that intersect with the bounding box of the polygon 
+#get the range of tiles that intersect with the bounding box of the polygon
 def getTileRange(bnds, zoom):
     xm=bnds[0]
     xmx=bnds[2]
@@ -85,9 +85,9 @@ def getTileASpolygon(z,y,x):
     ym=se[0]
     ymx=nw[0]
     tile_bound=Polygon([(xm,ym),(xmx,ym),(xmx,ymx),(xm,ymx)])
-    return tile_bound   
-    
-#to tell if the tile intersects with the given polygon  
+    return tile_bound
+
+#to tell if the tile intersects with the given polygon
 def doesTileIntersects(z, y, x, polygon):
     if(z<10):   #Zoom tolerance; Below these zoom levels, only check if tile intersects with bounding box of polygon
         return True
@@ -95,8 +95,8 @@ def doesTileIntersects(z, y, x, polygon):
         #get the four corners
         tile=getTileASpolygon(x,y,z)
         return polygon.intersects(tile)
-        
-#convert the URL to get URL of Tile     
+
+#convert the URL to get URL of Tile
 def getURL(x,y,z,url):
     u=url.replace("{x}", str(x))
     u=u.replace("{y}", str(y))
