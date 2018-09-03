@@ -350,7 +350,6 @@ class go2mapillary:
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
 
     def mlyDockwidgetvisibilityChanged(self,visibility):
-        print ("mlyDockwidgetvisibilityChanged",visibility)
         if self.dockwidget.isVisible():
             self.mainAction.setChecked(True)
         else:
