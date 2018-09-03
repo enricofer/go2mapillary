@@ -59,7 +59,7 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         self.mly_api = mapillaryApi()
-        self.page = os.path.join(os.path.dirname(__file__),'res','browser.html')
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
         self.openLocation('')
         self.enabled = True
 
@@ -89,8 +89,7 @@ class mapillaryViewer(QObject):
 
     def openLocation(self, key):
         if not self.locationKey:
-            print('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))
-            self.viewport.load(QUrl('file:///' + QDir.fromNativeSeparators(self.page+'?key='+key))) #'file:///'+
+            self.viewport.load(QUrl(self.page+'?key='+key))
         else:
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
             js = 'this.changeImgKey("%s")' % key
