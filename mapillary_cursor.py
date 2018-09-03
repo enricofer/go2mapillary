@@ -101,6 +101,7 @@ class mapillary_cursor():
         self.cursor.setPenWidth(2)
         self.pointOfView.setPenWidth(2)
         self.samples_datasource = ''
+        self.delete()
         #self.update_ds(self.parentInstance.sample_settings.settings['sample_source'])
 
     def getSamplesLayer(self, samples_datasource):
@@ -152,20 +153,23 @@ class mapillary_cursor():
         del writer
 
     def draw(self,pointOfView_coords,orig_pointOfView_coords,cursor_coords,endOfSight_coords):
-        self.cursor.show()
-        self.pointOfView.show()
-        self.lineOfSight.reset()
-        self.sightDirection.reset()
-        pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
-        cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
-        endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
-        self.pointOfView.setCenter (pointOfView)
-        self.cursor.setCenter (cursor)
-        self.lineOfSight.addPoint(pointOfView)
-        self.lineOfSight.addPoint(cursor)
-        self.sightDirection.addPoint(pointOfView)
-        self.sightDirection.addPoint(endOfSight)
-        self.cursor.updatePosition()
+        if pointOfView_coords[0]:
+            self.cursor.show()
+            self.pointOfView.show()
+            self.lineOfSight.reset()
+            self.sightDirection.reset()
+            pointOfView = self.transformToCurrentSRS(QgsPointXY(pointOfView_coords[1],pointOfView_coords[0]))
+            cursor = self.transformToCurrentSRS(QgsPointXY(cursor_coords[1],cursor_coords[0]))
+            endOfSight = self.transformToCurrentSRS(QgsPointXY(endOfSight_coords[1],endOfSight_coords[0]))
+            self.pointOfView.setCenter (pointOfView)
+            self.cursor.setCenter (cursor)
+            self.lineOfSight.addPoint(pointOfView)
+            self.lineOfSight.addPoint(cursor)
+            self.sightDirection.addPoint(pointOfView)
+            self.sightDirection.addPoint(endOfSight)
+            self.cursor.updatePosition()
+        else:
+            self.delete()
 
     def delete(self):
         self.cursor.hide()
