@@ -132,6 +132,7 @@ class go2mapillary:
         add_to_menu=True,
         add_to_toolbar=True,
         status_tip=None,
+        checkable=None,
         whats_this=None,
         parent=None):
         """Add a toolbar icon to the toolbar.
@@ -184,6 +185,9 @@ class go2mapillary:
         if whats_this is not None:
             action.setWhatsThis(whats_this)
 
+        if checkable is not None:
+            action.setCheckable(checkable)
+
         if add_to_toolbar:
             self.toolbar.addAction(action)
 
@@ -200,10 +204,11 @@ class go2mapillary:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         icon_path = os.path.join(self.plugin_dir,'res','icon.png')
-        self.add_action(
+        self.mainAction = self.add_action(
             icon_path,
             text=self.tr(u'go2mapillary'),
             callback=self.run,
+            checkable=True,
             parent=self.iface.mainWindow())
 
         self.dlg = go2mapillaryDockWidget()
@@ -211,6 +216,7 @@ class go2mapillary:
         self.dockwidget=QDockWidget("go2mapillary" , self.iface.mainWindow() )
         self.dockwidget.setObjectName("go2mapillary")
         self.dockwidget.setWidget(self.dlg)
+        self.dockwidget.visibilityChanged.connect(self.mlyDockwidgetvisibilityChanged)
         self.dlg.webView.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
@@ -343,7 +349,12 @@ class go2mapillary:
                 self.mapSelectionTool = IdentifyGeometry(self, layer)
                 self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
 
-
+    def mlyDockwidgetvisibilityChanged(self,visibility):
+        print ("mlyDockwidgetvisibilityChanged",visibility)
+        if self.dockwidget.isVisible():
+            self.mainAction.setChecked(True)
+        else:
+            self.mainAction.setChecked(False)
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -440,5 +451,3 @@ class go2mapillary:
                     layerNode.parent().removeChildNode(layerNode)
                 else:
                     legendRoot.removeChildNode(layerNode)
-
-
