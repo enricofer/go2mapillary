@@ -70,3 +70,15 @@ Compare Mode:
 Markers Mode:
 ![main dialog](./docs/04_markersCreateDrag.gif)
 
+### Python API
+
+You can use this Python snippet to open the dock and load a specific Mapillary ID image:
+```python
+from qgis.utils import plugins
+
+if 'go2mapillary' in plugins:
+    status = plugins['go2mapillary'].mainAction.isChecked()
+    plugins['go2mapillary'].dockwidget.show()
+    plugins['go2mapillary'].mainAction.setChecked(status)
+    plugins['go2mapillary'].viewer.openLocation('ub0cIhoZ7apeuyidB5qyyw')
+```
