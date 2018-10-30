@@ -61,6 +61,14 @@ The last three items on the right of plugin menu activate one of the mutually ex
 - Compare mode: This mode activate the compare component showing the diffences between a background and a foreground images moving a slider widget on the bottom of the dialog. When activated the current image become the foreground image, visible pulling the slider to the right and located on map canvas with the blue marker. The background images to be compared in the dialog could be selected with further mouse click over mapillary coverage, are visible pulling the slider to the right and located on the map with the red marker.
 - Markers mode: the markers mode allows to point and click in perspective in the current image and create geolocated markers. Dragging the mouse cursor over the image appears the digitizing cursor over the map canvas showing the corrected location of the image (see [changesets](https://www.mapillary.com/developer/api-documentation/#changesets)), the dragging cursor reprojected over the map and the line of sight axis. Clicking on image dialog the marker become visible, is stored on mapillary samples layer and can be related with categorized annotations. Once created, markers can be further dragged, edited or deleted to adjust or correct related informations.
 
+### Python API
+You can use this Python snippet to open the dock viewer and load a specific Mapillary ID image:
+```python
+from qgis.utils import plugins
+if 'go2mapillary' in plugins:
+    plugins['go2mapillary'].viewer.open('ub0cIhoZ7apeuyidB5qyyw')
+```
+
 Zoom Mode:
 ![main dialog](./docs/04_zoomInOut.gif)
 
@@ -69,4 +77,3 @@ Compare Mode:
 
 Markers Mode:
 ![main dialog](./docs/04_markersCreateDrag.gif)
-

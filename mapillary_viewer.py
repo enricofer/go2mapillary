@@ -85,7 +85,19 @@ class mapillaryViewer(QObject):
     def registerJS(self):
         self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
 
+    def open(self, key):
+        """
+        API Dedicated method to open a user specified mapillary_key:
 
+        from qgis.utils import plugins
+        if 'go2mapillary' in plugins:
+            plugins['go2mapillary'].viewer.open('ub0cIhoZ7apeuyidB5qyyw')
+
+        """
+        status = self.parentInstance.mainAction.isChecked()
+        self.parentInstance.dockwidget.show()
+        self.parentInstance.mainAction.setChecked(status)
+        self.openLocation(key)
 
     def openLocation(self, key):
         if not self.locationKey:
