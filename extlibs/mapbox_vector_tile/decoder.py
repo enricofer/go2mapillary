@@ -23,13 +23,13 @@ class TileData:
     def getMessage(self, pbf_data, y_coord_down=False, extents=4096, quantize_bounds=False):
         self.tile.ParseFromString(pbf_data)
         self.quantize_bounds = quantize_bounds
-        
+
         if quantize_bounds:
             self.origin_x = quantize_bounds[0]
             self.origin_y = quantize_bounds[1]
             self.rescale_factor_x = (quantize_bounds[2]-quantize_bounds[0]) / extents
             self.rescale_factor_y = (quantize_bounds[3]-quantize_bounds[1]) / extents
-        
+
         tile = {}
         for layer in self.tile.layers:
             keys = layer.keys
@@ -52,7 +52,7 @@ class TileData:
                     "geometry": geometry,
                     "properties": props,
                     "id": feature.id,
-                    "type": feature.type
+                    "type": "Feature" #feature.type
                 }
                 features.append(new_feature)
 
@@ -143,11 +143,11 @@ class TileData:
 
                     if not y_coord_down:
                         y = extent - y
-                    
+
                     if self.quantize_bounds:
                         x = self.origin_x + x * self.rescale_factor_x
                         y = self.origin_y + y * self.rescale_factor_y
-                    
+
                     coords.append([x, y])
 
         if ftype == POINT:
