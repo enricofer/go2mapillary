@@ -278,7 +278,7 @@ class mapillary_coverage:
                         if "mapillary-images" in json_data and zoom_level==14:
                             images_features = images_features + json_data["mapillary-images"]["features"]
 
-            print("loading time", datetime.datetime.now() - start_time)
+            # print("loading time", datetime.datetime.now() - start_time)
             progress.stop('loading complete')
 
 

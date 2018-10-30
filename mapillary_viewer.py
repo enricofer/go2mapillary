@@ -163,7 +163,7 @@ class mapillaryViewer(QObject):
 
     def removeMarker (self,key,id):
         js = "this.mHandler.removeMarker(['id:%s:%s']);" % (key,id)
-        print ('REMOVE',js)
+        # print ('REMOVE',js)
         self.viewport.page().mainFrame().evaluateJavaScript(js)
 
     def removeSample(self,type,key,id):
