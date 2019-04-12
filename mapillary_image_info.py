@@ -65,9 +65,13 @@ class mapillaryImageInfo(QtWidgets.QDialog, FORM_CLASS):
             self.field_latitude.setText(str(res["geometry"]["coordinates"][1]))
             self.field_longitude.setText(str(res["geometry"]["coordinates"][0]))
             for prop,value in res["properties"].items():
-                getattr(self, 'label_' + prop).show()
-                getattr(self, 'field_' + prop).show()
-                getattr(self, 'field_' + prop).setText(str(value))
+                try:
+                    getattr(self, 'label_' + prop).show()
+                    getattr(self, 'field_' + prop).show()
+                    getattr(self, 'field_' + prop).setText(str(value))
+                    getattr(self, 'field_' + prop).setReadOnly(True)
+                except:
+                    print("CAN'T READ PROP:",prop,value)
             #self.adjustSize()
 
 
