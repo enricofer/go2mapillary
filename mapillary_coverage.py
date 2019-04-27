@@ -307,6 +307,7 @@ class mapillary_coverage:
                     self.iface.addCustomActionForLayer(getattr(self.module,'filterAction_'+level), defLyr)
                     legendLayerNode = QgsProject.instance().layerTreeRoot().findLayer(defLyr.id())
                     legendLayerNode.setExpanded(False)
+                    defLyr.setDisplayExpression('"key"')
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)
