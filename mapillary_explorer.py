@@ -352,8 +352,16 @@ class go2mapillary:
     def mlyDockwidgetvisibilityChanged(self,visibility):
         if self.dockwidget.isVisible():
             self.mainAction.setChecked(True)
+            self.mapRefreshed(force=True)
+            self.canvas.setMapTool(self.mapSelectionTool)
+            self.canvas.extentsChanged.connect(self.mapChanged)
         else:
             self.mainAction.setChecked(False)
+            self.pluginIsActive = False
+            #self.coverage.removeLevels()
+            self.canvas.extentsChanged.disconnect(self.mapChanged)
+            self.removeMapillaryLayerGroup()
+            #self.reorderLegendInterface()
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -378,16 +386,8 @@ class go2mapillary:
             # toggle show/hide the widget
             if self.dockwidget.isVisible():
                 self.dockwidget.hide()
-                self.pluginIsActive = False
-                #self.coverage.removeLevels()
-                self.canvas.extentsChanged.disconnect(self.mapChanged)
-                self.removeMapillaryLayerGroup()
-                #self.reorderLegendInterface()
             else:
                 self.dockwidget.show()
-                self.mapRefreshed(force=True)
-                self.canvas.setMapTool(self.mapSelectionTool)
-                self.canvas.extentsChanged.connect(self.mapChanged)
 
     def openAttrDialog(self,feature):
         if feature.fields().indexFromName('cat') != -1:
