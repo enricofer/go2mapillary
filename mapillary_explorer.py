@@ -240,6 +240,8 @@ class go2mapillary:
         self.sample_cursor.update_ds(self.sample_settings.settings['sample_source'])
         self.samples_form = mapillaryForm(self)
         self.iface.projectRead.connect(self.removeMapillaryLayerGroup)
+        self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
+        self.enableMapillaryRender = False
 
 
     #--------------------------------------------------------------------------
@@ -287,6 +289,7 @@ class go2mapillary:
         self.filterDialog.show("overview")
 
     def toggleViewer(self,mapTool):
+        print (mapTool)
         if mapTool != self.mapSelectionTool:
             self.viewer.disable()
 
@@ -337,31 +340,36 @@ class go2mapillary:
 
     def mapRefreshed(self, force=None):
         try:
-            self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
+            #self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
+            pass
         except:
             pass
+        print ("mapRefreshed", self.enableMapillaryRender)
+        if self.enableMapillaryRender:
+            enabledLevels = self.coverage.update_coverage(force=force)
+            self.reorderLegendInterface()
 
-        enabledLevels = self.coverage.update_coverage(force=force)
-        self.reorderLegendInterface()
-
-        for level,layer in enabledLevels.items():
-            if not (level == 'sequences' and 'images' in enabledLevels.keys()):
-                self.mapSelectionTool = IdentifyGeometry(self, layer)
-                self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
+            for level,layer in enabledLevels.items():
+                if not (level == 'sequences' and 'images' in enabledLevels.keys()):
+                    self.mapSelectionTool = IdentifyGeometry(self, layer)
+                    self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
 
     def mlyDockwidgetvisibilityChanged(self,visibility):
         if self.dockwidget.isVisible():
             self.mainAction.setChecked(True)
             self.mapRefreshed(force=True)
-            self.canvas.setMapTool(self.mapSelectionTool)
-            self.canvas.extentsChanged.connect(self.mapChanged)
+            if self.canvas.mapTool != self.mapSelectionTool:
+                self.canvas.setMapTool(self.mapSelectionTool)
+            #self.canvas.extentsChanged.connect(self.mapChanged)
+            self.enableMapillaryRender = True
         else:
             self.mainAction.setChecked(False)
             self.pluginIsActive = False
             #self.coverage.removeLevels()
-            self.canvas.extentsChanged.disconnect(self.mapChanged)
+            #self.canvas.extentsChanged.disconnect(self.mapChanged)
             self.removeMapillaryLayerGroup()
             #self.reorderLegendInterface()
+            self.enableMapillaryRender = False
 
     def run(self):
         """Run method that loads and starts the plugin"""

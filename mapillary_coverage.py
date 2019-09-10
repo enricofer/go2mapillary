@@ -209,7 +209,7 @@ class mapillary_coverage:
         except ValueError:
             return
 
-        if not self.actual_ranges or not (
+        if force or not self.actual_ranges or not (
                                     ranges[0][0]==self.actual_ranges[0][0] and
                                     ranges[0][1]==self.actual_ranges[0][1] and
                                     ranges[1][0]==self.actual_ranges[1][0] and
