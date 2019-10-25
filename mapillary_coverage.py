@@ -336,14 +336,14 @@ class mapillary_coverage:
     def getActiveLevels(self):
         activeLevels = {}
         for level in LAYER_LEVELS:
-            if getattr(self,level):
+            if hasattr(self,level) and getattr(self,level):
                 activeLevels[level] = getattr(self, level+'Layer')
         return activeLevels
 
     def getActiveLayers(self):
         levels = []
         for level in LAYER_LEVELS:
-            if getattr(self,level):
+            if hasattr(self,level) and getattr(self,level):
                 levels.append(getattr(self, level+'Layer'))
         return levels
 
