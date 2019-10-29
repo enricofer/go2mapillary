@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src='https://unpkg.com/mapillary-js@2.12.0/dist/mapillary.min.js'></script>
+
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.12.0/dist/mapillary.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+      <style>
+        .hidden{
+            visibility: hidden;
+        }
+
+        .disabled{
+            visibility: hidden;
+        }
+
+        .itemDisabled{
+            color: white;
+        }
+
+        .itemEnabled{
+            color: red;
+        }
+
+        .separator{
+            display:inline-block;
+            width: 6px;
+        }
+
+        #focus {
+            z-index: 10001;
+        }
+
+        #focus, #splash {
+            background-color: rgba(80, 80, 80, 0.5);
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            display: table;
+        }
+
+        #message {
+            font-family:  "Arial", "Helvetica", sans-serif;
+            width:200px;
+            height: 50px;
+            display: table-cell;
+            vertical-align: middle;
+            color: white;
+            font-size: 0.85em;
+        }
+
+        #splash {
+            background: transparent url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Mapillary_logo.svg/langfr-96px-Mapillary_logo.svg.png") no-repeat center;
+            /*background: transparent url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2pJwtCCdRoub6T6AJ5_K71I6dqHi1VHatMps0BSm7AsC3EKQCrw") no-repeat center;*/
+            z-index: 10000;
+        }
+
+        html, body { margin: 0; padding: 0; height: 100%; }
+        #mly { position: absolute; width: 100%; height: 100%; }
+
+          .SequenceContainer {
+              left: 50% !important;
+              width: 10px !important;
+          }
+
+          .SequenceStepper {
+              -webkit-transform: translate(-35px) !important;
+              display: inline-block;
+              left: unset !important;
+          }
+
+          .SequenceControls {
+              -webkit-transform: translate(35px) !important;
+                border-bottom-right-radius: 0px !important;
+                border-top-right-radius: 0px !important;
+                display: inline-block;
+                left: unset !important;
+          }
+
+         /* Dropdown Button */
+        .dropbtn {
+            background-color: rgba(24,25,28,.3);
+            color: white;
+            width: 19px;
+            height: 19.3px;
+            border: none;
+            padding-top: 1px;
+            padding-right: 1px;
+            cursor: pointer;
+            cursor: pointer;
+            position:absolute;
+            text-align: center;
+            -webkit-transform: translate(-54px);
+            -webkit-transition: width .15s ease-out;
+            border-radius: 5px;
+            display: inline-block;
+            font-size: 14px !important;
+            left:50%;
+            top: 15px;
+            vertical-align: middle;
+
+            /*
+            position: fixed;
+            border-radius: 5px;
+            top: 14px;
+            left: 15px;
+            */
+        }
+
+        /* Dropdown button on hover & focus
+        .dropbtn:hover, .dropbtn:focus {
+            background-color: #2980B9;
+        }*/
+
+        /* Dropdown Content (Hidden by Default) */
+        .slider-content {
+            position: absolute;
+            background-color: rgba(24,25,28,.3);
+            width: 260px;
+            height: 25px;
+            border: none;
+            padding: 3px;
+            cursor: pointer;
+            cursor: pointer;
+            position:absolute;
+            text-align: center;
+            -webkit-transform: translate(-113px);
+            -webkit-transition: width .15s ease-out;
+            border-radius: 5px;
+            display: inline-block;
+            left:50%;
+            top: 45px;
+            z-index: 9999;
+            vertical-align: middle;
+        }
+
+        /* Links inside the dropdown */
+        .choice {
+            text-decoration: none;
+            font-size: 22px !important;
+        }
+
+        /* Change color of dropdown links on hover */
+        .dropdown-content a:hover {background-color: #ddd}
+
+        /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+        .show {display:block;}
+
+      </style>
+</head>
+
+<body style="margin:0px;">
+    <div id='mly'></div>
+    <div id="focus" class="hidden" onclick="focusOn()"><span id="message">click to enable<br/>go2mapillary maptool</span></div>
+    <div id="splash" class="hidden" onclick="focusOn()"></div>
+    <div id="menu" class="dropdown hidden">
+      <a href="#" id="menu_button" class="dropbtn qgis_menu"><i class="fa fa-bars qgis_menu"></i></a>
+      <div id="myDropdown" class="hidden slider-content">
+        <a onclick="imageInfo()" id="infoButton"  class="choice itemDisabled" href="#" title="Current image info"><i class="fa fa-info"></i></a>
+        <a onclick="panTo()" id="centerButton"  class="choice itemDisabled" href="#" title="Center on map canvas"><i class="fa fa-bullseye"></i></a>
+        <a onclick="save()" id="saveButton"  class="choice itemDisabled" href="#" title="Save image to local file"><i class="fa fa-save"></i></a>
+        <a onclick="link()" id="linkButton" class="choice itemDisabled" href="#" title="Link to external browser"><i class="fa fa-link"></i></a>
+        <a onclick="openSettings()" id="openSettingsButton" class="choice itemDisabled" href="#" title="Settings"><i class="fa fa-cog"></i></a>
+        <a onclick="filterCanvas()" id="filterCanvasButton"  class="choice itemDisabled" href="#" title="Filter mapillary images"><i class="fa fa-filter"></i></a>
+        <a onclick="addTag()" id="enableTagsButton" class="choice itemDisabled" href="#" title="tag image"><i class="fa fa-tag"></i></a>
+        <div class="separator"></div>
+        <a onclick="enableZoom()" id="enableZoomButton" class="choice itemEnabled" href="#" title="Enable double click zoom"><i class="fa fa-search"></i></a>
+        <a onclick="enableCompare()" id="compareButton"  class="choice itemDisabled" href="#" title="Enable compare images"><i class="fa fa-clone"></i></a>
+        <a onclick="enableMarkers()" id="enableMarkersButton" class="choice itemDisabled" href="#" title="Enable markers"><i class="fa fa-map-marker"></i></a>
+      </div>
+    </div>
+    <script>
+        "use strict";
+
+        var lastMsg = Date.now();
+        var addedTagsId = 0;
+
+        function sendMessage (msg){
+            if (Date.now()-lastMsg > 200){
+                QgisConnection.JSONmessage(msg);
+                lastMsg = Date.now();
+            }
+        }
+
+        function focusOn(){
+            var viewPar = {
+                "transport":"focusOn",
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function Q_enable_cursor(pos,originalPos){
+            var viewPar = {
+                "transport":"enable_cursor",
+                "originalPos": originalPos,
+                "pos": pos
+            };
+            sendMessage(window.status = JSON.stringify(viewPar));
+        }
+
+        function Q_move_cursor(pov,cursor,endOfSight,origina_pov){
+            var viewPar = {
+                "transport":"move_cursor",
+                "endOfSight": endOfSight,
+                "cursor": cursor,
+                "pov":pov,
+                "orig_pov":pov
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function Q_disable_cursor(){
+            var viewPar = {
+                "transport":"disable_cursor",
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_create_marker(id,markerPos){
+            var viewPar = {
+                "transport":"create_marker",
+                "key":key_param,
+                "id":id,
+                "markerPos":markerPos
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_store_tag(geom,id,loc){
+            var g = geom.getVertices2d();
+            var viewPar = {
+                "transport":"store_tag",
+                "key": key_param,
+                "geometry":geom.getVertices2d(),
+                "id":id,
+                "loc":loc,
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_drag_marker(id,markerPos){
+            var viewPar = {
+                "transport":"drag_marker",
+                "id":id,
+                "markerPos":markerPos
+            };
+            sendMessage(JSON.stringify(viewPar));
+        }
+
+        function Q_image_info(key){
+            var viewPar = {
+                "transport":"image_info",
+                "key":key_param,
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function Q_settings(){
+            var viewPar = {
+                "transport":"open_settings",
+            };
+            QgisConnection.JSONmessage(JSON.stringify(viewPar));
+        }
+
+        function gup(name)
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        };
+
+        var key_param = gup('key');
+
+        if (key_param == '') {
+            //key_param = 'lGR_tpysmbwfQCRhgX2etw'
+            document.getElementById("splash").classList.remove("hidden");
+            document.getElementById("focus").classList.remove("disabled");
+            document.getElementById("mly").classList.add("hidden");
+        } else {
+            document.getElementById("splash").classList.add("hidden");
+            document.getElementById("focus").classList.remove("disabled");
+            document.getElementById("mly").classList.remove("hidden");
+        }
+
+
+        var mly = new Mapillary.Viewer(
+            'mly',
+            'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh',
+            null,
+            {
+                component: {
+                    marker: {
+                        visibleBBoxSize: 150,
+                    },
+                    mouse: true,
+                    sequence: true,
+                    stats:true,
+                    loading:true,
+                    tag:true,
+                    slider:false,
+                },
+            }
+        );
+
+
+        function changeImgKey (key){
+            if (!cHandler.isActive){
+                key_param = key;
+                mly.currentKey = key
+                mly.moveToKey(key_param).then(
+                    function() { /* noop */ },
+                    function(e) { console.error(e); });
+            } else {
+                cHandler.changeBackgroundKey(key)
+            }
+        }
+
+
+        function updateTags (json_tags){
+            var tagComponent = mly.getComponent("tag");
+            tagComponent.removeAll();
+            var key_tags = JSON.parse(json_tags);
+            if (key_tags != undefined){
+                for (var i=0; i<key_tags.length; i++) {
+                    var tag_def = key_tags[i];
+                    var polygonGeometry = new Mapillary.TagComponent.PolygonGeometry(tag_def['geometry']);
+                    var tag = new Mapillary.TagComponent.OutlineTag(tag_def['id'], polygonGeometry, { editable: false, lineColor: tag_def['color'], lineWidth: 2 });
+                    tagComponent.add([tag]);
+                }
+            }
+        }
+
+        var mapNodePosition = {};
+
+        mly.on(Mapillary.Viewer.nodechanged, function (node) {
+
+            var latLon = [node.latLon.lat, node.latLon.lon];
+            var originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
+
+            mapNodePosition.line = [node.originalLatLon, node.latLon];
+            mapNodePosition.originalPos = node.originalLatLon;
+            mapNodePosition.pos = node.latLon;
+
+            console.log(node.key)
+
+            var viewPar = {
+                "transport":"view",
+                "lat":node.latLon.lat,
+                "lon":node.latLon.lon,
+                "key":node.key,
+                "ca":node.ca,
+                //"sequence":node.sequenceKey(),
+                //"originalLat":node.originalLatLon.lat,
+                //"originallon":node.originalLatLon.lon,
+                //"capturedAt":node.capturedAt()
+            };
+            sendMessage(JSON.stringify(viewPar));
+
+            var menuContainer = document.getElementById("menu")
+            var sequenceContainer = document.querySelectorAll(".SequenceContainer")
+            menuContainer.classList.remove("hidden");
+
+            key_param = node.key;
+            mly.currentKey = node.key
+
+            QgisConnection.restoreTags(key_param)
+
+        })
+
+
+        var mHandler = new markersHandler(mly);
+        var cHandler = new compareHandler(mly);
+        var zHandler = new zoomHandler(mly);
+        //var tHandler = new tagsHandler(mly);
+        var currentHandler = zHandler;
+        zHandler.subscribe();
+
+        changeImgKey(key_param);
+
+        // Trigger render on browser window resize
+        window.addEventListener("resize", function() { mly.resize(); });
+
+        function save() {
+            QgisConnection.saveImg(key_param)
+        }
+
+        function link() {
+            QgisConnection.openBrowser(key_param)
+        }
+
+        function panTo() {
+            QgisConnection.locate(key_param)
+        }
+
+        function filterCanvas() {
+            QgisConnection.openFilterDialog()
+        }
+
+        function imageInfo() {
+            Q_image_info();
+        }
+
+        function openSettings() {
+            Q_settings();
+        }
+
+        function toggleMenuButton(buttonId) {
+            var choiceElements = document.getElementsByClassName('choice');
+            for (var i=0; i<choiceElements.length; i++) {
+                var element = choiceElements[i];
+                if ( element.id == buttonId){ //element.id != 'filterCanvasButton' ||
+                    element.classList.add("itemEnabled");
+                    element.classList.remove("itemDisabled");
+                } else {
+                    element.classList.remove("itemEnabled");
+                    element.classList.add("itemDisabled");
+                }
+            }
+        }
+
+        function enableCompare() {
+            toggleMenuButton('compareButton');
+            currentHandler.unsubscribe();
+            cHandler.subscribe();
+            currentHandler = cHandler;
+        }
+
+        function enableZoom() {
+            toggleMenuButton('enableZoomButton');
+            currentHandler.unsubscribe();
+            zHandler.subscribe();
+            currentHandler = zHandler;
+        }
+
+        function enableMarkers() {
+            toggleMenuButton('enableMarkersButton');
+            currentHandler.unsubscribe();
+            mHandler.subscribe();
+            currentHandler = mHandler;
+        }
+
+        function addTag(){
+            currentHandler.unsubscribe();
+            mly.deactivateComponent("mouse");
+            var tagComponent = mly.getComponent("tag");
+            tagComponent.changeMode(Mapillary.TagComponent.TagMode.CreateRect);
+            tagComponent.on(Mapillary.TagComponent.TagComponent.geometrycreated, function(geometry) {
+                addedTagsId ++;
+                var tagId = 'id:' + key_param + ':' + addedTagsId;
+                var tag = new Mapillary.TagComponent.OutlineTag(tagId, geometry, { editable: false });
+                tagComponent.add([tag]);
+                Q_store_tag(geometry,addedTagsId,[mapNodePosition.pos.lat,mapNodePosition.pos.lon]);
+                mly.activateComponent("mouse");
+                var mouseComponent = mly.getComponent("mouse");
+                mouseComponent.doubleClickZoom.enable();
+                mouseComponent.dragPan.enable();
+                currentHandler.subscribe();
+            })
+        }
+
+        function changeTag(tagId,color){
+            var tagComponent = mly.getComponent("tag");
+            var tag = tagComponent.get(tagId);
+            tag.setOptions({
+                'lineColor': color,
+                'lineWidth': 2,
+            })
+        }
+
+        // Close the dropdown menu if the user clicks outside of it
+        window.onclick = function(event) {
+          var dropdown = document.getElementById("myDropdown");
+          var buttonMenu = document.getElementById("menu_button");
+          if (event.target.classList.contains('qgis_menu')) {
+              dropdown.classList.remove("hidden");
+              //buttonMenu.classList.add("hidden");
+          } else {
+              dropdown.classList.add('hidden');
+              //buttonMenu.classList.remove("hidden");
+          }
+        }
+
+        function zoomHandler(mViewer) {
+            this.mViewer = mViewer;
+            this.isActive = false;
+
+            var that = this;
+
+            this.subscribe = function () {
+                that.isActive = true;
+                that.mViewer.activateComponent("mouse");
+                that.mouseComponent = that.mViewer.getComponent("mouse");
+                that.mouseComponent.doubleClickZoom.enable();
+                that.mouseComponent.dragPan.enable();
+            }
+
+            this.unsubscribe = function () {
+                that.mViewer.deactivateComponent("mouse");
+                //that.mouseComponent = null;
+                that.isActive = false;
+            }
+        }
+
+        function compareHandler(mViewer) {
+            this.mViewer = mViewer;
+            this.isActive = false;
+
+            var that = this;
+
+            this.changeBackgroundKey = function (key){
+                that.sliderComponent.setKeys({
+                    foreground: that.mViewer.currentKey,
+                    background: key
+                })
+                QgisConnection.setCompareKey(that.mViewer.currentKey)
+            }
+
+            this.subscribe = function () {
+                that.isActive = true;
+                that.mViewer.activateComponent("slider");
+                that.sliderComponent = that.mViewer.getComponent("slider");
+                that.changeBackgroundKey(that.mViewer.currentKey)
+
+            }
+
+            this.unsubscribe = function () {
+                that.mViewer.deactivateComponent("slider");
+                that.sliderComponent = null;
+                that.isActive = false;
+                QgisConnection.setCompareKey('')
+            }
+        }
+
+        function markersHandler(mViewer) {
+
+            this.mViewer = mViewer
+            this.isActive = false;
+            this.addedMarkerId = 0;
+            this.mapMarkers = {};
+            this.indicator = {
+                id: "indicator-id",
+                viewerMarker: null,
+                state: {
+                    dragging: false,
+                    lastPos: null,
+                    moving: false,
+                },
+            };
+
+            var that = this
+
+            this.removeViewerIndicator = function() {
+                if (!!that.indicator.viewerMarker && that.markerComponent.has(this.indicator.viewerMarker.id)) {
+                    that.markerComponent.remove([that.indicator.viewerMarker.id]);
+                    that.indicator.viewerMarker = null;
+                }
+            }
+
+            this.setViewerIndicatorMarker = function(latLon) {
+                //var viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
+                var viewerMarker = new Mapillary.MarkerComponent.CircleMarker(
+                    that.indicator.id,
+                    latLon
+                    ,{ color: '#0f0' }
+                );
+
+                that.markerComponent.add([viewerMarker]);
+
+                that.indicator.viewerMarker = viewerMarker;
+            }
+
+            this.moveIndicatorMarker = function(latLon) {
+                if (that.indicator.state.dragging) { return; }
+
+                if (latLon == null) {
+                    window.Q_disable_cursor()
+                    that.removeViewerIndicator();
+                    return;
+                }
+
+                var posLatLng = mapNodePosition.pos;
+                var lineString = [
+                    [posLatLng.lat, posLatLng.lon],
+                    [latLon.lat, latLon.lon],
+                    [
+                        posLatLng.lat + 100 * (latLon.lat - posLatLng.lat),
+                        posLatLng.lon + 100 * (latLon.lon - posLatLng.lon),
+                    ],
+                ];
+
+                that.setViewerIndicatorMarker({ lat: latLon.lat, lon: latLon.lon });
+
+                window.Q_move_cursor(lineString[1],lineString[0],lineString[2])
+            }
+
+            this.onViewerMouseEvent = function(event) {
+                that.indicator.state.lastPos = event.pixelPoint;
+                that.moveIndicatorMarker(event.latLon);
+            }
+
+            this.onViewerMousemove = function(event) {
+                // Store last mouse position for later unprojection
+                that.indicator.state.lastPos = event.pixelPoint;
+
+                if (that.indicator.state.moving || that.indicator.state.dragging) { return; }
+
+                that.moveIndicatorMarker(event.latLon);
+            }
+
+            this.onViewerMouseout = function(event) {
+                that.indicator.state.lastPos = null;
+                that.removeViewerIndicator();
+            }
+
+            this.onViewerMovestart = function(event) {that.indicator.state.moving = true; }
+
+            this.onViewerMoveend = function(event) {
+                that.indicator.state.moving = false;
+
+                if (!that.indicator.state.lastPos) { return; }
+                that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
+            }
+
+            this.restoreMarkers = function(definition) {
+                that.markerComponent.removeAll()
+                for (var i=0; i<definition.length; i++) {
+                    var marker_def = definition[i];
+                    var id = 'id:' + marker_def.key + ':' + marker_def.id;
+                    that.addOrReplaceViewerMarker(id,marker_def.loc,marker_def.color)
+                }
+            }
+
+            this.changeMarker  = function(id, latLon, color) {
+                that.mViewer.activateComponent('marker');
+                that.markerComponent = that.mViewer.getComponent('marker')
+                that.markerComponent.remove(id);
+                that.addOrReplaceViewerMarker(id, latLon, color);
+                that.mViewer.deactivateComponent('marker');
+            }
+
+            this.removeMarker  = function(id) {
+                that.markerComponent.remove(id);
+            }
+
+            this.addOrReplaceViewerMarker = function(id, latLon, color) {
+                // Create an interactive marker to be able to drag it in viewer
+                // and retrieve it with getMarkerIdAt method
+                var marker = new Mapillary.MarkerComponent.SimpleMarker(
+                    id,
+                    latLon,
+                    { interactive: true, color: color, ballColor: color});
+                that.markerComponent.add([marker]);
+            }
+
+            this.createMarker = function(latLon) {
+                this.addedMarkerId++
+                var id = 'id:' + key_param + ':' + this.addedMarkerId;
+                that.addOrReplaceViewerMarker(id, latLon, '#ffffff');
+                window.Q_create_marker(this.addedMarkerId,[latLon.lat, latLon.lon])
+                that.mapMarkers[id] = mapMarker;
+            }
+
+            this.onViewerClick = function(e) {
+                // if (!e.latLon) { return; }
+                that.markerComponent.getMarkerIdAt(e.pixelPoint).then(function(markerId) {
+                    // Only create a new marker if no interactive markers are hovered
+                    if (markerId != null) {
+                        QgisConnection.openMarkerForm(markerId);
+                        return
+                    }
+                    that.createMarker(e.latLon);
+                });
+            }
+
+            this.subscribe = function(){
+                // Get marker component
+                that.mViewer.activateComponent('marker');
+                that.markerComponent = that.mViewer.getComponent('marker');
+                that.isActive = true;
+
+                that.mViewer.activateComponent("mouse");
+                that.mouseComponent = that.mViewer.getComponent("mouse");
+                that.mouseComponent.doubleClickZoom.enable();
+                that.mouseComponent.dragPan.enable();
+
+                that.mViewer.on(Mapillary.Viewer.mouseup, that.onViewerMouseEvent);
+                that.mViewer.on(Mapillary.Viewer.mouseover, that.onViewerMouseEvent);
+                that.mViewer.on(Mapillary.Viewer.mousedown, that.onViewerMouseEvent);
+                that.mViewer.on(Mapillary.Viewer.mousemove, that.onViewerMousemove);
+
+                that.mViewer.on(Mapillary.Viewer.mouseout, that.onViewerMouseout);
+
+                that.mViewer.on(Mapillary.Viewer.movestart, that.onViewerMovestart);
+
+                that.mViewer.on(Mapillary.Viewer.moveend, that.onViewerMoveend);
+
+
+                that.markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragstart, function() {
+                    // Remove indicators when dragging marker in the viewer
+                    that.indicator.state.dragging = true;
+                    that.removeViewerIndicator();
+                });
+
+                that.markerComponent.on(Mapillary.MarkerComponent.MarkerComponent.dragend, function(e) {
+                    that.indicator.state.dragging = false;
+                    if (!that.indicator.state.lastPos) { return; }
+
+                    // Unproject the last position and move indicator marker if latLon exist
+                    that.mViewer.unproject(that.indicator.state.lastPos).then(that.moveIndicatorMarker);
+                    Q_drag_marker(e.marker.id,[e.marker.latLon.lat,e.marker.latLon.lon]);
+                });
+
+                that.mViewer.on(Mapillary.Viewer.click, that.onViewerClick);
+            }
+
+            this.unsubscribe = function(){
+                that.mViewer.deactivateComponent('marker');
+                that.mViewer.deactivateComponent("mouse");
+                that.isActive = false;
+                that.mViewer.off(Mapillary.Viewer.mouseup, that.onViewerMouseEvent);
+                that.mViewer.off(Mapillary.Viewer.mouseover, that.onViewerMouseEvent);
+                that.mViewer.off(Mapillary.Viewer.mousedown, that.onViewerMouseEvent);
+                that.mViewer.off(Mapillary.Viewer.mousemove, that.onViewerMousemove);
+                that.mViewer.off(Mapillary.Viewer.mouseout, that.onViewerMouseout);
+                that.mViewer.off(Mapillary.Viewer.movestart, that.onViewerMovestart);
+                that.mViewer.off(Mapillary.Viewer.moveend, that.onViewerMoveend);
+                that.mViewer.off(Mapillary.Viewer.click, that.onViewerClick);
+            }
+
+        }
+
+    </script>
+</body>
+</html>
+
