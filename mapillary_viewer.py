@@ -59,7 +59,7 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebSettings.WebGLEnabled,True)
         self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         self.mly_api = mapillaryApi()
-        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html'
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser_alt.html'
         self.openLocation('')
         self.enabled = True
 
