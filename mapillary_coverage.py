@@ -24,6 +24,7 @@ import os
 import sys
 from shapely.geometry import Polygon
 from go2mapillary.extlibs import mapbox_vector_tile
+from .mapillary_api import ACCESS_TOKEN
 import requests
 import math
 import json
@@ -34,10 +35,10 @@ import tempfile
 from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.PyQt.QtWidgets import QProgressBar, QApplication, QAction
 
-from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
+from qgis.core import QgsRectangle, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
 from qgis.gui import QgsMessageBar
 
-SERVER_URL = r"https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
+SERVER_URL = r"https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=" + ACCESS_TOKEN
 
 LAYER_LEVELS = ['overview', 'sequences', 'images']
 
@@ -117,7 +118,7 @@ def getProxiesConf():
             "https": "http://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort)
         }
         return proxyDict
-    else:
+    else: #test connection
         return None
 
 class progressBar:
@@ -237,10 +238,12 @@ class mapillary_coverage:
                     res = None
 
 
-                    if not os.path.exists(filePathMvt) or (datetime.datetime.fromtimestamp(os.path.getmtime(filePathMvt)) < (datetime.datetime.now() - self.expire_time) ):
+                    if not os.path.exists(filePathMvt) or not os.stat(filePathMvt).st_size or (datetime.datetime.fromtimestamp(os.path.getmtime(filePathMvt)) < (datetime.datetime.now() - self.expire_time) ):
                         # make the URL
                         url = getURL(x, y, zoom_level, SERVER_URL)
                         with open(filePathMvt, 'wb') as f:
+                            QgsMessageLog.logMessage("loading... "+url, tag="go2mapillary",level=Qgis.Info)
+                            print (getProxiesConf())
                             response = requests.get(url, proxies=getProxiesConf(), stream=True)
                             total_length = response.headers.get('content-length')
 
@@ -268,15 +271,17 @@ class mapillary_coverage:
                         else:
                             mvt = res.content
 
-                        bounds = mercantile.bounds(x,y,zoom_level)
-                        tile_box = (bounds.west,bounds.south,bounds.east,bounds.north)
+                        mbounds = mercantile.bounds(x,y,zoom_level)
+                        tile_box = (mbounds.west,mbounds.south,mbounds.east,mbounds.north)
+                        print (bounds, tile_box)
                         json_data = mapbox_vector_tile.decode(mvt, quantize_bounds=tile_box)
-                        if "mapillary-sequence-overview" in json_data:
-                            overview_features = overview_features + json_data["mapillary-sequence-overview"]["features"]
-                        elif "mapillary-sequences" in json_data:
-                            sequences_features = sequences_features + json_data["mapillary-sequences"]["features"]
-                        if "mapillary-images" in json_data and zoom_level==14:
-                            images_features = images_features + json_data["mapillary-images"]["features"]
+                        print (bounds, tile_box)
+                        if "overview" in json_data:
+                            overview_features = overview_features + json_data["overview"]["features"]
+                        elif "sequence" in json_data:
+                            sequences_features = sequences_features + json_data["sequence"]["features"]
+                        if "image" in json_data and zoom_level==14:
+                            images_features = images_features + json_data["image"]["features"]
 
             # print("loading time", datetime.datetime.now() - start_time)
             progress.stop('loading complete')
@@ -298,6 +303,9 @@ class mapillary_coverage:
                     with open(geojson_file, 'w') as outfile:
                         json.dump(geojson, outfile)
                     defLyr = QgsVectorLayer(os.path.join(self.cache_dir, 'mapillary_%s.geojson' % level),"Mapillary " + level, "ogr")
+                    defLyr.selectAll()
+                    defLyr.selectByRect(QgsRectangle(*bounds),  Qgis.SelectBehavior.RemoveFromSelection)
+                    defLyr.dataProvider().deleteFeatures(defLyr.selectedFeatureIds())
                     defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s.qml" % level))
                     QgsExpressionContextUtils.setLayerVariable(defLyr, "mapillaryCurrentKey", self.module.viewer.locationKey)
                     defLyr.setCrs(QgsCoordinateReferenceSystem(4326))

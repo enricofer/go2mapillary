@@ -22,7 +22,8 @@
 """
 from PyQt5.QtCore import QSettings, QObject, QUrl, QDir, pyqtSignal, pyqtProperty, pyqtSlot
 from PyQt5.QtGui import *
-from PyQt5.QtWebKit import QWebSettings
+from PyQt5.QtWebEngineWidgets import QWebEngineSettings
+from PyQt5.QtWebChannel import QWebChannel
 from qgis.PyQt.QtNetwork import QNetworkProxy
 
 from qgis.core import QgsNetworkAccessManager
@@ -46,18 +47,21 @@ class mapillaryViewer(QObject):
         self.parentInstance = parentInstance
         self.viewport = parentInstance.dlg.webView
         #self.viewport.statusBarMessage.connect(self.getJSONmessage)
-        self.viewport.page().mainFrame().javaScriptWindowObjectCleared.connect(self.registerJS)
+        #self.viewport.page().javaScriptWindowObjectCleared.connect(self.registerJS)
         self.locationKey = None
+
+        self.channel = QWebChannel()
+        self.channel.registerObject('backend', self)
+        self.viewport.page().setWebChannel(self.channel)
+
         WS = self.viewport.settings()
-        WS.setAttribute(QWebSettings.JavascriptEnabled,True)
-        WS.setAttribute(QWebSettings.DeveloperExtrasEnabled,True)
-        WS.setAttribute(QWebSettings.JavascriptCanAccessClipboard,True)
-        WS.setAttribute(QWebSettings.PrintElementBackgrounds,True)
-        WS.setAttribute(QWebSettings.OfflineStorageDatabaseEnabled,True)
-        WS.setAttribute(QWebSettings.LocalStorageEnabled,True)
-        WS.setAttribute(QWebSettings.PluginsEnabled,True)
-        WS.setAttribute(QWebSettings.WebGLEnabled,True)
-        self.viewport.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
+
+
+        WS.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        WS.setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
+        WS.setAttribute(QWebEngineSettings.ErrorPageEnabled, True)
+        WS.setAttribute(QWebEngineSettings.PluginsEnabled, True)
+
         self.mly_api = mapillaryApi()
         self.page = 'https://enricofer.github.io/go2mapillary/res/browser_alt.html'
         self.openLocation('')
@@ -83,7 +87,8 @@ class mapillaryViewer(QObject):
             QNetworkProxy.setApplicationProxy(proxy)
 
     def registerJS(self):
-        self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
+        #self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
+        pass
 
     def open(self, key):
         """
@@ -101,11 +106,11 @@ class mapillaryViewer(QObject):
 
     def openLocation(self, key):
         if not self.locationKey:
-            self.viewport.load(QUrl(self.page+'?key='+key))
+            self.viewport.setUrl(QUrl(self.page+'?key='+key))
         else:
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
             js = 'this.changeImgKey("%s")' % key
-            self.viewport.page().mainFrame().evaluateJavaScript(js)
+            self.viewport.page().runJavaScript(js)
         self.locationKey = key
 
     @pyqtSlot(str)
@@ -122,7 +127,7 @@ class mapillaryViewer(QObject):
         print ('restoreTags')
         if key:
             js = "this.updateTags('%s')" % json.dumps(self.parentInstance.sample_cursor.restoreTags(key))
-            self.viewport.page().mainFrame().evaluateJavaScript(js)
+            self.viewport.page().runJavaScript(js)
 
     @pyqtSlot()
     def openFilterDialog(self):
@@ -156,7 +161,7 @@ class mapillaryViewer(QObject):
         js = "this.enableMarkers();;this.mHandler.restoreMarkers(JSON.parse('%s'));" % json.dumps(markers_def)
         #js = "this.currentHandler.unsubscribe();this.mHandler.subscribe();"
         #js += "this.mHandler.restoreMarkers(JSON.parse('%s'));this.currentHandler.subscribe();" % json.dumps(markers_def)
-        self.viewport.page().mainFrame().evaluateJavaScript(js)
+        self.viewport.page().runJavaScript(js)
 
     def removeTag(self,key):
         self.restoreTags(key)
@@ -164,7 +169,7 @@ class mapillaryViewer(QObject):
     def removeMarker (self,key,id):
         js = "this.mHandler.removeMarker(['id:%s:%s']);" % (key,id)
         # print ('REMOVE',js)
-        self.viewport.page().mainFrame().evaluateJavaScript(js)
+        self.viewport.page().runJavaScript(js)
 
     def removeSample(self,type,key,id):
         if type == 'tag':
@@ -184,16 +189,16 @@ class mapillaryViewer(QObject):
             loc = feat.geometry().asPoint()
             latlon = '{lat:%f,lon:%f}' % (loc.y(),loc.x())
             js = "this.mHandler.addOrReplaceViewerMarker('id:%s:%s',%s,'%s');" % (feat['key'],feat['id'],latlon,color)
-        self.viewport.page().mainFrame().evaluateJavaScript(js)
+        self.viewport.page().runJavaScript(js)
 
     def enable(self):
         js = 'document.getElementById("focus").classList.add("hidden");'
-        self.viewport.page().mainFrame().evaluateJavaScript(js)
+        self.viewport.page().runJavaScript(js)
         self.enabled = True
 
     def disable(self):
         js = 'document.getElementById("focus").classList.remove("hidden");'
-        self.viewport.page().mainFrame().evaluateJavaScript(js)
+        self.viewport.page().runJavaScript(js)
         self.enabled = None
 
     def isEnabled(self):

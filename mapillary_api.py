@@ -30,8 +30,8 @@ from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import QgsMessageLog, Qgis
 
-ROOT = 'https://a.mapillary.com/v3/'
-CLIENT_ID = 'ZUZ1MWdOaW1IXzRucVgxNzhwWTBlZzoyNWJjODcwMWIzNzNjNGQ0'
+ROOT = 'https://graph.mapillary.com/'
+ACCESS_TOKEN = 'MLY|4756369651124824|daee50b6cb15570a90b6a151bbd97bf3'
 DOWNLOAD_ENDPOINT = 'https://d1cuyjsrcm0gby.cloudfront.net/%s/thumb-2048.jpg'
 BROWSER_ENDPOINT = 'https://www.mapillary.com/app/?pKey=%s&focus=photo'
 
@@ -81,7 +81,7 @@ class mapillaryApi:
         return self.proto_method('map_features', **kwargs)
 
     def proto_method(self, endpoint, **kwargs):
-        kwargs['client_id'] =  CLIENT_ID
+        kwargs['access_token'] =  ACCESS_TOKEN
         res = requests.get(ROOT+endpoint, params=kwargs, proxies=getProxiesConf())
         if res.status_code == 200:
             return res.json()
