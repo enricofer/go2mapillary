@@ -8,6 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -40,7 +41,7 @@ class Ui_go2mapillaryDockWidgetBase(object):
         self.gridLayout.setMargin(0)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.webView = QtWebKitWidgets.QWebView(self.dockWidgetContents)
+        self.webView = QWebEngineView(self.dockWidgetContents)
         self.webView.setUrl(QtCore.QUrl(_fromUtf8("about:blank")))
         self.webView.setObjectName(_fromUtf8("webView"))
         self.gridLayout.addWidget(self.webView, 0, 0, 1, 1)
@@ -52,4 +53,3 @@ class Ui_go2mapillaryDockWidgetBase(object):
     def retranslateUi(self, go2mapillaryDockWidgetBase):
         go2mapillaryDockWidgetBase.setWindowTitle(_translate("go2mapillaryDockWidgetBase", "go2mapillary", None))
 
-from PyQt5 import QtWebKitWidgets

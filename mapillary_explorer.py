@@ -239,7 +239,7 @@ class go2mapillary:
         self.sample_settings = mapillarySettings(self)
         self.sample_cursor.update_ds(self.sample_settings.settings['sample_source'])
         self.samples_form = mapillaryForm(self)
-        self.iface.projectRead.connect(self.removeMapillaryLayerGroup)
+        self.iface.projectRead.connect(self.coverage.deactivate)
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
         self.enableMapillaryRender = False
 
@@ -251,9 +251,8 @@ class go2mapillary:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
-        self.coverage.removeLevels()
+        self.coverage.deactivate()
         self.sample_cursor.delete()
-        self.removeMapillaryLayerGroup()
 
         try:
             QgsProject.instance().removeMapLayer(self.sample_cursor.samplesLayer.id())
@@ -310,10 +309,9 @@ class go2mapillary:
                 self.sample_cursor.delete()
                 self.currentLocation = message
                 try:
-                    QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", self.currentLocation['key'])
+                    self.coverage.setCurrentKey(imageKey=key)
                     if self.sample_settings.settings['sample_source'] != 'memory':
                         self.sample_cursor.addSampleLayerToCanvas()
-                    self.coverage.imagesLayer.triggerRepaint()
                 except Exception as e:
                     print ("error opening key %s: %s" % (self.currentLocation['key'],e))
                     pass
@@ -328,13 +326,6 @@ class go2mapillary:
             if message["transport"] == "store_tag":
                 self.sample_cursor.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
 
-    def setCompareKey(self,key):
-        try:
-            QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCompareKey",key)
-            self.coverage.imagesLayer.triggerRepaint()
-        except:
-            pass
-
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
 
@@ -344,18 +335,19 @@ class go2mapillary:
             pass
         except:
             pass
-        print ("mapRefreshed", self.enableMapillaryRender)
+        #print ("mapRefreshed", self.enableMapillaryRender)
         if self.enableMapillaryRender:
-            enabledLevels = self.coverage.update_coverage(force=force)
-            self.reorderLegendInterface()
-
-            for level,layer in enabledLevels.items():
-                if not (level == 'sequences' and 'images' in enabledLevels.keys()):
-                    self.mapSelectionTool = IdentifyGeometry(self, layer)
-                    self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
+            pass
+            #enabledLevels = self.coverage.update_coverage(force=force)
+            #self.reorderLegendInterface()
+            #for level,layer in enabledLevels.items():
+            #    if not (level == 'sequences' and 'images' in enabledLevels.keys()):
+            #        self.mapSelectionTool = IdentifyGeometry(self, layer)
+            #        self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
 
     def mlyDockwidgetvisibilityChanged(self,visibility):
         if self.dockwidget.isVisible():
+            self.coverage.activate()
             self.mainAction.setChecked(True)
             self.mapRefreshed(force=True)
             if self.canvas.mapTool != self.mapSelectionTool:
@@ -365,10 +357,7 @@ class go2mapillary:
         else:
             self.mainAction.setChecked(False)
             self.pluginIsActive = False
-            #self.coverage.removeLevels()
-            #self.canvas.extentsChanged.disconnect(self.mapChanged)
-            self.removeMapillaryLayerGroup()
-            #self.reorderLegendInterface()
+            self.coverage.deactivate()
             self.enableMapillaryRender = False
 
     def run(self):
@@ -388,7 +377,7 @@ class go2mapillary:
             self.mapRefreshed(force=True)
             self.canvas.extentsChanged.connect(self.mapChanged)
             self.canvas.setMapTool(self.mapSelectionTool)
-            self.setCompareKey('')
+            self.coverage.setCurrentKey()
 
         else:
             # toggle show/hide the widget
@@ -407,54 +396,18 @@ class go2mapillary:
     def changeMapillary_images(self, feature):
         #print("changeMapillary_images")
         if not self.openAttrDialog(feature):
-            QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['skey'])
+            self.coverage.setCurrentKey(sequenceKey=feature['skey'])
         self.viewer.openLocation(feature['key'])
-        QgsExpressionContextUtils.setLayerVariable(self.coverage.imagesLayer, "mapillaryCurrentKey", feature['key'])
-        self.coverage.imagesLayer.triggerRepaint()
-        self.coverage.sequencesLayer.triggerRepaint()
+        self.coverage.setCurrentKey(imageKey=feature['key'])
 
     def changeMapillary_sequences(self, feature):
         #print("changeMapillary_sequences")
         if not self.openAttrDialog(feature):
             self.viewer.openLocation(feature['ikey'])
-            QgsExpressionContextUtils.setLayerVariable(self.coverage.sequencesLayer, "mapillaryCurrentKey", feature['key'])
-            self.coverage.sequencesLayer.triggerRepaint()
+            self.coverage.setCurrentKey(sequenceKey=feature['ikey'])
 
     def changeMapillary_overview(self, feature):
         #print("changeMapillary_overview")
         if not self.openAttrDialog(feature):
             self.viewer.openLocation(feature['ikey'])
-            QgsExpressionContextUtils.setLayerVariable(self.coverage.overviewLayer, "mapillaryCurrentKey", feature['key'])
-            self.coverage.overviewLayer.triggerRepaint()
-
-    def removeMapillaryLayerGroup(self):
-        mapillaryGroup = self.getMapillaryLayerGroup()
-        QgsProject.instance().layerTreeRoot().removeChildNode(mapillaryGroup)
-
-    def getMapillaryLayerGroup(self):
-        legendRoot = QgsProject.instance().layerTreeRoot()
-        mapillaryGroupName = 'Mapillary'
-        mapillaryGroup = legendRoot.findGroup(mapillaryGroupName)
-        if not mapillaryGroup:
-            mapillaryGroup = legendRoot.insertGroup(0, mapillaryGroupName)
-        mapillaryGroup.setExpanded(False)
-        return mapillaryGroup
-
-    def reorderLegendInterface(self):
-        mapillaryLayers = self.coverage.getActiveLayers() + [self.sample_cursor.samplesLayer]
-        #print (mapillaryLayers)
-        legendRoot = QgsProject.instance().layerTreeRoot()
-        mapillaryGroup = self.getMapillaryLayerGroup()
-
-        for layer in mapillaryLayers:
-            try:
-                layerNode = legendRoot.findLayer(layer)
-            except:
-                layerNode = None
-            if layerNode:# and layerNode.parent() != mapillaryGroup:
-                cloned_node = layerNode.clone()
-                mapillaryGroup.insertChildNode(0, cloned_node)
-                if layerNode.parent():
-                    layerNode.parent().removeChildNode(layerNode)
-                else:
-                    legendRoot.removeChildNode(layerNode)
+            self.coverage.setCurrentKey(overviewKey=feature['ikey'])

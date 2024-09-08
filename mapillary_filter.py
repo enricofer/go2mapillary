@@ -137,13 +137,8 @@ class mapillaryFilter(QtWidgets.QDialog, FORM_CLASS):
                 sqlFilter += ' and '
             sqlFilter += '("pano" = 1)'
 
-        if not layer:
-            layer = getattr(self.module.coverage,level+'Layer')
-        try:
-            layer.setSubsetString(sqlFilter)
-            layer.triggerRepaint()
-        except:
-            pass
+        if layer:
+            self.module.coverage.applyFilter(sqlFilter)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
