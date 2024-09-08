@@ -179,7 +179,10 @@ if sys.version_info[0] < 3:
 else:
   # In Python 3 we can just use MutableMapping directly, because it defines
   # __slots__.
-  MutableMapping = collections.MutableMapping
+  try:
+    from collections.abc import MutableMapping
+  except:
+    from collections import MutableMapping
 
 
 class BaseContainer(object):
@@ -336,8 +339,10 @@ class RepeatedScalarFieldContainer(BaseContainer):
       return other._values == self._values
     # We are presumably comparing against some other sequence type.
     return other == self._values
-
-collections.MutableSequence.register(BaseContainer)
+try:
+  collections.abc.MutableSequence.register(BaseContainer)
+except:
+  collections.MutableSequence.register(BaseContainer)
 
 
 class RepeatedCompositeFieldContainer(BaseContainer):
