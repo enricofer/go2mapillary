@@ -10,3 +10,4 @@ i18n/
 temp/*
 res/bak/*
 res/bak/
+.vscode/
