@@ -35,7 +35,7 @@ import tempfile
 from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.PyQt.QtWidgets import QProgressBar, QApplication, QAction
 
-from qgis.core import QgsVectorTileLayer, QgsRectangle, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsVectorLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
+from qgis.core import QgsVectorTileLayer, QgsRectangle, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsLayerTreeLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
 from qgis.gui import QgsMessageBar
 
 VECTOR_TILES_ENDPOINTS = {
@@ -52,8 +52,7 @@ class mapillary_coverage:
         self.iface = module.iface
         self.actual_ranges = None
         self.vectorTileSet = vectorTileSet
-        self.vectorTileLayer = QgsVectorTileLayer(VECTOR_TILES_ENDPOINTS[self.vectorTileSet], "Mapillary")
-        print ("vectorTileLayer",self.vectorTileLayer)
+        #self.vectorTileLayer = QgsVectorTileLayer(VECTOR_TILES_ENDPOINTS[self.vectorTileSet], "Mapillary")
         self.mlyKey = None
     
     def setCurrentKey(self, imageKey=None, sequenceKey=None, overviewKey=None):
@@ -65,8 +64,13 @@ class mapillary_coverage:
     def activate(self):
         print ("activate")
         #self.deactivate()
-        #self.vectorTileLayer = QgsVectorTileLayer(VECTOR_TILES_ENDPOINTS[self.vectorTileSet], "Mapillary")
-        QgsProject.instance().addMapLayer(self.vectorTileLayer,addToLegend=False)
+        try:
+            self.vectorTileLayer = QgsVectorTileLayer(VECTOR_TILES_ENDPOINTS[self.vectorTileSet], "Mapillary")
+            print ("vectorTileLayer",self.vectorTileLayer, VECTOR_TILES_ENDPOINTS[self.vectorTileSet])
+            QgsProject.instance().addMapLayer(self.vectorTileLayer,addToLegend=False)
+        except Exception as E:
+            print (E)
+            pass
         self.reorderLegendInterface()
 
     def deactivate(self):
@@ -83,7 +87,7 @@ class mapillary_coverage:
         layerNode = legendRoot.findLayer(self.vectorTileLayer)
         if layerNode:
             layerNode.parent().removeChildNode(layerNode)
-        legendRoot.insertLayer(0, layerNode)
+        legendRoot.insertLayer(0, self.vectorTileLayer)
 
     def applyFilter(self, sqlFilter):
         print ("applyFilter")
