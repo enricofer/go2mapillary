@@ -53,7 +53,6 @@ from .mapillary_settings import mapillarySettings
 from .mapillary_form import mapillaryForm
 from .mapillary_coverage import mapillary_coverage, LAYER_LEVELS
 from .mapillary_image_info import mapillaryImageInfo
-from .identifygeometry import IdentifyGeometry
 from .mapillary_cursor import mapillary_cursor
 #from .geojson_request import geojson_request
 
@@ -217,17 +216,15 @@ class go2mapillary:
         self.dockwidget.setObjectName("go2mapillary")
         self.dockwidget.setWidget(self.dlg)
         self.dockwidget.visibilityChanged.connect(self.mlyDockwidgetvisibilityChanged)
-        #self.dlg.webView.page().setNetworkAccessManager(QgsNetworkAccessManager.instance())
         #self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         #self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
-        self.canvas.mapToolSet.connect(self.toggleViewer)
         self.viewer = mapillaryViewer(self)
         self.viewer.messageArrived.connect(self.viewerConnection)
         self.viewer.openFilter.connect(self.filter_images_func)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         #QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
-        self.mapSelectionTool = None
-        self.coverage = mapillary_coverage(self)
+        self.coverage = mapillary_coverage(self, self.getClickedFeature)
+        self.coverage.changeVisibility.connect(self.toggleViewer)
         self.filterDialog = mapillaryFilter(self)
         self.filterAction_images = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
         self.filterAction_sequences = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
@@ -287,9 +284,9 @@ class go2mapillary:
     def filter_overview_func(self):
         self.filterDialog.show("overview")
 
-    def toggleViewer(self,mapTool):
-        print (mapTool)
-        if mapTool != self.mapSelectionTool:
+    def toggleViewer(self, active):
+        print ("toggleViewer", active)
+        if not active and self.dockwidget.isVisible():
             self.viewer.disable()
 
     def viewerConnection(self, message):
@@ -330,29 +327,13 @@ class go2mapillary:
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
 
     def mapRefreshed(self, force=None):
-        try:
-            #self.canvas.mapCanvasRefreshed.disconnect(self.mapRefreshed)
-            pass
-        except:
-            pass
-        #print ("mapRefreshed", self.enableMapillaryRender)
-        if self.enableMapillaryRender:
-            pass
-            #enabledLevels = self.coverage.update_coverage(force=force)
-            #self.reorderLegendInterface()
-            #for level,layer in enabledLevels.items():
-            #    if not (level == 'sequences' and 'images' in enabledLevels.keys()):
-            #        self.mapSelectionTool = IdentifyGeometry(self, layer)
-            #        self.mapSelectionTool.geomIdentified.connect(getattr(self,'changeMapillary_'+level))
+        pass
 
-    def mlyDockwidgetvisibilityChanged(self,visibility):
+    def mlyDockwidgetvisibilityChanged(self, visibility):
         if self.dockwidget.isVisible():
             self.coverage.activate()
             self.mainAction.setChecked(True)
             self.mapRefreshed(force=True)
-            if self.canvas.mapTool != self.mapSelectionTool:
-                self.canvas.setMapTool(self.mapSelectionTool)
-            #self.canvas.extentsChanged.connect(self.mapChanged)
             self.enableMapillaryRender = True
         else:
             self.mainAction.setChecked(False)
@@ -370,13 +351,11 @@ class go2mapillary:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
-            #self.setupLayer('')
             if not QgsProject.instance().mapLayers():
-                self.canvas.setCenter(QgsPointXY(0,0))
+                self.canvas.setCenter(QgsPointXY(0, 0))
                 self.canvas.zoomScale(70000000.00)
             self.mapRefreshed(force=True)
             self.canvas.extentsChanged.connect(self.mapChanged)
-            self.canvas.setMapTool(self.mapSelectionTool)
             self.coverage.setCurrentKey()
 
         else:
@@ -386,28 +365,16 @@ class go2mapillary:
             else:
                 self.dockwidget.show()
 
-    def openAttrDialog(self,feature):
+    def getClickedFeature(self, feature):
+        print("getClickedFeature", feature['id'])
+        if not self.openAttrDialog(feature):
+            self.viewer.openLocation(feature['id'])
+            self.coverage.setCurrentKey(sequenceKey=feature['id'])
+
+    def openAttrDialog(self, feature):
+        print("openAttrDialog", feature['id'])
         if feature.fields().indexFromName('cat') != -1:
             if self.sample_settings.settings['auto_open_form']:
                 self.samples_form.open(feature)
             return True
 
-
-    def changeMapillary_images(self, feature):
-        #print("changeMapillary_images")
-        if not self.openAttrDialog(feature):
-            self.coverage.setCurrentKey(sequenceKey=feature['skey'])
-        self.viewer.openLocation(feature['key'])
-        self.coverage.setCurrentKey(imageKey=feature['key'])
-
-    def changeMapillary_sequences(self, feature):
-        #print("changeMapillary_sequences")
-        if not self.openAttrDialog(feature):
-            self.viewer.openLocation(feature['ikey'])
-            self.coverage.setCurrentKey(sequenceKey=feature['ikey'])
-
-    def changeMapillary_overview(self, feature):
-        #print("changeMapillary_overview")
-        if not self.openAttrDialog(feature):
-            self.viewer.openLocation(feature['ikey'])
-            self.coverage.setCurrentKey(overviewKey=feature['ikey'])
