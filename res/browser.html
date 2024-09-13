@@ -184,9 +184,6 @@
         var addedTagsId = 0;
 
         var QgisConnection;
-        new QWebChannel(qt.webChannelTransport, function (channel) {
-            QgisConnection = channel.objects.backend;
-        });
 
         function sendMessage (msg){
             if (Date.now()-lastMsg > 200){
@@ -386,6 +383,9 @@
 
         })
 
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            QgisConnection = channel.objects.backend;
+        });
 
         var mHandler = new markersHandler(mly);
         var cHandler = new compareHandler(mly);
