@@ -365,8 +365,8 @@ class go2mapillary:
             else:
                 self.dockwidget.show()
 
-    def getClickedFeature(self, feature):
-        print("getClickedFeature", feature['id'])
+    def getClickedFeature(self, type, feature):
+        print("getClickedFeature", type, feature['id'])
         if not self.openAttrDialog(feature):
             self.viewer.openLocation(feature['id'])
             self.coverage.setCurrentKey(sequenceKey=feature['id'])

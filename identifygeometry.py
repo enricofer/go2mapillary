@@ -36,7 +36,7 @@ from qgis.gui import QgsMapToolIdentify
 
 class IdentifyGeometry(QgsMapToolIdentify):
 
-    geomIdentified = pyqtSignal(QgsFeature)
+    geomIdentified = pyqtSignal(str,QgsFeature)
 
     def __init__(self, canvas, targetSet):
         print ("identify layer", targetSet)
@@ -52,8 +52,8 @@ class IdentifyGeometry(QgsMapToolIdentify):
         except Exception as E:
             print ("identify except", E)
             results = []
-        print ("identify1", results)
+        #print ("identify1", results[0].mFields, results[0].mLabel, results[0].mParams, results[0].mAttributes)
         if len(results) > 0:
             print ("identify2", results[0].mFeature.attributes())
-            self.geomIdentified.emit(QgsFeature(results[0].mFeature))
+            self.geomIdentified.emit(results[0].mLabel, QgsFeature(results[0].mFeature))
 

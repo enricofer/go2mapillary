@@ -25,8 +25,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWebEngineWidgets import QWebEngineSettings
 from PyQt5.QtWebChannel import QWebChannel
 from qgis.PyQt.QtNetwork import QNetworkProxy
-
+from PyQt5.QtCore import pyqtSlot
 from qgis.core import QgsNetworkAccessManager
+from .mapillary_api import ACCESS_TOKEN
 
 from .mapillary_api import getProxySettings, mapillaryApi
 
@@ -63,7 +64,7 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebEngineSettings.PluginsEnabled, True)
 
         self.mly_api = mapillaryApi()
-        self.page = 'https://enricofer.github.io/go2mapillary/res/browser_alt.html'
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html?accessToken=' + ACCESS_TOKEN
         self.openLocation('')
         self.enabled = True
 
@@ -105,8 +106,9 @@ class mapillaryViewer(QObject):
         self.openLocation(key)
 
     def openLocation(self, key):
+        key = str(key)
         if not self.locationKey:
-            self.viewport.setUrl(QUrl(self.page+'?key='+key))
+            self.viewport.setUrl(QUrl(self.page+'&key='+key))
         else:
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
             js = 'this.changeImgKey("%s")' % key

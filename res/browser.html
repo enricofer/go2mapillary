@@ -4,10 +4,10 @@
     <meta charset='utf-8' />
     <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.js'></script> 
 
-    <script src='https://unpkg.com/mapillary-js@2.18.0/dist/mapillary.min.js'></script>
-
-    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.18.0/dist/mapillary.min.css'>
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
       <style>
@@ -183,6 +183,11 @@
         var lastMsg = Date.now();
         var addedTagsId = 0;
 
+        var QgisConnection;
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            QgisConnection = channel.objects.backend;
+        });
+
         function sendMessage (msg){
             if (Date.now()-lastMsg > 200){
                 QgisConnection.JSONmessage(msg);
@@ -295,10 +300,11 @@
             document.getElementById("mly").classList.remove("hidden");
         }
 
+        var accessToken = gup('accessToken');
 
         var mly = new Mapillary.Viewer(
             'mly',
-            'MkJKbDA0bnZuZlcxeTJHTmFqN3g1dzo1YTM0NjRkM2EyZGU5MzBh',
+            accessToken,
             null,
             {
                 component: {
