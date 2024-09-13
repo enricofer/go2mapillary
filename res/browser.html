@@ -304,7 +304,7 @@
         var mly = new Viewer({ 
             accessToken: accessToken,    
             container: 'mly', 
-            imageId: key_param,  
+            imageId: key_param, 
             });
 
         /*
@@ -358,7 +358,7 @@
 
         var mapNodePosition = {};
 
-        mly.on(Mapillary.Viewer.nodechanged, function (node) {
+        mly.on("image", function (node) {
 
             var latLon = [node.latLon.lat, node.latLon.lon];
             var originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
