@@ -5,9 +5,9 @@
     <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-    <script src='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.js'></script> 
+    <script src='https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js'></script> 
 
-    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@2.21.0/dist/mapillary.min.css'>
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.min.css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
       <style>
@@ -299,6 +299,15 @@
 
         var accessToken = gup('accessToken');
 
+        var {Viewer} = mapillary;
+
+        var mly = new Viewer({ 
+            accessToken: accessToken,    
+            container: 'mly', 
+            imageId: key_param,  
+            });
+
+        /*
         var mly = new Mapillary.Viewer(
             'mly',
             accessToken,
@@ -317,13 +326,14 @@
                 },
             }
         );
+        */
 
 
         function changeImgKey (key){
             if (!cHandler.isActive){
                 key_param = key;
                 mly.currentKey = key
-                mly.moveToKey(key_param).then(
+                mly.moveTo(key_param).then(
                     function() { /* noop */ },
                     function(e) { console.error(e); });
             } else {
