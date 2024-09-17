@@ -65,6 +65,7 @@ class mapillary_coverage(QObject):
         self.previuosTool = None
         self.active = False
         self.callback = callback
+        self.legendRoot = QgsProject.instance().layerTreeRoot()
         super(mapillary_coverage, self).__init__(None)
 
     def zoomLevel(self): # courtesy of https://github.com/datalyze-solutions/TileMapScaleLevels/blob/master/tilemapscalelevels.py
@@ -96,38 +97,43 @@ class mapillary_coverage(QObject):
             return 'images'
 
     def setCurrentKey(self, imageKey=None, sequenceKey=None, overviewKey=None):
+        print("imageKey", imageKey)
         QgsExpressionContextUtils.setLayerVariable(self.vectorTileLayer, "mapillaryImageKey",imageKey)
         QgsExpressionContextUtils.setLayerVariable(self.vectorTileLayer, "mapillarySequenceKey",sequenceKey)
         QgsExpressionContextUtils.setLayerVariable(self.vectorTileLayer, "mapillaryOverviewKey",overviewKey)
-        self.vectorTileLayer.triggerRepaint()
+        if self.vectorTileLayer:
+            self.vectorTileLayer.triggerRepaint()
 
     def activate(self):
-        print ("activate", self.getURI())
-        self.vectorTileLayer = QgsVectorTileLayer(self.getURI(), "Mapillary")
-        QgsProject.instance().addMapLayer(self.vectorTileLayer, addToLegend=False)
-        self.reorderLegendInterface()
+        print ("activate",self.getURI())
+        if not self.vectorTileLayer:
+            self.vectorTileLayer = QgsVectorTileLayer(self.getURI(), "Mapillary")
+            QgsProject.instance().addMapLayer(self.vectorTileLayer, False)
+            self.legendRoot.insertLayer(0, self.vectorTileLayer)
         self.previuosTool = self.canvas.mapTool()
         self.mapSelectionTool = IdentifyGeometry(self.canvas, [self.vectorTileLayer]) #self.parentInstance.sample_cursor.samplesLayer
         self.mapSelectionTool.geomIdentified.connect(self.callback)
         self.canvas.setMapTool(self.mapSelectionTool) 
         self.active = True
-
+ 
     def deactivate(self):
         print ("deactivate")
-        self.canvas.setMapTool(self.previuosTool) 
+        #self.reorderLegendInterface(False)
         if self.vectorTileLayer:
-            QgsProject.instance().removeMapLayer(self.vectorTileLayer)
+            QgsProject.instance().removeMapLayer(self.vectorTileLayer.id())
+        self.canvas.setMapTool(self.previuosTool) 
         self.vectorTileLayer = None
         self.iface.mapCanvas().refresh()
         self.active = False
 
-    def reorderLegendInterface(self):
+    def reorderLegendInterface(self, show):
         print ("reorderLegendInterface")
-        legendRoot = QgsProject.instance().layerTreeRoot()
+        
         layerNode = legendRoot.findLayer(self.vectorTileLayer)
         if layerNode:
             layerNode.parent().removeChildNode(layerNode)
-        legendRoot.insertLayer(0, self.vectorTileLayer)
+        if show:
+            legendRoot.insertLayer(0, self.vectorTileLayer)
 
     def applyFilter(self, sqlFilter):
         print ("applyFilter")

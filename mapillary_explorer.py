@@ -242,8 +242,7 @@ class go2mapillary:
 
 
     #--------------------------------------------------------------------------
-
-
+ 
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -315,7 +314,7 @@ class go2mapillary:
             if message["transport"] == "focusOn":
                 self.sample_cursor.delete()
                 self.viewer.enable()
-                self.canvas.setMapTool(self.mapSelectionTool)
+                self.coverage.activate()
             if message["transport"] == "open_settings":
                 self.sample_settings.open()
             if message["transport"] == "image_info":
@@ -331,11 +330,13 @@ class go2mapillary:
 
     def mlyDockwidgetvisibilityChanged(self, visibility):
         if self.dockwidget.isVisible():
+            print ("dockwidget visible")
             self.coverage.activate()
             self.mainAction.setChecked(True)
             self.mapRefreshed(force=True)
             self.enableMapillaryRender = True
         else:
+            print ("dockwidget NOT visible")
             self.mainAction.setChecked(False)
             self.pluginIsActive = False
             self.coverage.deactivate()

@@ -22,7 +22,7 @@
 """
 from PyQt5.QtCore import QSettings, QObject, QUrl, QDir, pyqtSignal, pyqtProperty, pyqtSlot
 from PyQt5.QtGui import *
-from PyQt5.QtWebEngineWidgets import QWebEngineSettings
+from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 from qgis.PyQt.QtNetwork import QNetworkProxy
 from PyQt5.QtCore import pyqtSlot
@@ -37,6 +37,9 @@ import os
 import sys
 import json
 
+DEBUG_PORT = '5588'
+DEBUG_URL = 'http://127.0.0.1:%s' % DEBUG_PORT
+os.environ['QTWEBENGINE_REMOTE_DEBUGGING'] = DEBUG_PORT
 
 class mapillaryViewer(QObject):
 
@@ -55,8 +58,10 @@ class mapillaryViewer(QObject):
         self.channel.registerObject('backend', self)
         self.viewport.page().setWebChannel(self.channel)
 
-        WS = self.viewport.settings()
+        manager = QgsNetworkAccessManager.instance()
 
+        WS = self.viewport.settings()
+ 
 
         WS.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
         WS.setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
@@ -67,6 +72,7 @@ class mapillaryViewer(QObject):
         self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html?accessToken=' + ACCESS_TOKEN
         self.openLocation('')
         self.enabled = True
+        self.showWebInspectorAction()
 
         proxy_conf = getProxySettings()
         if proxy_conf:
@@ -86,6 +92,14 @@ class mapillaryViewer(QObject):
             proxy.setUser(proxy_conf['user'])
             proxy.setPassword(proxy_conf['password'])
             QNetworkProxy.setApplicationProxy(proxy)
+
+    def showWebInspectorAction(self):
+        self.inspector = QWebEngineView()
+        self.inspector.setWindowTitle('Web Inspector')
+        self.inspector.load(QUrl(DEBUG_URL))
+        self.viewport.page().setDevToolsPage(self.inspector.page())
+        self.inspector.show()
+        self.inspector.raise_()
 
     def registerJS(self):
         #self.viewport.page().mainFrame().addToJavaScriptWindowObject("QgisConnection", self)
@@ -107,6 +121,7 @@ class mapillaryViewer(QObject):
 
     def openLocation(self, key):
         key = str(key)
+        print(self.page+'&key='+key)
         if not self.locationKey:
             self.viewport.setUrl(QUrl(self.page+'&key='+key))
         else:
