@@ -305,7 +305,7 @@ class go2mapillary:
                 self.sample_cursor.delete()
                 self.currentLocation = message
                 try:
-                    self.coverage.setCurrentKey(imageKey=key)
+                    self.coverage.setCurrentKey(key)
                     if self.sample_settings.settings['sample_source'] != 'memory':
                         self.sample_cursor.addSampleLayerToCanvas()
                 except Exception as e:
@@ -357,7 +357,7 @@ class go2mapillary:
                 self.canvas.zoomScale(70000000.00)
             self.mapRefreshed(force=True)
             self.canvas.extentsChanged.connect(self.mapChanged)
-            self.coverage.setCurrentKey()
+            self.coverage.setCurrentKey(None)
 
         else:
             # toggle show/hide the widget
@@ -370,7 +370,7 @@ class go2mapillary:
         print("getClickedFeature", type, feature['id'])
         if not self.openAttrDialog(feature):
             self.viewer.openLocation(feature['id'])
-            self.coverage.setCurrentKey(sequenceKey=feature['id'])
+            self.coverage.setCurrentKey(feature['id'])
 
     def openAttrDialog(self, feature):
         print("openAttrDialog", feature['id'])
