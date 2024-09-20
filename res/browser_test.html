@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src='https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js'></script> 
+
+    <link rel="stylesheet" href='https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+      </style>
+</head>
+
+<body style="margin:0px;">
+    <div id='mly'></div>
+    <script>
+        "use strict";
+
+        var lastMsg = Date.now();
+        var addedTagsId = 0;
+
+        var QgisConnection;
+
+        function sendMessage (msg){
+            if (Date.now()-lastMsg > 200){
+                QgisConnection.JSONmessage(msg);
+                lastMsg = Date.now();
+            }
+        }
+
+
+        function gup(name)
+        {
+          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+          var regexS = "[\\?&]"+name+"=([^&#]*)";
+          var regex = new RegExp( regexS );
+          var results = regex.exec( window.location.href );
+          if( results == null )
+            return "";
+          else
+            return results[1];
+        };
+
+        var key_param = gup('key');
+
+        var accessToken = gup('accessToken');
+
+        var {Viewer} = mapillary;
+
+        var mly = new Viewer({ 
+            accessToken: accessToken,    
+            container: 'mly', 
+            imageId: key_param, 
+            });
+
+        function changeImgKey (key){
+                key_param = key;
+                mly.currentKey = key
+                mly.moveTo(key_param).then(
+                    function() { /* noop */ },
+                    function(e) { console.error(e); });
+        }
+
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+            QgisConnection = channel.objects.backend;
+        });
+
+        changeImgKey(key_param);
+
+    </script>
+</body>
+</html>
+

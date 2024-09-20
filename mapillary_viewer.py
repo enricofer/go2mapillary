@@ -69,7 +69,7 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebEngineSettings.PluginsEnabled, True)
 
         self.mly_api = mapillaryApi()
-        self.page = 'https://enricofer.github.io/go2mapillary/res/browser.html?accessToken=' + ACCESS_TOKEN
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser_test.html?accessToken=' + ACCESS_TOKEN
         self.openLocation('')
         self.enabled = True
         self.showWebInspectorAction()
