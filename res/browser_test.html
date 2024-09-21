@@ -63,6 +63,41 @@
             //imageId: key_param, 
             });
 
+
+
+            mly.on("image", function (event) {
+                console.log("EVENT", event)
+                // var latLon = [node.latLon.lat, node.latLon.lon];
+                // var originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
+
+                // mapNodePosition.line = [node.originalLatLon, node.latLon];
+                // mapNodePosition.originalPos = node.originalLatLon;
+                // mapNodePosition.pos = node.latLon;
+
+                var viewPar = {
+                    "transport":"view",
+                    "lat":undefined,
+                    "lon":undefined,
+                    "key":event.id,
+                    "ca": undefined,
+                    //"sequence":node.sequenceKey(),
+                    //"originalLat":node.originalLatLon.lat,
+                    //"originallon":node.originalLatLon.lon,
+                    //"capturedAt":node.capturedAt()
+                };
+                sendMessage(JSON.stringify(viewPar));
+
+                // var menuContainer = document.getElementById("menu")
+                // var sequenceContainer = document.querySelectorAll(".SequenceContainer")
+                // menuContainer.classList.remove("hidden");
+
+                // key_param = node.key;
+                // mly.currentKey = node.key
+
+                // QgisConnection.restoreTags(key_param)
+
+        })
+
         function changeImgKey (key){
                 key_param = key;
                 mly.currentKey = key
