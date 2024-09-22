@@ -97,9 +97,9 @@
         })
 
         function changeImgKey (key){
-                key_param = key;
-                mly.currentKey = key
-                mly.moveTo(key_param).then(
+                // let key_param = key;
+                // ?? mly.currentKey = key
+                mly.moveTo(key).then(
                     function() { /* noop */ },
                     function(e) { console.error(e); });
         }
