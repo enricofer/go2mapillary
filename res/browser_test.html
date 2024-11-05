@@ -50,6 +50,10 @@
             z-index: 10000;
         }
         
+        .hidden{
+            visibility: hidden;
+        }
+
     </style>
 </head>
 
@@ -71,6 +75,13 @@
                 QgisConnection.JSONmessage(msg);
                 lastMsg = Date.now();
             }
+        }
+
+        function focusOn(){
+            var viewPar = {
+                "transport":"focusOn",
+            };
+            sendMessage(JSON.stringify(viewPar));
         }
 
         function gup(name)
