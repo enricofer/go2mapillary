@@ -33,6 +33,7 @@
 
         function sendMessage (msg){
             if (Date.now()-lastMsg > 200){
+                console.log("sending", msg)
                 QgisConnection.JSONmessage(msg);
                 lastMsg = Date.now();
             }
