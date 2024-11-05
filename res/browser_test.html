@@ -73,11 +73,11 @@
 
             var viewPar = {
                 "transport":"view",
-                "lat":event.image.latLon.lat,
-                "lon":event.image.latLon.lon,
+                "lat":event.image.lngLat().Lat,
+                "lon":event.image.lngLat().Lng,
                 "key":event.image.id,
-                "ca": event.image.compass_angle,
-                "sequence": event.image.sequence
+                "ca": event.image.compassAngle,
+                "sequence": event.sequenceId
                 //"sequence":node.sequenceKey(),
                 //"originalLat":node.originalLatLon.lat,
                 //"originallon":node.originalLatLon.lon,
