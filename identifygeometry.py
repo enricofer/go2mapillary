@@ -37,6 +37,7 @@ from qgis.gui import QgsMapToolIdentify
 class IdentifyGeometry(QgsMapToolIdentify):
 
     geomIdentified = pyqtSignal(str,QgsFeature)
+    go2mapillary = 'go2mapillary'
 
     def __init__(self, canvas, targetSet):
         print ("identify layer", targetSet)
@@ -54,6 +55,6 @@ class IdentifyGeometry(QgsMapToolIdentify):
             results = []
         #print ("identify1", results[0].mFields, results[0].mLabel, results[0].mParams, results[0].mAttributes)
         if len(results) > 0:
-            print ("identify2-1",results[0].mLabel, results[0])
-            self.geomIdentified.emit(results[0].mLabel, QgsFeature(results[0].mFeature))
+            print ("identify2-1",results[0].mLayer.name(), results[0])
+            self.geomIdentified.emit(results[0].mLayer.name().replace("Mapillary ", ""), QgsFeature(results[0].mFeature))
 

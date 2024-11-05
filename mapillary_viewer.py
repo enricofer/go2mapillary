@@ -26,7 +26,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineSettings, QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 from qgis.PyQt.QtNetwork import QNetworkProxy
 from PyQt5.QtCore import pyqtSlot
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsNetworkAccessManager, QgsExpressionContextUtils
 from .mapillary_api import ACCESS_TOKEN
 
 from .mapillary_api import getProxySettings, mapillaryApi
@@ -120,15 +120,19 @@ class mapillaryViewer(QObject):
         self.openLocation(key)
 
     def openLocation(self, key):
-        key = str(key)
-        print(self.page+'&key='+key)
+        print(self.page+'&key=' + str(key))
         if not self.locationKey:
-            self.viewport.setUrl(QUrl(self.page+'&key='+key))
+            self.viewport.setUrl(QUrl(self.page+'&key=' + str(key)))
         else:
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
-            js = 'this.changeImgKey(%s)' % key
+            js = 'this.changeImgKey(%d)' % key
             self.viewport.page().runJavaScript(js)
+        self.updateLocationKey(key)
+    
+    def updateLocationKey(self,key):
+        #QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey",key)
         self.locationKey = key
+
 
     @pyqtSlot(str)
     def JSONmessage(self,status):
@@ -209,11 +213,13 @@ class mapillaryViewer(QObject):
         self.viewport.page().runJavaScript(js)
 
     def enable(self):
+        print("viewer enabled")
         js = 'document.getElementById("focus").classList.add("hidden");'
         self.viewport.page().runJavaScript(js)
         self.enabled = True
 
     def disable(self):
+        print("viewer disabled")
         js = 'document.getElementById("focus").classList.remove("hidden");'
         self.viewport.page().runJavaScript(js)
         self.enabled = None

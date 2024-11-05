@@ -339,6 +339,8 @@ class mapillary_coverage(QObject):
                     setattr(self, level + 'Layer', defLyr)
                 else:
                     setattr(self, level, False)
+                            
+            self.updateSelectionTool(rendered_layers)
             return rendered_layers
         else:
             print ("SAME RANGES")
@@ -379,14 +381,24 @@ class mapillary_coverage(QObject):
         return getattr(self, self.getLevel() + 'Layer')
         
 
-    def setCurrentKey(self, key):
+    def setCurrentKey(self, feat_id=None, seq_id=None):
+        print("coverage - setCurrentKey", feat_id, seq_id)
         for level in LAYER_LEVELS:
             layer = getattr(self, level + 'Layer')
             try:
-                QgsExpressionContextUtils.setLayerVariable(layer, "mapillaryCurrentKey", key)
+                #QgsExpressionContextUtils.setLayerVariable(layer, "mapillaryCurrentKey", key)
+                QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey",feat_id)
+                QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentSequence",seq_id)
+
                 layer.triggerRepaint()
             except:
                 pass
+    
+    def updateSelectionTool(self, lyrs):
+        self.previuosTool = self.canvas.mapTool()
+        self.mapSelectionTool = IdentifyGeometry(self.canvas, lyrs)
+        self.mapSelectionTool.geomIdentified.connect(self.callback)
+        self.canvas.setMapTool(self.mapSelectionTool) 
 
     def activate(self):
         print ("activate")
@@ -395,10 +407,6 @@ class mapillary_coverage(QObject):
         print ("rendered_layers1", rendered_layers)
         self.reorderLegendInterface()
         print ("rendered_layers2", rendered_layers)
-        self.previuosTool = self.canvas.mapTool()
-        self.mapSelectionTool = IdentifyGeometry(self.canvas, rendered_layers) #self.parentInstance.sample_cursor.samplesLayer
-        self.mapSelectionTool.geomIdentified.connect(self.callback)
-        self.canvas.setMapTool(self.mapSelectionTool) 
         self.active = True
  
     def deactivate(self):

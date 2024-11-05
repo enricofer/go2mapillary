@@ -222,6 +222,8 @@ class go2mapillary:
         self.viewer.messageArrived.connect(self.viewerConnection)
         self.viewer.openFilter.connect(self.filter_images_func)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
+        QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentSequence",None)
+        QgsExpressionContextUtils.setGlobalVariable( "mapillaryCompareKey","")
         #QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.coverage = mapillary_coverage(self, self.getClickedFeature)
         self.coverage.changeVisibility.connect(self.toggleViewer)
@@ -238,6 +240,7 @@ class go2mapillary:
         self.samples_form = mapillaryForm(self)
         self.iface.projectRead.connect(self.coverage.deactivate)
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
+        self.canvas.mapToolSet.connect(self.updateViewer)
         self.enableMapillaryRender = False
 
 
@@ -265,6 +268,11 @@ class go2mapillary:
         except:
             pass
 
+        try:
+            self.canvas.mapToolSet.disconnect(self.updateViewer)
+        except:
+            pass
+
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr(u'&go2mapillary'),
@@ -283,13 +291,19 @@ class go2mapillary:
     def filter_overview_func(self):
         self.filterDialog.show("overview")
 
+    def updateViewer(self,current_tool, previous_tool):
+        try:
+            a = current_tool.go2mapillary
+        except:
+            self.viewer.disable()
+
     def toggleViewer(self, active):
         print ("toggleViewer", active)
         if not active and self.dockwidget.isVisible():
             self.viewer.disable()
 
     def viewerConnection(self, message):
-        #print (message)
+        print ("viewerConnection", message)
         if message:
             if message["transport"] == "move_cursor":
                 self.sample_cursor.draw(message["pov"], message["orig_pov"], message["cursor"], message["endOfSight"])
@@ -305,7 +319,7 @@ class go2mapillary:
                 self.sample_cursor.delete()
                 self.currentLocation = message
                 try:
-                    self.coverage.setCurrentKey(key)
+                    self.coverage.setCurrentKey(self.currentLocation["key"],self.currentLocation["sequence"])
                     if self.sample_settings.settings['sample_source'] != 'memory':
                         self.sample_cursor.addSampleLayerToCanvas()
                 except Exception as e:
@@ -369,8 +383,12 @@ class go2mapillary:
     def getClickedFeature(self, type, feature):
         print("getClickedFeature", type, feature['id'])
         if not self.openAttrDialog(feature):
-            self.viewer.openLocation(feature['id'])
-            self.coverage.setCurrentKey(feature['id'])
+            if type == 'image':
+                self.viewer.openLocation(feature['id'])
+                self.coverage.setCurrentKey(feat_id = feature['id'], seq_id=feature['sequence_id'])
+            elif type == 'sequence':
+                self.viewer.openLocation(feature['image_id'])
+                self.coverage.setCurrentKey(seq_id=feature['id'])
 
     def openAttrDialog(self, feature):
         print("openAttrDialog", feature['id'])
