@@ -62,37 +62,37 @@
             //imageId: key_param, 
             });
 
-            mly.on("image", function (event) {
-                console.log("EVENT", event)
-                // var latLon = [node.latLon.lat, node.latLon.lon];
-                // var originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
+        mly.on("image", function (event) {
+            console.log("EVENT", event)
+            // var latLon = [node.latLon.lat, node.latLon.lon];
+            // var originalLatLon = [node.originalLatLon.lat, node.originalLatLon.lon];
 
-                // mapNodePosition.line = [node.originalLatLon, node.latLon];
-                // mapNodePosition.originalPos = node.originalLatLon;
-                // mapNodePosition.pos = node.latLon;
+            // mapNodePosition.line = [node.originalLatLon, node.latLon];
+            // mapNodePosition.originalPos = node.originalLatLon;
+            // mapNodePosition.pos = node.latLon;
 
-                var viewPar = {
-                    "transport":"view",
-                    "lat":event.image.latLon.lat,
-                    "lon":event.image.latLon.lon,
-                    "key":event.image.id,
-                    "ca": event.image.compass_angle,
-                    "sequence": event.image.sequence
-                    //"sequence":node.sequenceKey(),
-                    //"originalLat":node.originalLatLon.lat,
-                    //"originallon":node.originalLatLon.lon,
-                    //"capturedAt":node.capturedAt()
-                };
-                sendMessage(JSON.stringify(viewPar));
+            var viewPar = {
+                "transport":"view",
+                "lat":event.image.latLon.lat,
+                "lon":event.image.latLon.lon,
+                "key":event.image.id,
+                "ca": event.image.compass_angle,
+                "sequence": event.image.sequence
+                //"sequence":node.sequenceKey(),
+                //"originalLat":node.originalLatLon.lat,
+                //"originallon":node.originalLatLon.lon,
+                //"capturedAt":node.capturedAt()
+            };
+            sendMessage(JSON.stringify(viewPar));
 
-                // var menuContainer = document.getElementById("menu")
-                // var sequenceContainer = document.querySelectorAll(".SequenceContainer")
-                // menuContainer.classList.remove("hidden");
+            // var menuContainer = document.getElementById("menu")
+            // var sequenceContainer = document.querySelectorAll(".SequenceContainer")
+            // menuContainer.classList.remove("hidden");
 
-                // key_param = node.key;
-                // mly.currentKey = node.key
+            // key_param = node.key;
+            // mly.currentKey = node.key
 
-                // QgisConnection.restoreTags(key_param)
+            // QgisConnection.restoreTags(key_param)
 
         })
 

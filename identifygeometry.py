@@ -54,6 +54,6 @@ class IdentifyGeometry(QgsMapToolIdentify):
             results = []
         #print ("identify1", results[0].mFields, results[0].mLabel, results[0].mParams, results[0].mAttributes)
         if len(results) > 0:
-            print ("identify2",results[0].mFeature["id"], results[0].mFeature.attributes(), results[0].mDerivedAttributes)
+            print ("identify2-1",results[0].mLabel, results[0])
             self.geomIdentified.emit(results[0].mLabel, QgsFeature(results[0].mFeature))
 

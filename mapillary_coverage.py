@@ -51,7 +51,7 @@ VECTOR_TILES_ENDPOINTS = {
     "computed": r"https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=" + ACCESS_TOKEN,
 }
 
-LAYER_LEVELS = ['overview', 'sequence', 'image']
+LAYER_LEVELS = ['image','overview', 'sequence']
 
 SERVER_URL = r"https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=MLY|4756369651124824|daee50b6cb15570a90b6a151bbd97bf3"
 
@@ -217,6 +217,7 @@ class mapillary_coverage(QObject):
 
     def mapRefreshed(self, force=None):
         if not self.active:
+            print ("not active. removing layers")
             self.removeLayers()
             return
         #calculate zoom_level con current canvas extents
@@ -232,14 +233,17 @@ class mapillary_coverage(QObject):
         try:
             ranges = getTileRange(bounds, zoom_level)
         except ValueError:
+            print("ValueError")
             return
+        
+        print ("ZOOM_LEVEL", zoom_level, "NEW RANGES", ranges, "LAST RANGES", self.actual_ranges)
 
         if force or not self.actual_ranges or not (
                                     ranges[0][0]==self.actual_ranges[0][0] and
                                     ranges[0][1]==self.actual_ranges[0][1] and
                                     ranges[1][0]==self.actual_ranges[1][0] and
                                     ranges[1][1]==self.actual_ranges[1][1]):
-            #print ("ZOOM_LEVEL", zoom_level, "NEW RANGES", ranges, "LAST RANGES", self.actual_ranges)
+            
             self.actual_ranges = ranges
             x_range = ranges[0]
             y_range = ranges[1]
@@ -337,6 +341,7 @@ class mapillary_coverage(QObject):
                     setattr(self, level, False)
             return rendered_layers
         else:
+            print ("SAME RANGES")
             pass
             #print ("SAME RANGES")
 
@@ -386,8 +391,10 @@ class mapillary_coverage(QObject):
     def activate(self):
         print ("activate")
         self.active = True
-        rendered_layers = self.mapRefreshed()
+        rendered_layers = self.mapRefreshed(force=True)
+        print ("rendered_layers1", rendered_layers)
         self.reorderLegendInterface()
+        print ("rendered_layers2", rendered_layers)
         self.previuosTool = self.canvas.mapTool()
         self.mapSelectionTool = IdentifyGeometry(self.canvas, rendered_layers) #self.parentInstance.sample_cursor.samplesLayer
         self.mapSelectionTool.geomIdentified.connect(self.callback)

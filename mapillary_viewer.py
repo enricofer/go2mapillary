@@ -126,7 +126,7 @@ class mapillaryViewer(QObject):
             self.viewport.setUrl(QUrl(self.page+'&key='+key))
         else:
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
-            js = 'this.changeImgKey("%s")' % key
+            js = 'this.changeImgKey(%s)' % key
             self.viewport.page().runJavaScript(js)
         self.locationKey = key
 
