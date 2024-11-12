@@ -27,10 +27,10 @@ from PyQt5.QtWebChannel import QWebChannel
 from qgis.PyQt.QtNetwork import QNetworkProxy
 from PyQt5.QtCore import pyqtSlot
 from qgis.core import QgsNetworkAccessManager, QgsExpressionContextUtils
-from .mapillary_api import ACCESS_TOKEN
 
 from .mapillary_api import getProxySettings, mapillaryApi
 
+from .mapillary_settings import mapillarySettings
 from .mapillary_image_info import mapillaryImageInfo
 
 import os
@@ -53,6 +53,7 @@ class mapillaryViewer(QObject):
         #self.viewport.statusBarMessage.connect(self.getJSONmessage)
         #self.viewport.page().javaScriptWindowObjectCleared.connect(self.registerJS)
         self.locationKey = None
+        self.settings = mapillarySettings()
 
         self.channel = QWebChannel()
         self.channel.registerObject('backend', self)
@@ -69,10 +70,9 @@ class mapillaryViewer(QObject):
         WS.setAttribute(QWebEngineSettings.PluginsEnabled, True)
 
         self.mly_api = mapillaryApi()
-        self.page = 'https://enricofer.github.io/go2mapillary/res/browser_test.html?accessToken=' + ACCESS_TOKEN
+        self.page = 'https://enricofer.github.io/go2mapillary/res/browser_test.html?accessToken=' + self.settings.get("access_token","")
         self.openLocation('')
         self.enabled = True
-        self.showWebInspectorAction()
 
         proxy_conf = getProxySettings()
         if proxy_conf:

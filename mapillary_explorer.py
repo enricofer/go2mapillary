@@ -204,10 +204,24 @@ class go2mapillary:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         icon_path = os.path.join(self.plugin_dir,'res','icon.png')
         self.mainAction = self.add_action(
-            icon_path,
-            text=self.tr(u'go2mapillary'),
+            os.path.join(self.plugin_dir,'res','icon.png'),
+            text=self.tr(u'go2mapillary viewer'),
             callback=self.run,
             checkable=True,
+            parent=self.iface.mainWindow())
+        
+        self.settingsAction = self.add_action(
+            os.path.join(self.plugin_dir,'res','icon_settings.png'),
+            text=self.tr(u'go2mapillary settings'),
+            callback=self.settings,
+            checkable=False,
+            parent=self.iface.mainWindow())
+        
+        self.settingsAction = self.add_action(
+            os.path.join(self.plugin_dir,'res','icon_inspect.png'),
+            text=self.tr(u'inspect go2mapillary web component'),
+            callback=self.inspect,
+            checkable=False,
             parent=self.iface.mainWindow())
 
         self.dlg = go2mapillaryDockWidget()
@@ -220,20 +234,12 @@ class go2mapillary:
         #self.dlg.webView.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         self.viewer = mapillaryViewer(self)
         self.viewer.messageArrived.connect(self.viewerConnection)
-        self.viewer.openFilter.connect(self.filter_images_func)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey","noKey")
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentSequence",None)
         QgsExpressionContextUtils.setGlobalVariable( "mapillaryCompareKey","")
         #QgsExpressionContextUtils.removeGlobalVariable("mapillaryCurrentKey")
         self.coverage = mapillary_coverage(self, self.getClickedFeature)
         self.coverage.changeVisibility.connect(self.toggleViewer)
-        self.filterDialog = mapillaryFilter(self)
-        self.filterAction_images = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
-        self.filterAction_sequences = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
-        self.filterAction_overview = QAction(QIcon(icon_path), 'filter mapillary coverage', self.iface.mainWindow())
-        self.filterAction_images.triggered.connect(self.filter_images_func)
-        self.filterAction_sequences.triggered.connect(self.filter_sequences_func)
-        self.filterAction_overview.triggered.connect(self.filter_overview_func)
         self.sample_cursor = mapillary_cursor(self)
         self.sample_settings = mapillarySettings(self)
         self.sample_cursor.update_ds(self.sample_settings.settings['sample_source'])
@@ -281,15 +287,9 @@ class go2mapillary:
         # remove the toolbar
         del self.toolbar
         self.dockwidget.hide()
-
-    def filter_images_func(self):
-        self.filterDialog.show('images')
-
-    def filter_sequences_func(self):
-        self.filterDialog.show('sequences')
-
-    def filter_overview_func(self):
-        self.filterDialog.show("overview")
+    
+    def inspect(self):
+        self.viewer.showWebInspectorAction()
 
     def updateViewer(self,current_tool, previous_tool):
         try:
@@ -305,15 +305,6 @@ class go2mapillary:
     def viewerConnection(self, message):
         print ("viewerConnection", message)
         if message:
-            if message["transport"] == "move_cursor":
-                self.sample_cursor.draw(message["pov"], message["orig_pov"], message["cursor"], message["endOfSight"])
-            if message["transport"] == "disable_cursor":
-                self.sample_cursor.delete()
-            if message["transport"] == "create_marker":
-                self.sample_cursor.sample("marker", message['id'], message['key'], message['markerPos'])
-            if message["transport"] == "drag_marker":
-                s,key,id = message['id'].split(':')
-                self.sample_cursor.moveMarker(key, id, message['markerPos'])
 
             if message["transport"] == "view":
                 self.sample_cursor.delete()
@@ -333,8 +324,6 @@ class go2mapillary:
                 self.sample_settings.open()
             if message["transport"] == "image_info":
                 mapillaryImageInfo.openKey(self,message["key"])
-            if message["transport"] == "store_tag":
-                self.sample_cursor.sample("tag", message['id'], message['key'], message['loc'], json.dumps(message['geometry']))
 
     def mapChanged(self):
         self.canvas.mapCanvasRefreshed.connect(self.mapRefreshed)
@@ -355,6 +344,9 @@ class go2mapillary:
             self.pluginIsActive = False
             self.coverage.deactivate()
             self.enableMapillaryRender = False
+
+    def settings(self):
+        self.sample_settings.open()
 
     def run(self):
         """Run method that loads and starts the plugin"""

@@ -22,7 +22,6 @@
 """
 import os
 import sys
-from .mapillary_api import ACCESS_TOKEN
 
 from shapely.geometry import Polygon
 from go2mapillary.extlibs import mapbox_vector_tile
@@ -31,9 +30,7 @@ import requests
 import math
 import json
 import datetime
-import mercantile
 import tempfile
-import urllib.parse
 import math
 
 from PyQt5.QtCore import pyqtSignal
@@ -44,16 +41,11 @@ from qgis.core import QgsVectorLayer, QgsVectorTileLayer, QgsDataSourceUri, QgsP
 from qgis.gui import QgsMessageBar
 
 from .identifygeometry import IdentifyGeometry
+from .mapillary_settings import mapillarySettings
 
-
-VECTOR_TILES_ENDPOINTS = {
-    "original": r"https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=" + ACCESS_TOKEN,
-    "computed": r"https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=" + ACCESS_TOKEN,
-}
+VECTOR_TILES_ENDPOINTS = "https://tiles.mapillary.com/maps/vtp/mly1%s_public/2/{z}/{x}/{y}?access_token=%s"
 
 LAYER_LEVELS = ['image','overview', 'sequence']
-
-SERVER_URL = r"https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=MLY|4756369651124824|daee50b6cb15570a90b6a151bbd97bf3"
 
 CACHE_EXPIRE_HOURS = 24
 
@@ -117,7 +109,7 @@ def getURL(x,y,z,url):
     u=u.replace("{z}", str(z))
     return u
 
-def getProxiesConf():
+def getProxiesConf(default=True):
     s = QSettings()  # getting proxy from qgis options settings
     proxyEnabled = s.value("proxy/proxyEnabled", "")
     proxyType = s.value("proxy/proxyType", "")
@@ -125,7 +117,7 @@ def getProxiesConf():
     proxyPort = s.value("proxy/proxyPort", "")
     proxyUser = s.value("proxy/proxyUser", "")
     proxyPassword = s.value("proxy/proxyPassword", "")
-    if proxyEnabled == "true":
+    if default and proxyEnabled == "true":
         if proxyType == 'HttpProxy':  # test if there are proxy settings
             proxyDict = {
                 "http": "http://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort),
@@ -136,6 +128,8 @@ def getProxiesConf():
                 "http": "socks5://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort),
                 "https": "socks5://%s:%s@%s:%s" % (proxyUser, proxyPassword, proxyHost, proxyPort)
             }
+        else:
+            proxyDict = None
         return proxyDict
     else:
         return None
@@ -151,6 +145,7 @@ class progressBar:
         self.title = title
 
     def start(self,max=0, msg = ''):
+        max = max or 0
         self.widget = self.iface.messageBar().createMessage(self.title,msg)
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0,max)
@@ -190,6 +185,7 @@ class mapillary_coverage(QObject):
     changeVisibility = pyqtSignal(bool)
 
     def __init__(self, explorer, callback, vectorTileSet='computed'):
+        self.settings = mapillarySettings()
         self.explorer = explorer
         self.iface = explorer.iface
         self.canvas = explorer.iface.mapCanvas()
@@ -229,7 +225,6 @@ class mapillary_coverage(QObject):
         print(name, source)
         if not target:
             decodeWkb={0:"UnknownType",1:"Point",2:"LineString",3:"Polygon",4:"MultiPoint",5:"MultiLineString",6:"MultiPolygon" }
-            print ("WKBTYPE",int(source.wkbType()), decodeWkb[int(source.wkbType())])
             type = decodeWkb[int(source.wkbType())]
             crs = source.crs().toWkt()
             target = QgsVectorLayer("%s?crs=%s" % (type,crs),name,'memory')
@@ -247,6 +242,7 @@ class mapillary_coverage(QObject):
             return
         #calculate zoom_level con current canvas extents
         ex = self.iface.mapCanvas().extent()
+        print ("mapcanvas extent", self.iface.mapCanvas().extent())
         wgs84_minimum = self.transformToWGS84(QgsPointXY (ex.xMinimum(),ex.yMinimum()))
         wgs84_maximum = self.transformToWGS84(QgsPointXY (ex.xMaximum(),ex.yMaximum()))
         bounds =(wgs84_minimum.x(),wgs84_minimum.y(),wgs84_maximum.x(),wgs84_maximum.y())
@@ -273,10 +269,6 @@ class mapillary_coverage(QObject):
             x_range = ranges[0]
             y_range = ranges[1]
 
-            #overview_features = []
-            #sequence_features = []
-            #image_features = []
-
             self.overview_updt = None
             self.sequence_updt = None
             self.image_updt = None
@@ -289,32 +281,31 @@ class mapillary_coverage(QObject):
                 for x in range(x_range[0], x_range[1] + 1):
                     folderPath = os.path.join(self.cache_dir, str(zoom_level), str(x))
                     filePathMvt = os.path.join(folderPath, str(y) + '.mvt')
-                    #filePathJson = os.path.join(folderPath, str(y) + '.json')
                     if not os.path.exists(folderPath):
                         os.makedirs(folderPath)
-                    res = None
 
-                    if not os.path.exists(filePathMvt) or (datetime.datetime.fromtimestamp(os.path.getmtime(filePathMvt)) < (datetime.datetime.now() - self.expire_time) ):
+                    if not os.path.exists(filePathMvt) or (datetime.datetime.fromtimestamp(os.path.getmtime(filePathMvt)) < (start_time - self.expire_time) ):
                         # make the URL
-                        url = getURL(x, y, zoom_level, SERVER_URL)
-                        print ("caching", url)
+                        url = getURL(x, y, zoom_level, VECTOR_TILES_ENDPOINTS % ("_computed" if self.settings.get("computed_tiles_coverage") else "", self.settings.get("access_token","")))
+                        print (url,self.settings.get("computed_tiles_coverage"), self.settings.get("access_token"))
                         with open(filePathMvt, 'wb') as f:
-                            response = requests.get(url, proxies=getProxiesConf(), stream=True)
-                            print ("response", response.status_code)
-                            total_length = response.headers.get('content-length')
+                            
+                            response = requests.get(url, proxies=getProxiesConf(self.settings.get("use_proxy")), stream=True)
+                            total_length = response.headers.get('Content-length')
+                            print (response.headers)
+                            progress.start(total_length,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
 
                             if total_length is None:  # no content length header
                                 f.write(response.content)
                             else:
                                 dl = 0
-                                total_length = int(total_length)
-                                progress.start(total_length,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
                                 QgsMessageLog.logMessage("MISS [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
                                                          level=Qgis.Info)
                                 for data in response.iter_content(chunk_size=4096):
                                     dl += len(data)
                                     f.write(data)
                                     progress.setProgress(dl)
+                            progress.stop('caching complete')
 
 
                     if os.path.exists(filePathMvt):
@@ -322,38 +313,14 @@ class mapillary_coverage(QObject):
 
                         for level in LAYER_LEVELS:
                             tile = QgsVectorLayer(filePathMvt+"|layername="+level, level, 'ogr')
-                            #if tile.isValid():
                             setattr(self,level+"_updt", self.extend(getattr(self,level+"_updt"), tile, "Mapillary " + level)) 
-
-                        #if not res:
-                        #    with open(filePathMvt, "rb") as f:
-                        #        mvt = f.read()
-                        #        QgsMessageLog.logMessage("CACHE [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
-                        #                                 level=Qgis.Info)
-                        #else:
-                        #    mvt = res.content
-
-                        #bounds = mercantile.bounds(x,y,zoom_level)
-                        #tile_box = (bounds.west,bounds.south,bounds.east,bounds.north)
-                        #json_data = mapbox_vector_tile.decode(mvt, quantize_bounds=tile_box)
-                        #if "overview" in json_data:
-                        #    overview_features = overview_features + json_data["overview"]["features"]
-                        #elif "sequence" in json_data:
-                        #    sequence_features = sequence_features + json_data["sequence"]["features"]
-                        #if "image" in json_data and zoom_level>=14:
-                        #    image_features = image_features + json_data["image"]["features"]
 
             # print("loading time", datetime.datetime.now() - start_time)
             
             rendered_layers = []
             for level in LAYER_LEVELS:
-                #geojson_file = os.path.join(self.cache_dir, "mapillary_%s.geojson" % level)
                 prevLyr = getattr(self,level+"_lyr")
                 updtLyr = getattr(self,level+"_updt")
-                #if not updtLyr:
-                #    if prevLyr:
-                #        QgsProject.instance().removeMapLayer(defLyr.id())
-                #        setattr(self, level+"_lyr", None)
 
                 try:
                     QgsProject.instance().removeMapLayer(prevLyr.id())
@@ -369,40 +336,23 @@ class mapillary_coverage(QObject):
                     check = False
 
                 if check:
-                    #setattr(self, level, True)
-                    #geojson = {
-                    #    "type": "FeatureCollection",
-                    #    "features": locals()[level+'_features']
-                    #}
-
-                    #with open(geojson_file, 'w') as outfile:
-                    #    json.dump(geojson, outfile)
                     setattr(self, level+"_lyr", updtLyr)
                     defLyr = updtLyr
                     defLyr.loadNamedStyle(os.path.join(os.path.dirname(__file__), "res", "mapillary_%s.qml" % level))
-                    #defLyr.setCrs(QgsCoordinateReferenceSystem(4326))
                     self.setCurrentKey(self.explorer.viewer.locationKey)
                     QgsProject.instance().addMapLayer(defLyr)
                     rendered_layers.append(defLyr)
-                    #self.iface.addCustomActionForLayerType(getattr(self.explorer,'filterAction_'+level), None, QgsMapLayer.VectorLayer, allLayers=False)
-                    #self.explorer.filterDialog.applySqlFilter(layer=defLyr)
-                    #self.iface.addCustomActionForLayer(getattr(self.explorer,'filterAction_'+level), defLyr)
                     legendLayerNode = QgsProject.instance().layerTreeRoot().findLayer(defLyr.id())
                     legendLayerNode.setExpanded(False)
                     defLyr.setDisplayExpression('"key"')
-                    #setattr(self, level + 'Layer', defLyr)
-                #else:
-                #    setattr(self, level, False)
 
             progress.stop('loading complete')  
-            print ("rendered_layers", rendered_layers)
             self.updateSelectionTool(rendered_layers)
             self.reorderLegendInterface()
             return rendered_layers
         else:
             print ("SAME RANGES")
             pass
-            #print ("SAME RANGES")
 
     def zoomLevel(self): # courtesy of https://github.com/datalyze-solutions/TileMapScaleLevels/blob/master/tilemapscalelevels.py
         scale = self.canvas.scale()
@@ -439,11 +389,9 @@ class mapillary_coverage(QObject):
         
 
     def setCurrentKey(self, feat_id=None, seq_id=None):
-        print("coverage - setCurrentKey", feat_id, seq_id)
         for level in LAYER_LEVELS:
             layer = getattr(self, level + '_lyr')
             try:
-                #QgsExpressionContextUtils.setLayerVariable(layer, "mapillaryCurrentKey", key)
                 QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentKey",feat_id)
                 QgsExpressionContextUtils.setGlobalVariable( "mapillaryCurrentSequence",seq_id)
 
@@ -458,16 +406,11 @@ class mapillary_coverage(QObject):
         self.canvas.setMapTool(self.mapSelectionTool) 
 
     def activate(self):
-        print ("activate")
         self.active = True
         rendered_layers = self.mapRefreshed(force=True)
-        print ("rendered_layers1", rendered_layers)
-        print ("rendered_layers2", rendered_layers)
         self.active = True
  
     def deactivate(self):
-        print ("deactivate")
-        #self.reorderLegendInterface(False)
         self.active = False
         self.mapRefreshed()
         self.defaultLayers()
@@ -489,6 +432,9 @@ class mapillary_coverage(QObject):
         return mapillaryGroup
 
     def reorderLegendInterface(self):
+        """
+        Keep mapillary layers grouped at the top of current TOC
+        """
         print ("reorderLegendInterface")
         legendRoot = QgsProject.instance().layerTreeRoot()
         mapillaryGroup = self.getMapillaryLayerGroup()
@@ -499,20 +445,13 @@ class mapillary_coverage(QObject):
                 layerNode = legendRoot.findLayer(layer)
             except:
                 layerNode = None
-            if layerNode:# and layerNode.parent() != mapillaryGroup:
+            if layerNode:
                 cloned_node = layerNode.clone()
                 mapillaryGroup.insertChildNode(0, cloned_node)
                 if layerNode.parent():
                     layerNode.parent().removeChildNode(layerNode)
                 else:
                     legendRoot.removeChildNode(layerNode)
-
-    def applyFilter(self, sqlFilter):
-        print ("applyFilter")
-        for level in LAYER_LEVELS:
-            layer = getattr(self, level + '_lyr')
-            layer.dataProvider().setSubsetString(sqlFilter)
-            layer.triggerRepaint()
     
     def transformToWGS84(self, pPoint):
         # transformation from the current SRS to WGS84

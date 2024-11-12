@@ -30,10 +30,14 @@ from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import QgsMessageLog, Qgis
 
-ROOT = 'https://graph.mapillary.com/'
-ACCESS_TOKEN = 'MLY|4756369651124824|daee50b6cb15570a90b6a151bbd97bf3'
-DOWNLOAD_ENDPOINT = 'https://d1cuyjsrcm0gby.cloudfront.net/%s/thumb-2048.jpg'
-BROWSER_ENDPOINT = 'https://www.mapillary.com/app/?pKey=%s&focus=photo'
+
+from .mapillary_settings import mapillarySettings
+from .mapillary_coverage import getProxiesConf
+
+ROOT = 'https://graph.mapillary.com/' # ?????
+#ACCESS_TOKEN = 'MLY|4756369651124824|daee50b6cb15570a90b6a151bbd97bf3'
+DOWNLOAD_ENDPOINT = 'https://d1cuyjsrcm0gby.cloudfront.net/%s/thumb-2048.jpg' # ?????
+BROWSER_ENDPOINT = 'https://www.mapillary.com/app/?pKey=%s&focus=photo' 
 
 def getProxySettings():
     s = QSettings() #getting proxy from qgis options settings
@@ -49,7 +53,7 @@ def getProxySettings():
         return None
 
 
-def getProxiesConf():
+def getProxiesConf_():
     proxy = getProxySettings()
     if proxy and proxy['type'] == 'HttpProxy': # test if there are proxy settings
         proxyDict = {
@@ -59,8 +63,12 @@ def getProxiesConf():
         return proxyDict
     else:
         return None
+        
 
 class mapillaryApi:
+
+    def __init__(self):
+        self.settings = mapillarySettings()
 
     def users(self, **kwargs):
         return self.proto_method('users', **kwargs)
@@ -81,15 +89,15 @@ class mapillaryApi:
         return self.proto_method('map_features', **kwargs)
 
     def proto_method(self, endpoint, **kwargs):
-        kwargs['access_token'] =  ACCESS_TOKEN
-        res = requests.get(ROOT+endpoint, params=kwargs, proxies=getProxiesConf())
+        kwargs['access_token'] = self.settings.get("access_token","")
+        res = requests.get(ROOT+endpoint, params=kwargs, proxies=getProxiesConf(self.settings.get("use_proxy")))
         if res.status_code == 200:
             return res.json()
         else:
             QgsMessageLog.logMessage("mapillary connection error: %d" % res.status_code, tag="go2mapillary",level=Qgis.Info)
 
     def download(self,key):
-        res = requests.get(DOWNLOAD_ENDPOINT % key, proxies=getProxiesConf())
+        res = requests.get(DOWNLOAD_ENDPOINT % key, proxies=getProxiesConf(self.settings.get("use_proxy")))
         if res.status_code == 200:
             fileName = QFileDialog.getSaveFileName(None,'Save mapillary Image',key+'.jpg',"JPG (*.jpg)")
             if fileName:
