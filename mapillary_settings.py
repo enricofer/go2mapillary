@@ -28,7 +28,7 @@ import json
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QTableWidgetItem, QCheckBox, QLineEdit
+from PyQt5.QtWidgets import QTableWidgetItem, QCheckBox, QLineEdit, QComboBox
 from PyQt5.QtGui import QColor
 
 from qgis.core import QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, Qgis, QgsExpressionContextUtils
@@ -78,6 +78,7 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
             'computed_tiles_coverage': True,
             'use_proxy': True,
             'sample_source': 'memory',
+            #'test_combo': ['choice 1','choice 2']
         }
 
 
@@ -112,7 +113,15 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
                 self.tableWidget.item(0, 1).setCheckState(Qt.Checked if value == True else Qt.Unchecked)
             elif isinstance(proto_value, str):
                 self.tableWidget.setItem(0, 1, QTableWidgetItem(value))
+            elif isinstance(proto_value, list):
+                combo = QComboBox()
+                combo.addItems([""] + proto_value)
+                i = next((i for i, x in enumerate([""] + proto_value) if x == value), 0)
+                combo.setCurrentIndex(i)
+                self.tableWidget.setCellWidget(0, 1, combo)
         self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.adjustSize()
+        self.adjustSize()
             # elif isinstance(int, self.proto_settings[key]):
             # elif isinstance(float, self.proto_settings[key]):
 
@@ -137,6 +146,9 @@ class mapillarySettings(QtWidgets.QDialog, FORM_CLASS):
                 self.settings[self.tableWidget.item(row,0).text()] = self.tableWidget.item(row,1).text()
             elif isinstance(self.proto_settings[self.tableWidget.item(row,0).text()],bool):
                 self.settings[self.tableWidget.item(row,0).text()] = self.tableWidget.item(row,1).checkState() == Qt.Checked
+            elif isinstance(self.proto_settings[self.tableWidget.item(row,0).text()],list):
+                if self.tableWidget.cellWidget(row,1).currentText() != "":
+                    self.settings[self.tableWidget.item(row,0).text()] = self.tableWidget.cellWidget(row,1).currentText()
         if self.parentInstance:
             self.parentInstance.sample_cursor.update_ds(self.settings['sample_source'])
         print (self.settings)
