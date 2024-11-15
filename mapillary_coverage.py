@@ -34,9 +34,10 @@ import tempfile
 import math
 
 from PyQt5.QtCore import pyqtSignal
-from qgis.PyQt.QtCore import QObject, QSettings, Qt
+from qgis.PyQt.QtCore import QObject, QSettings, Qt, QJsonDocument, QUrl
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.PyQt.QtWidgets import QProgressBar, QApplication, QAction
-
+from qgis.core import QgsNetworkAccessManager
 from qgis.core import QgsVectorLayer, QgsVectorTileLayer, QgsDataSourceUri, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsLayerTreeLayer, QgsProject, QgsExpressionContextUtils, Qgis, QgsMessageLog, QgsMapLayer
 from qgis.gui import QgsMessageBar
 
@@ -109,7 +110,7 @@ def getURL(x,y,z,url):
     u=u.replace("{z}", str(z))
     return u
 
-def getProxiesConf(default=True):
+def getProxiesConf__(default=True):
     s = QSettings()  # getting proxy from qgis options settings
     proxyEnabled = s.value("proxy/proxyEnabled", "")
     proxyType = s.value("proxy/proxyType", "")
@@ -133,6 +134,40 @@ def getProxiesConf(default=True):
         return proxyDict
     else:
         return None
+
+class networkConnection:
+
+    def __init__(self):
+        self.manager = QgsNetworkAccessManager.instance()
+        self.request = QNetworkRequest()
+
+    def getRaw(self,url):
+        self.request.setUrl(QUrl(url))
+        rawReplyObject = self.manager.blockingGet(self.request)
+        return rawReplyObject
+
+    @staticmethod
+    def getFile(url,target):
+        connection = networkConnection()
+        reply = connection.getRaw(url)
+        if reply.error() == QNetworkReply.NoError:
+            with open(target,'wb') as outfile:
+                outfile.write(reply.content())
+            return {"status":"OK", "error": False}
+        else:
+            return {"status":"KO", "error": reply.errorString()}
+
+    @staticmethod
+    def getJson(url):
+        connection = networkConnection()
+        reply = connection.getRaw(url)
+        if reply.error() == QNetworkReply.NoError:
+            j = QJsonDocument.fromJson(reply.content())
+            replyObject = j.toVariant()
+            return replyObject
+        else:
+            return {"status":"KO", "error": reply.errorString()}
+
 
 class progressBar:
     def __init__(self, parent, title = ''):
@@ -290,21 +325,25 @@ class mapillary_coverage(QObject):
                         print (url,self.settings.get("computed_tiles_coverage"), self.settings.get("access_token"))
                         with open(filePathMvt, 'wb') as f:
                             
-                            response = requests.get(url, proxies=getProxiesConf(self.settings.get("use_proxy")), stream=True)
-                            total_length = response.headers.get('Content-length')
-                            print (response.headers)
-                            progress.start(total_length,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
+                            #response = requests.get(url, proxies=getProxiesConf(self.settings.get("use_proxy")), stream=True)
+                            #total_length = response.headers.get('Content-length')
+                            #print (response.headers)
+                            #progress.start(total_length,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
 
-                            if total_length is None:  # no content length header
-                                f.write(response.content)
-                            else:
-                                dl = 0
-                                QgsMessageLog.logMessage("MISS [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
-                                                         level=Qgis.Info)
-                                for data in response.iter_content(chunk_size=4096):
-                                    dl += len(data)
-                                    f.write(data)
-                                    progress.setProgress(dl)
+                            #if total_length is None:  # no content length header
+                            #    f.write(response.content)
+                            #else:
+                            #    dl = 0
+                            #    QgsMessageLog.logMessage("MISS [%d,%d,%d]" % (x, y, zoom_level), tag="go2mapillary",
+                            #                             level=Qgis.Info)
+                            #    for data in response.iter_content(chunk_size=4096):
+                            #        dl += len(data)
+                            #        f.write(data)
+                            #        progress.setProgress(dl)
+                            
+
+                            progress.start(0,'caching vector tile [%d,%d,%d]' % (x, y, zoom_level))
+                            networkConnection.getFile(url, filePathMvt)
                             progress.stop('caching complete')
 
 
@@ -347,8 +386,8 @@ class mapillary_coverage(QObject):
                     defLyr.setDisplayExpression('"key"')
 
             progress.stop('loading complete')  
-            self.updateSelectionTool(rendered_layers)
             self.reorderLegendInterface()
+            self.updateSelectionTool(rendered_layers)
             return rendered_layers
         else:
             print ("SAME RANGES")
@@ -399,7 +438,9 @@ class mapillary_coverage(QObject):
             except:
                 pass
     
-    def updateSelectionTool(self, lyrs):
+    def updateSelectionTool(self, lyrs=None):
+        if not lyrs:
+            lyrs = self.rendered_layers
         self.previuosTool = self.canvas.mapTool()
         self.mapSelectionTool = IdentifyGeometry(self.canvas, lyrs)
         self.mapSelectionTool.geomIdentified.connect(self.callback)
@@ -407,7 +448,7 @@ class mapillary_coverage(QObject):
 
     def activate(self):
         self.active = True
-        rendered_layers = self.mapRefreshed(force=True)
+        self.rendered_layers = self.mapRefreshed(force=True)
         self.active = True
  
     def deactivate(self):

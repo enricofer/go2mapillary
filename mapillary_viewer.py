@@ -28,7 +28,7 @@ from qgis.PyQt.QtNetwork import QNetworkProxy
 from PyQt5.QtCore import pyqtSlot
 from qgis.core import QgsNetworkAccessManager, QgsExpressionContextUtils
 
-from .mapillary_api import getProxySettings, mapillaryApi
+from .mapillary_api import mapillaryApi
 
 from .mapillary_settings import mapillarySettings
 from .mapillary_image_info import mapillaryImageInfo
@@ -59,7 +59,7 @@ class mapillaryViewer(QObject):
         self.channel.registerObject('backend', self)
         self.viewport.page().setWebChannel(self.channel)
 
-        manager = QgsNetworkAccessManager.instance()
+        #manager = QgsNetworkAccessManager.instance()
 
         WS = self.viewport.settings()
  
@@ -73,25 +73,6 @@ class mapillaryViewer(QObject):
         self.page = 'https://enricofer.github.io/go2mapillary/res/browser_test.html?accessToken=' + self.settings.get("access_token","")
         self.openLocation('')
         self.enabled = True
-
-        proxy_conf = getProxySettings()
-        if proxy_conf:
-            proxy = QNetworkProxy()
-            if proxy_conf['type'] == "DefaultProxy":
-                proxy.setType(QNetworkProxy.DefaultProxy)
-            elif proxy_conf['type'] == "Socks5Proxy":
-                proxy.setType(QNetworkProxy.Socks5Proxy)
-            elif proxy_conf['type'] == "HttpProxy":
-                proxy.setType(QNetworkProxy.HttpProxy)
-            elif proxy_conf['type'] == "HttpCachingProxy":
-                proxy.setType(QNetworkProxy.HttpCachingProxy)
-            elif proxy_conf['type'] == "FtpCachingProxy":
-                proxy.setType(QNetworkProxy.FtpCachingProxy)
-            proxy.setHostName(proxy_conf['host'])
-            proxy.setPort(int(proxy_conf['port']))
-            proxy.setUser(proxy_conf['user'])
-            proxy.setPassword(proxy_conf['password'])
-            QNetworkProxy.setApplicationProxy(proxy)
 
     def showWebInspectorAction(self):
         self.inspector = QWebEngineView()
