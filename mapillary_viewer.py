@@ -108,6 +108,10 @@ class mapillaryViewer(QObject):
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
             js = 'this.changeImgKey(%d)' % key
             self.viewport.page().runJavaScript(js)
+        
+        js = 'document.getElementById("splash").classList.remove("hidden");'
+        self.viewport.page().runJavaScript(js)
+        
         self.updateLocationKey(key)
     
     def updateLocationKey(self,key):
