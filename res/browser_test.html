@@ -146,7 +146,7 @@
                 // let key_param = key;
                 // ?? mly.currentKey = key
                 mly.moveTo(key).then(
-                    function() { /* noop */ },
+                    function() { document.getElementById("splash").classList.add("hidden"); },
                     function(e) { console.error(e); });
         }
 
