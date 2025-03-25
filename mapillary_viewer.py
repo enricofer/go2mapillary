@@ -71,6 +71,7 @@ class mapillaryViewer(QObject):
 
         self.mly_api = mapillaryApi()
         self.page = 'https://enricofer.github.io/go2mapillary/res/browser_test.html?accessToken=' + self.settings.get("access_token","")
+        self.locationKey = ''
         self.openLocation('')
         self.enabled = True
 
@@ -101,6 +102,7 @@ class mapillaryViewer(QObject):
         self.openLocation(key)
 
     def openLocation(self, key):
+
         print(self.page+'&key=' + str(key))
         if not self.locationKey:
             self.viewport.setUrl(QUrl(self.page+'&key=' + str(key)))
@@ -108,9 +110,6 @@ class mapillaryViewer(QObject):
             #js = 'this.key_param = "%s";this.mly.moveToKey(this.key_param).then(function() {},function(e) { console.error(e); })' % key
             js = 'this.changeImgKey(%d)' % key
             self.viewport.page().runJavaScript(js)
-        
-        js = 'document.getElementById("splash").classList.remove("hidden");'
-        self.viewport.page().runJavaScript(js)
         
         self.updateLocationKey(key)
     

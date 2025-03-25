@@ -283,7 +283,9 @@ class mapillary_coverage(QObject):
         bounds =(wgs84_minimum.x(),wgs84_minimum.y(),wgs84_maximum.x(),wgs84_maximum.y())
         map_units_per_pixel = (wgs84_maximum.x() - wgs84_minimum.x())/self.iface.mapCanvas().width()
         zoom_level = ZoomForPixelSize(map_units_per_pixel)
-        if zoom_level > 14:
+        if not zoom_level:
+            return
+        elif zoom_level > 14:
             zoom_level = 14
 
         try:
@@ -460,8 +462,9 @@ class mapillary_coverage(QObject):
         self.iface.mapCanvas().refresh()
 
     def removeMapillaryLayerGroup(self):
-        mapillaryGroup = self.getMapillaryLayerGroup()
-        QgsProject.instance().layerTreeRoot().removeChildNode(mapillaryGroup)
+        if QgsProject.instance().isDirty():
+            mapillaryGroup = self.getMapillaryLayerGroup()
+            QgsProject.instance().layerTreeRoot().removeChildNode(mapillaryGroup)
 
     def getMapillaryLayerGroup(self):
         legendRoot = QgsProject.instance().layerTreeRoot()
